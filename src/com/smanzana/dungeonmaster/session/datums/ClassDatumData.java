@@ -1,6 +1,8 @@
 package com.smanzana.dungeonmaster.session.datums;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +37,8 @@ public class ClassDatumData implements DatumData {
 			startRanges.put(at, new ValueRange(0, 0));
 			growthRanges.put(at, new ValueRange(0, 0));
 		}
+		
+		this.promotions = new LinkedList<>();
 	}
 	
 	public ClassDatumData(String name, String description) {
@@ -122,14 +126,119 @@ public class ClassDatumData implements DatumData {
 
 	@Override
 	public void load(DataNode root) {
-		// TODO Auto-generated method stub
+		DataNode node;
 		
+		// name (which is primitive)
+		if ((node = root.getChild("name")) != null) {
+			this.name = node.getValue();
+		}
+		
+		// description (primitive)
+		if ((node = root.getChild("description")) != null) {
+			this.description = node.getValue();
+		}
+		
+		// start ranges
+		if ((node = root.getChild("stats_base")) != null) {
+			// node has 1 child for each attribute which a child that's the range
+			DataNode aNode;
+			for (Attributes attr : Attributes.values()) {
+				aNode = node.getChild(attr.name());
+				if (aNode == null)
+					continue;
+				
+				ValueRange range = new ValueRange(0, 0);
+				range.load(aNode);
+				this.setStatBase(attr, range);
+			}
+		}
+		
+		// growth ranges
+		if ((node = root.getChild("stats_growth")) != null) {
+			// node has 1 child for each attribute which a child that's the range
+			DataNode aNode;
+			for (Attributes attr : Attributes.values()) {
+				aNode = node.getChild(attr.name());
+				if (aNode == null)
+					continue;
+				
+				ValueRange range = new ValueRange(0, 0);
+				range.load(aNode);
+				this.setStatGrowth(attr, range);
+			}
+		}
+		
+		//promotions
+		this.clearPromotions();
+		if ((node = root.getChild("promotions")) != null) {
+			for (DataNode child : node.getChildren())
+				this.addPromotion(child.getValue());
+		}
 	}
 
 	@Override
 	public DataNode write(String key) {
-		// TODO Auto-generated method stub
-		return null;
+		List<DataNode> nodes = new ArrayList<>(5);
+		DataNode node;
+		
+		//Name
+		node = new DataNode("name", this.name);
+		nodes.add(node);
+		
+		//Description
+		node = new DataNode("description", this.description);
+		nodes.add(node);
+		
+		//Base & Growth
+		{
+			List<DataNode> baseList = new ArrayList<>(Attributes.values().length),
+					growthList = new ArrayList<>(Attributes.values().length);
+			for (Attributes attr : Attributes.values()) {
+				baseList.add(startRanges.get(attr).write(attr.name()));
+				growthList.add(growthRanges.get(attr).write(attr.name()));
+			}
+			
+			node = new DataNode("stats_base", null, baseList);
+			nodes.add(node);
+			node = new DataNode("stats_growth", null, growthList);
+			nodes.add(node);
+		}
+		
+		//Promotions
+		{
+			List<DataNode> list = new ArrayList<>(this.promotions.size());
+			for (String promo : this.promotions) {
+				list.add(new DataNode("promotion", promo, null));
+			}
+			
+			node = new DataNode("promotions", null, list);
+			nodes.add(node);
+		}
+		
+		return new DataNode(key, null, nodes);
+	}
+
+	public static DatumData getExampleData() {
+		ClassDatumData data = new ClassDatumData("Class-Example", "Just an example class");
+		
+		data.addPromotion("Class2");
+		data.addPromotion("Class3");
+		
+		data.setStatBase(Attributes.STRENGTH, 5, 10);
+		data.setStatBase(Attributes.CHARISMA, 10, 12);
+		data.setStatBase(Attributes.DEXTERITY, 5, 10);
+		data.setStatBase(Attributes.WISDOM, 5, 10);
+		data.setStatBase(Attributes.INTELLIGENCE, 5, 10);
+		data.setStatBase(Attributes.VITALITY, 5, 10);
+		
+		data.setStatGrowth(Attributes.STRENGTH, 5, 10);
+		data.setStatGrowth(Attributes.CHARISMA, 10, 12);
+		data.setStatGrowth(Attributes.DEXTERITY, 5, 10);
+		data.setStatGrowth(Attributes.WISDOM, 5, 10);
+		data.setStatGrowth(Attributes.INTELLIGENCE, 5, 10);
+		data.setStatGrowth(Attributes.VITALITY, 5, 10);
+		
+		return data;
 	}
 	
 }

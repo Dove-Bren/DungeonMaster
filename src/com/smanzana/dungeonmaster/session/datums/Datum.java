@@ -46,7 +46,19 @@ public abstract class Datum<T extends DatumData> {
 		return this.childKey;
 	}
 	
+	public void addData(T data) {
+		this.data.add(data);
+	}
+	
 	protected abstract T constructEmptyData();
+	
+	/**
+	 * Construct and return a piece of example data.
+	 * This is used when the datum does not exist on disk and
+	 * an example is being written out
+	 * @return
+	 */
+	protected abstract T constructDefaultData();
 	
 	public void saveToFile(File outFile) throws FileNotFoundException {
 		// Convert data list into DataNode object wrapper, then serialize that
@@ -89,6 +101,15 @@ public abstract class Datum<T extends DatumData> {
 			d.load(node);
 			data.add(d);
 		}
+	}
+	
+	public void createDefaultFile(File outFile) throws FileNotFoundException {
+		List<T> backup = this.data;
+		this.data = new ArrayList<>(1);
+		this.addData(this.constructDefaultData());
+		
+		this.saveToFile(outFile);
+		this.data = backup;
 	}
 	
 }

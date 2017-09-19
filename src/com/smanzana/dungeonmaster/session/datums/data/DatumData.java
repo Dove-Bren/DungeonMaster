@@ -6,5 +6,5 @@ package com.smanzana.dungeonmaster.session.datums.data;
  *
  */
 public interface DatumData extends DataCompatible {
-		
+	
 }

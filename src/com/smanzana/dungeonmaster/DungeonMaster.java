@@ -1,7 +1,10 @@
 package com.smanzana.dungeonmaster;
 
-import com.smanzana.dungeonmaster.session.datums.data.DataNode;
-import com.smanzana.dungeonmaster.utils.ValueRange;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import com.smanzana.dungeonmaster.session.datums.ClassDatum;
 
 /**
  * D&D Companion Program.
@@ -19,10 +22,21 @@ public class DungeonMaster {
 		// Creation mode: Create templates
 		// DM mode: Spawn a session from a template OR load an existing session
 		
-		ValueRange range = new ValueRange(1, 5);
-		DataNode node = range.write("range");
+		ClassDatum datum = new ClassDatum();
 		
-		System.out.println(node.serialize(true, true));
+		try {
+			datum.loadFromFile(new File("example1234.ex"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			datum.saveToFile(new File("outagainfile.ex"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 		
 }

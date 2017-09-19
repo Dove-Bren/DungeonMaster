@@ -12,5 +12,10 @@ public class ClassDatum extends Datum<ClassDatumData> {
 	protected ClassDatumData constructEmptyData() {
 		return new ClassDatumData();
 	}
+
+	@Override
+	protected ClassDatumData constructDefaultData() {
+		return (ClassDatumData) ClassDatumData.getExampleData();
+	}
 	
 }

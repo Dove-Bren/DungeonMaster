@@ -61,7 +61,7 @@ public class DataNode {
 	public DataNode(String keyName, String serialized) {
 		this.children = new LinkedList<DataNode>();
 		this.key = keyName;
-		serialized.trim();
+		serialized = serialized.trim();
 		// Check for tags of any sort.
 		// If none, primitive
 		if (serialized.isEmpty())
@@ -85,7 +85,7 @@ public class DataNode {
 		// There exist a tag. Wrap into an object and repeat
 		while (posOpen != -1) {
 			String openTag = serialized.substring(posOpen, posClose + 1);
-			serialized = serialized.substring(posClose + 1);
+			serialized = serialized.substring(posClose + 1).trim();
 			
 			// look for matching tag
 			int closing = serialized.indexOf("</" + openTag.substring(1));
@@ -99,7 +99,7 @@ public class DataNode {
 			DataNode node = new DataNode(openTag.substring(1, openTag.length() -1), nested);
 			children.add(node);
 			
-			serialized = serialized.substring(closing + openTag.length() + 1); // + 1 for added /
+			serialized = serialized.substring(closing + openTag.length() + 1).trim(); // + 1 for added /
 			
 			posOpen = serialized.indexOf("<");
 			posClose = serialized.indexOf(">");

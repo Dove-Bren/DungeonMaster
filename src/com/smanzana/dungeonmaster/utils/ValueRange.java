@@ -55,7 +55,7 @@ public class ValueRange implements DataCompatible {
 		
 		// get range
 		if ((node = root.getChild("range")) != null) {
-			this.min = Integer.parseInt(node.getValue());
+			this.range = Integer.parseInt(node.getValue());
 			foundNew = true;
 		}
 		
