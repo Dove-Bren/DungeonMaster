@@ -1,10 +1,7 @@
 package com.smanzana.dungeonmaster;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
+import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.utils.ValueRange;
 
 /**
  * D&D Companion Program.
@@ -13,56 +10,20 @@ import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
  */
 public class DungeonMaster {
 
-	private static final String PATH_CONFIG = "config/";
-	private static final String PATH_MECHS = "mechanics.cfg";
 	
 	public static void main(String[] args) {
-		loadConfigs();
+		// Two modes:
+		// Creation mode (set up configs)
+		// DM mode (play a session)
 		
-		// do stuff
+		// Creation mode: Create templates
+		// DM mode: Spawn a session from a template OR load an existing session
 		
-		saveConfigs();
+		ValueRange range = new ValueRange(1, 5);
+		DataNode node = range.write("range");
+		
+		System.out.println(node.serialize(true, true));
 	}
-	
-	private static void loadConfigs() {
-		File configDir = new File(PATH_CONFIG);
-		if (!configDir.exists())
-			configDir.mkdirs();
 		
-		File mf = new File(configDir, PATH_MECHS);
-		if (mf.exists())
-		{
-			try {
-				MechanicsConfig.instance().readFromFile(mf);
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.out.println("Encountered error while reading mechanics config at " + mf.getAbsolutePath());
-			}
-		}
-		else
-		{
-			try {
-				MechanicsConfig.instance().writeToFile(mf);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				System.out.println("Failed to create default mechanics config at " + mf.getAbsolutePath());
-			}
-		}
-	}
-	
-	private static void saveConfigs() {
-		File configDir = new File(PATH_CONFIG);
-		if (!configDir.exists())
-			configDir.mkdirs();
-		
-		File mf = new File(configDir, PATH_MECHS);
-		try {
-			MechanicsConfig.instance().writeToFile(mf);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			System.out.println("Failed to save out mechanics config file to " + mf.getAbsolutePath());
-		}
-	}
-	
 }
 

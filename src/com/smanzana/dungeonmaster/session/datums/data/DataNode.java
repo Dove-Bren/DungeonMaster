@@ -108,21 +108,54 @@ public class DataNode {
 	
 	/**
 	 * Includes wrapper tags (from key value)
+	 * @param pretty print newlines and tabs?
 	 * @return
 	 */
-	public String serialize() {
-		String buf = "<" + key + ">";
+	public String serialize(boolean pretty) {
+		return serialize(pretty, false, 0);
+	}
+	
+	/**
+	 * If headless, prints out only the internals (children/value) of this node
+	 * @param pretty
+	 * @param headless
+	 * @return
+	 */
+	public String serialize(boolean pretty, boolean headless) {
+		return serialize(pretty, headless, 0);
+	}
+	
+	protected String serialize(boolean pretty, boolean headless, int numTabs) {
+		String tabs = "";
+		if (pretty) {
+			for (int i = 0; i < numTabs; i++)
+				tabs += "\t";
+		}
+		String buf = "";
+		
+		if (!headless)
+			buf = tabs + "<" + key + ">";
 		
 		if (children == null || children.isEmpty()) {
 			if (value != null)
 				buf += value;
 		} else {
-			for (DataNode node : children) {
-				buf += node.serialize();
+			// pretty: add newline here and after each, + tab to tab closing
+			if (pretty && !headless) {
+				buf += "\n";
 			}
+			for (DataNode node : children) {
+				buf += node.serialize(pretty, false, numTabs + (headless ? 0 : 1));
+				if (pretty) {
+					buf += "\n";
+				}
+			}
+			if (pretty)
+				buf += tabs;
 		}
 		
-		buf += "</" + key + ">";
+		if (!headless)
+			buf += "</" + key + ">";
 		return buf;
 	}
 	
@@ -141,6 +174,40 @@ public class DataNode {
 			this.children = children;
 		else
 			this.value = value;
+	}
+	
+	/**
+	 * Returns the first child that matches the provided key.
+	 * Does not check recursively
+	 * @param key
+	 * @return
+	 */
+	public DataNode getChild(String key) {
+		DataNode node = null;
+		if (children != null && !children.isEmpty()) {
+			for (DataNode child : children) {
+				if (child.key.equals(key)) {
+					node = child;
+					break;
+				}
+			}
+		}
+		
+		return node;
+	}
+	
+	/**
+	 * Returns the primitive value of this node.
+	 * If the node has children, this is almost certainly null.
+	 * Be careful
+	 * @return
+	 */
+	public String getValue() {
+		return this.value;
+	}
+	
+	public Collection<DataNode> getChildren() {
+		return this.children;
 	}
 	
 }
