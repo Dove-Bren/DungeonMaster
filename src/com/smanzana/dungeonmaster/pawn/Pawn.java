@@ -1,12 +1,18 @@
 package com.smanzana.dungeonmaster.pawn;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.smanzana.dungeonmaster.utils.Notable;
+
 /**
  * Base entity class.
  * A Pawn can be a player character, an NPC, and enemy, etc
  * @author Skyler
  *
  */
-public abstract class Pawn {
+public abstract class Pawn implements Notable {
 	
 	private boolean canDie;
 	protected boolean dead;
@@ -14,6 +20,8 @@ public abstract class Pawn {
 	protected int health;
 	protected int maxMana;
 	protected int mana;
+	
+	private List<String> notes;
 	
 	/**
 	 * Creates a pawn with the given max attributes.
@@ -26,6 +34,7 @@ public abstract class Pawn {
 		canDie = true;
 		this.health = this.maxHealth = maxHealth;
 		this.mana = this.maxMana = maxMana;
+		notes = new LinkedList<>();
 	}
 	
 	/**
@@ -37,6 +46,7 @@ public abstract class Pawn {
 		canDie = false;
 		this.health = this.maxHealth = 1;
 		this.mana = this.maxMana = 1;
+		notes = new LinkedList<>();
 	}
 	
 	public boolean getCanDie()
@@ -58,4 +68,19 @@ public abstract class Pawn {
 	 * @return true if the pawn dies
 	 */
 	public abstract boolean heal(int amount);
+	
+	@Override
+	public void addNote(String note) {
+		notes.add(note);
+	}
+	
+	@Override
+	public void clearNotes() {
+		notes.clear();
+	}
+	
+	@Override
+	public Collection<String> getNotes() {
+		return notes;
+	}
 }

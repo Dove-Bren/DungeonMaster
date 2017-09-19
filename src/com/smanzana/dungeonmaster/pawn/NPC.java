@@ -1,5 +1,10 @@
 package com.smanzana.dungeonmaster.pawn;
 
-public class NPC extends Pawn {
+/**
+ * NPC.
+ * @author Skyler
+ *
+ */
+public class NPC extends Mob {
 
 }
