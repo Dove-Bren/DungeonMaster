@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.smanzana.dungeonmaster.pawn.Attributes;
+import com.smanzana.dungeonmaster.utils.StepList;
 
 /**
  * Holds config for mechanics.
@@ -102,6 +103,8 @@ public class CombatBonusConfig extends Config<CombatBonusKey> {
 		String raw = this.getString(key);
 		
 		// parse it!
+		StepList list = StepList.deserialize(raw);
+		return list.getValue(score);
 	}
 	
 }

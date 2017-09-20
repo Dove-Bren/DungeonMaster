@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.smanzana.dungeonmaster.session.configuration.CombatBonusConfig;
 import com.smanzana.dungeonmaster.session.configuration.Config;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
@@ -13,6 +14,7 @@ public abstract class SessionBase {
 	
 	// Config paths
 	private static final String PATH_MECHS = "mechanics.cfg";
+	private static final String PATH_COMBONUS = "combatbonuses.cfg";
 	
 	// Datum paths
 	private static final String PATH_CLASS = "class.dat";
@@ -102,6 +104,7 @@ public abstract class SessionBase {
 			configDir.mkdirs();
 		
 		loadConfig(configDir, PATH_MECHS, MechanicsConfig.instance());
+		loadConfig(configDir, PATH_COMBONUS, CombatBonusConfig.instance());
 	}
 	
 	protected void save() {
