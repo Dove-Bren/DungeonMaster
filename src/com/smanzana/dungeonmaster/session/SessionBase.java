@@ -4,11 +4,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.smanzana.dungeonmaster.session.configuration.Config;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
+import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
+import com.smanzana.dungeonmaster.session.datums.Datum;
 
 public abstract class SessionBase {
 	
+	// Config paths
 	private static final String PATH_MECHS = "mechanics.cfg";
+	
+	// Datum paths
+	private static final String PATH_CLASS = "class.dat";
+	
+	// Datums
+	protected Datum<ClassDatumData> classDatum;
 	
 	protected File root;
 	protected String configDir;
@@ -16,6 +26,8 @@ public abstract class SessionBase {
 	protected SessionBase(File root, String configDir) {
 		this.root = root;
 		this.configDir = configDir;
+		
+		this.classDatum = new Datum<ClassDatumData>("class", new ClassDatumData.ClassDatumFactory());
 	}
 	
 	public File getRoot() {
@@ -26,29 +38,102 @@ public abstract class SessionBase {
 		return configDir;
 	}
 	
-	protected void loadConfigs() {
+	/**
+	 * Loads configs and datums from the appropriate subdirs of root
+	 */
+	protected void load() {
+		loadConfigs();
+		loadDatums();
+	}
+	
+	private void loadDatum(File configDir, String path, Datum<?> datum) {
+		File f = new File(configDir, path);
+
+		if (!f.exists()) {
+			try {
+				datum.createDefaultFile(f);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		try {
+			datum.loadFromFile(f);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Encountered error while reading data file at " + f.getAbsolutePath());
+		}
+	}
+	
+	protected void loadDatums() {
 		File configDir = new File(root, this.configDir);
 		if (!configDir.exists())
 			configDir.mkdirs();
 		
-		File mf = new File(configDir, PATH_MECHS);
-		if (mf.exists())
+		loadDatum(configDir, PATH_CLASS, this.classDatum);
+	}
+	
+	private void loadConfig(File configDir, String path, Config<?> instance) {
+		File f = new File(configDir, path);
+		if (f.exists())
 		{
 			try {
-				MechanicsConfig.instance().readFromFile(mf);
+				instance.readFromFile(f);
 			} catch (IOException e) {
 				e.printStackTrace();
-				System.out.println("Encountered error while reading mechanics config at " + mf.getAbsolutePath());
+				System.out.println("Encountered error while reading config at " + f.getAbsolutePath());
 			}
 		}
 		else
 		{
 			try {
-				MechanicsConfig.instance().writeToFile(mf);
+				instance.writeToFile(f);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
-				System.out.println("Failed to create default mechanics config at " + mf.getAbsolutePath());
+				System.out.println("Failed to create default mechanics config at " + f.getAbsolutePath());
 			}
+		}
+	}
+	
+	protected void loadConfigs() {
+		File configDir = new File(root, this.configDir);
+		if (!configDir.exists())
+			configDir.mkdirs();
+		
+		loadConfig(configDir, PATH_MECHS, MechanicsConfig.instance());
+	}
+	
+	protected void save() {
+		saveConfigs();
+		saveDatums();
+	}
+	
+	private void saveDatum(File configDir, String path, Datum<?> datum) {
+		File f = new File(configDir, path);
+		try {
+			datum.saveToFile(f);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.out.println("Failed to save data file to " + f.getAbsolutePath());
+		}
+	}
+	
+	protected void saveDatums() {
+		File configDir = new File(root, this.configDir);
+		if (!configDir.exists())
+			configDir.mkdirs();
+		
+		saveDatum(configDir, PATH_CLASS, this.classDatum);
+	}
+	
+	private void saveConfig(File configDir, String path, Config<?> instance) {
+		File f = new File(configDir, path);
+		try {
+			instance.writeToFile(f);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.out.println("Failed to save out config file to " + f.getAbsolutePath());
 		}
 	}
 	
@@ -57,12 +142,6 @@ public abstract class SessionBase {
 		if (!configDir.exists())
 			configDir.mkdirs();
 		
-		File mf = new File(configDir, PATH_MECHS);
-		try {
-			MechanicsConfig.instance().writeToFile(mf);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			System.out.println("Failed to save out mechanics config file to " + mf.getAbsolutePath());
-		}
+		saveConfig(configDir, PATH_MECHS, MechanicsConfig.instance());
 	}
 }

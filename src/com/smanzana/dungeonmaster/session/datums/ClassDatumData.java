@@ -23,6 +23,20 @@ import com.smanzana.dungeonmaster.utils.ValueRange;
  */
 public class ClassDatumData implements DatumData {
 	
+	public static class ClassDatumFactory implements DatumFactory<ClassDatumData> {
+
+		@Override
+		public ClassDatumData constructEmptyData() {
+			return new ClassDatumData();
+		}
+
+		@Override
+		public ClassDatumData constructDefaultData() {
+			return (ClassDatumData) ClassDatumData.getExampleData();
+		}
+		
+	}
+	
 	private String name;
 	private String description;
 	private Map<Attributes, ValueRange> startRanges;

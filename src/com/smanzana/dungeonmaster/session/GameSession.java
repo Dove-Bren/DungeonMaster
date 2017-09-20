@@ -17,6 +17,10 @@ public class GameSession extends SessionBase implements Notable {
 		super(root, PATH_CONFIG);
 		notes = new LinkedList<>();
 		
+		// just for testing
+		load();
+		// just for testing
+		
 		// Nothing special; Session does not begin until 'run' is called
 	}
 	
@@ -26,12 +30,12 @@ public class GameSession extends SessionBase implements Notable {
 	 * Sessions are responsible for loading and saving all their own data
 	 */
 	public void run() {
-		loadConfigs();
+		load();
 		
 		// Run the game
 		// Detect end
 		
-		saveConfigs();
+		save();
 	}
 
 	

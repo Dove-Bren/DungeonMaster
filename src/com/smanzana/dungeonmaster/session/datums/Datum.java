@@ -18,8 +18,9 @@ import com.smanzana.dungeonmaster.session.datums.data.DatumData;
  * Like a config, but instead of predefined "key: value" data, holds an arbitrary number of data templates.
  * @author Skyler
  */
-public abstract class Datum<T extends DatumData> {
+public class Datum<T extends DatumData> {
 	
+	private DatumFactory<T> factory;
 	protected List<T> data; // List of all data 'objects'
 	protected String childKey;
 	
@@ -38,6 +39,10 @@ public abstract class Datum<T extends DatumData> {
 		this.childKey = childKey;
 	}
 	
+	public Datum(String childKey, DatumFactory<T> factory) {
+		this.factory = factory;
+	}
+	
 	public List<T> getData() {
 		return data;
 	}
@@ -50,15 +55,7 @@ public abstract class Datum<T extends DatumData> {
 		this.data.add(data);
 	}
 	
-	protected abstract T constructEmptyData();
 	
-	/**
-	 * Construct and return a piece of example data.
-	 * This is used when the datum does not exist on disk and
-	 * an example is being written out
-	 * @return
-	 */
-	protected abstract T constructDefaultData();
 	
 	public void saveToFile(File outFile) throws FileNotFoundException {
 		// Convert data list into DataNode object wrapper, then serialize that
@@ -97,7 +94,7 @@ public abstract class Datum<T extends DatumData> {
 		
 		Collection<DataNode> nodes = DataNode.parse(input);
 		for (DataNode node : nodes) {
-			T d = constructEmptyData();
+			T d = factory.constructEmptyData();
 			d.load(node);
 			data.add(d);
 		}
@@ -106,7 +103,7 @@ public abstract class Datum<T extends DatumData> {
 	public void createDefaultFile(File outFile) throws FileNotFoundException {
 		List<T> backup = this.data;
 		this.data = new ArrayList<>(1);
-		this.addData(this.constructDefaultData());
+		this.addData(this.factory.constructDefaultData());
 		
 		this.saveToFile(outFile);
 		this.data = backup;
