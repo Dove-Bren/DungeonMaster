@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.smanzana.dungeonmaster.pawn.Attributes;
+
 /**
  * Holds config for mechanics.
  * For example, holds whether normal use of equipment results in durability loss
@@ -87,11 +89,19 @@ public class CombatBonusConfig extends Config<CombatBonusKey> {
 	}
 	
 	private CombatBonusKey keyFromAttrib(Attributes attrib) {
+		for (CombatBonusKey key : CombatBonusKey.values()) {
+			if (key.getAttribute().equals(attrib))
+				return key;
+		}
 		
+		return null;
 	}
 	
-	public int getBonus(Attributes attrib) {
+	public int getBonus(Attributes attrib, int score) {
+		CombatBonusKey key = keyFromAttrib(attrib);
+		String raw = this.getString(key);
 		
+		// parse it!
 	}
 	
 }
