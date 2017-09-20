@@ -7,6 +7,7 @@ import java.io.IOException;
 import com.smanzana.dungeonmaster.session.configuration.CombatBonusConfig;
 import com.smanzana.dungeonmaster.session.configuration.Config;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
+import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
 import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
 
@@ -15,6 +16,7 @@ public abstract class SessionBase {
 	// Config paths
 	private static final String PATH_MECHS = "mechanics.cfg";
 	private static final String PATH_COMBONUS = "combatbonuses.cfg";
+	private static final String PATH_ROLLTABLE = "rolltables.cfg";
 	
 	// Datum paths
 	private static final String PATH_CLASS = "class.dat";
@@ -105,6 +107,7 @@ public abstract class SessionBase {
 		
 		loadConfig(configDir, PATH_MECHS, MechanicsConfig.instance());
 		loadConfig(configDir, PATH_COMBONUS, CombatBonusConfig.instance());
+		loadConfig(configDir, PATH_ROLLTABLE, RollTableConfig.instance());
 	}
 	
 	protected void save() {
@@ -146,5 +149,7 @@ public abstract class SessionBase {
 			configDir.mkdirs();
 		
 		saveConfig(configDir, PATH_MECHS, MechanicsConfig.instance());
+		saveConfig(configDir, PATH_COMBONUS, CombatBonusConfig.instance());
+		saveConfig(configDir, PATH_ROLLTABLE, RollTableConfig.instance());
 	}
 }

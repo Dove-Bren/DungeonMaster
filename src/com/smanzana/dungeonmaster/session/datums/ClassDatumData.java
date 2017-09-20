@@ -243,14 +243,14 @@ public class ClassDatumData implements DatumData {
 		data.setStatBase(Attributes.DEXTERITY, 5, 10);
 		data.setStatBase(Attributes.WISDOM, 5, 10);
 		data.setStatBase(Attributes.INTELLIGENCE, 5, 10);
-		data.setStatBase(Attributes.VITALITY, 5, 10);
+		data.setStatBase(Attributes.CONSTITUTION, 5, 10);
 		
 		data.setStatGrowth(Attributes.STRENGTH, 5, 10);
 		data.setStatGrowth(Attributes.CHARISMA, 10, 12);
 		data.setStatGrowth(Attributes.DEXTERITY, 5, 10);
 		data.setStatGrowth(Attributes.WISDOM, 5, 10);
 		data.setStatGrowth(Attributes.INTELLIGENCE, 5, 10);
-		data.setStatGrowth(Attributes.VITALITY, 5, 10);
+		data.setStatGrowth(Attributes.CONSTITUTION, 5, 10);
 		
 		return data;
 	}
