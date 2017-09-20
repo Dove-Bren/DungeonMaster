@@ -2,7 +2,7 @@ package com.smanzana.dungeonmaster.pawn;
 
 public enum Attributes {
 	STRENGTH,
-	VITALITY,
+	CONSTITUTION,
 	DEXTERITY,
 	INTELLIGENCE,
 	WISDOM,
