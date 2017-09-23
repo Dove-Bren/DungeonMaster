@@ -61,14 +61,14 @@ public abstract class Pawn implements Notable, DataCompatible {
 	 * @param amount
 	 * @return true when the entity dies.
 	 */
-	public abstract boolean damage(int amount);
+	public abstract boolean damage(Pawn source, int amount);
 	
 	/**
 	 * Heals conventually. This could be interpreted as damage to undead.
 	 * @param amount
 	 * @return true if the pawn dies
 	 */
-	public abstract boolean heal(int amount);
+	public abstract boolean heal(Pawn source, int amount);
 	
 	@Override
 	public void addNote(String note) {

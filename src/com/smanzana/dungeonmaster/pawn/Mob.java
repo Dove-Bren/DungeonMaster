@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.smanzana.dungeonmaster.battle.effects.Effect;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.utils.ValueCapsule;
 
 /**
  * NPC that is in combat
@@ -44,28 +45,30 @@ public class Mob extends NPC {
 	}
 	
 	@Override
-	public boolean damage(int amount) {
+	public boolean damage(Pawn source, int amount) {
 		
-		// TODO hook into effects (PRE)
+		ValueCapsule capsule = new ValueCapsule(amount);
+		Effect.doPreEffects(activeEffects, source, this, capsule);
 		
-		this.stats.addHealth(-amount);
+		this.stats.addHealth(-capsule.getFinal());
 		
-		// TODO hook into effects (POST);
+		Effect.doPostEffects(activeEffects, source, this, capsule);
 		
 		return this.stats.getHealth() <= 0;
 	}
 
 	@Override
-	public boolean heal(int amount) {
+	public boolean heal(Pawn source, int amount) {
 		
-		// TODO hook into effects (PRE)
+		ValueCapsule capsule = new ValueCapsule(amount);
+		Effect.doPreEffects(activeEffects, source, this, capsule);
 		
 		if (undead)
-			damage(amount);
+			damage(source, capsule.getFinal());
 		else
-			this.stats.addHealth(amount);
+			this.stats.addHealth(capsule.getFinal());
 		
-		// TODO hook into effects (POST);
+		Effect.doPostEffects(activeEffects, source, this, capsule);
 		
 		return this.stats.getHealth() <= 0;
 	}

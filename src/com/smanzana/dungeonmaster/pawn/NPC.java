@@ -46,13 +46,13 @@ public class NPC extends Pawn {
 	}
 
 	@Override
-	public boolean damage(int amount) {
+	public boolean damage(Pawn source, int amount) {
 		; // do nothing. We're not a Mob
 		return false;
 	}
 
 	@Override
-	public boolean heal(int amount) {
+	public boolean heal(Pawn source, int amount) {
 		; // do nothing. Again, not a mob
 		return false;
 	}
