@@ -9,23 +9,37 @@ public abstract class Equipment extends Item {
 	
 	public enum Slot
 	{
-		HEAD,
-		CHEST,
-		LEGS,
-		ARMS,
-		MAIN_HAND,
-		OFF_HAND,
-		RING_LEFT,
-		RIGHT_RIGHT,
-		BRACELET,
-		AMULET,
-		CAPE,
+		HEAD(true),
+		CHEST(true),
+		LEGS(true),
+		ARMS(true),
+		MAIN_HAND(false),
+		OFF_HAND(false),
+		RING_LEFT(true),
+		RING_RIGHT(true),
+		BRACELET(true),
+		AMULET(true),
+		CAPE(true);
+		
+		private boolean isArmor;
+		
+		private Slot(boolean isArmor) {
+			this.isArmor = isArmor;
+		}
+		
+		public boolean getIsArmor() {
+			return this.isArmor;
+		}
 	}
 	
 	protected Slot slot;
 	protected int durability;
 	protected int maxDurability;
 	protected List<Effect> effects;
+	
+	public Equipment() {
+		this("", "", 0, Slot.HEAD, 1);
+	}
 	
 	public Equipment(String name, String description, int value, Slot slot, int durability)
 	{

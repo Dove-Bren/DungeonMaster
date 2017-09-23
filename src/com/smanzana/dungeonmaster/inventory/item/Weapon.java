@@ -2,22 +2,22 @@ package com.smanzana.dungeonmaster.inventory.item;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
-public class Armor extends Equipment {
+public class Weapon extends Equipment {
 
-	private int defense;
+	private int attack;
 	
-	public Armor() {
-		this("", "", 0, Slot.HEAD, 1, 0);
+	public Weapon() {
+		this("", "", 0, Slot.OFF_HAND, 1, 0);
 	}
 	
-	public Armor(String name, String description, int value, Slot slot, int durability, int defense) {
+	public Weapon(String name, String description, int value, Slot slot, int durability, int attack) {
 		super(name, description, value, slot, durability);
-		this.defense = defense;
+		this.attack = attack;
 	}
 	
-	public int getDefense()
+	public int getAttack()
 	{
-		return defense;
+		return attack;
 	}
 	
 	@Override
@@ -25,9 +25,9 @@ public class Armor extends Equipment {
 		super.load(root);
 		DataNode node;
 		
-		if (null != (node = root.getChild("defense"))) {
+		if (null != (node = root.getChild("attack"))) {
 			try {
-				this.defense = Integer.parseInt(node.getValue());
+				this.attack = Integer.parseInt(node.getValue());
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 				System.out.println("Failed to convert " + node.getValue() + " to a number");
@@ -40,7 +40,7 @@ public class Armor extends Equipment {
 	public DataNode write(String key) {
 		DataNode base = super.write(key);
 		
-		base.addChild(new DataNode("defense", this.defense + "", null));
+		base.addChild(new DataNode("attack", this.attack + "", null));
 		
 		return base;
 	}

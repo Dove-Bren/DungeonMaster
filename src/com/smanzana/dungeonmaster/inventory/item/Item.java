@@ -17,11 +17,15 @@ public abstract class Item implements Notable, DataCompatible {
 	
 	private List<String> notes;
 	
+	public Item() {
+		notes = new LinkedList<>();
+	}
+	
 	public Item(String name, String desc, int value) {
+		this();
 		this.name = name;
 		this.value = value;
 		this.description = desc;
-		notes = new LinkedList<>();
 	}
 	
 	public int getValue() {
