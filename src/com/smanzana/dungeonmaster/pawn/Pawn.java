@@ -19,10 +19,9 @@ import com.smanzana.dungeonmaster.utils.StatSet;
  */
 public abstract class Pawn implements Notable, DataCompatible {
 	
-	private boolean canDie;
+	protected boolean canDie;
 	protected boolean dead;
-	
-	private StatSet stats;
+	protected StatSet stats;
 	
 	private List<String> notes;
 		

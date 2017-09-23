@@ -71,6 +71,22 @@ public class StatSet implements DataCompatible {
 	public void setAbilityScore(Attributes attribute, int score) {
 		this.abilityScores.put(attribute, score);
 	}
+	
+	public void addHealth(int amount) {
+		this.health += amount;
+		if (health < 0)
+			health = 0;
+		if (health > this.maxHealth)
+			this.health = this.maxHealth;
+	}
+	
+	public void addMana(int amount) {
+		this.mana += amount;
+		if (mana < 0)
+			mana = 0;
+		if (mana > this.maxMana)
+			this.mana = this.maxMana;
+	}
 
 	@Override
 	public void load(DataNode root) {
