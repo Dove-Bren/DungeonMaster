@@ -1,6 +1,5 @@
 package com.smanzana.dungeonmaster.pawn;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -93,7 +92,7 @@ public abstract class Pawn implements Notable, DataCompatible {
 	 * @return
 	 */
 	protected DataNode writeBase(String key) {
-		List<DataNode> list = new ArrayList<>(4);
+		List<DataNode> list = new LinkedList<>();
 		
 		list.add(new DataNode("killable", this.canDie + "", null));
 		list.add(new DataNode("dead", this.dead + "", null));

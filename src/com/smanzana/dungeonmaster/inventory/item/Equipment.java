@@ -27,9 +27,9 @@ public abstract class Equipment extends Item {
 	protected int maxDurability;
 	protected List<Effect> effects;
 	
-	public Equipment(String name, int value, Slot slot, int durability)
+	public Equipment(String name, String description, int value, Slot slot, int durability)
 	{
-		super(name, value);
+		super(name, description, value);
 		this.slot = slot;
 		this.maxDurability = this.durability = durability;
 		this.effects = new LinkedList<Effect>();
@@ -94,9 +94,14 @@ public abstract class Equipment extends Item {
 	 * The stub from Equipment only does durability accounting
 	 * @return True if the equipment has broken
 	 */
-	public abstract boolean use()
+	public boolean use()
 	{
 		// Do durability damage if config says to
+		// TODO
+		
+		// TODO also hook into effects
+		
+		return this.durability <= 0;
 	}
 	
 }
