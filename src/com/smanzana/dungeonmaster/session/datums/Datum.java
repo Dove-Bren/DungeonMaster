@@ -24,23 +24,14 @@ public class Datum<T extends DatumData> {
 	protected List<T> data; // List of all data 'objects'
 	protected String childKey;
 	
-	protected Datum() {
+	private Datum() {
 		this.data = new LinkedList<>();
-		this.childKey = "node";
-	}
-	
-	protected Datum(String childKey) {
-		this();
-		this.childKey = childKey;
-	}
-	
-	protected Datum(List<T> data, String childKey) {
-		this.data = data;
-		this.childKey = childKey;
 	}
 	
 	public Datum(String childKey, DatumFactory<T> factory) {
+		this();
 		this.factory = factory;
+		this.childKey = childKey;
 	}
 	
 	public List<T> getData() {

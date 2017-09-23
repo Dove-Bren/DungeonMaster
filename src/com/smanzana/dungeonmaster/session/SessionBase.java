@@ -10,6 +10,7 @@ import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
 import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
+import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
 
 public abstract class SessionBase {
 	
@@ -20,9 +21,11 @@ public abstract class SessionBase {
 	
 	// Datum paths
 	private static final String PATH_CLASS = "class.dat";
+	private static final String PATH_PROFILE = "profiles.dat";
 	
 	// Datums
 	protected Datum<ClassDatumData> classDatum;
+	protected Datum<ProfileDatumData> profileDatum;
 	
 	protected File root;
 	protected String configDir;
@@ -32,6 +35,7 @@ public abstract class SessionBase {
 		this.configDir = configDir;
 		
 		this.classDatum = new Datum<ClassDatumData>("class", new ClassDatumData.ClassDatumFactory());
+		this.profileDatum = new Datum<ProfileDatumData>("profile", new ProfileDatumData.ProfileDatumFactory());
 	}
 	
 	public File getRoot() {
@@ -76,6 +80,7 @@ public abstract class SessionBase {
 			configDir.mkdirs();
 		
 		loadDatum(configDir, PATH_CLASS, this.classDatum);
+		loadDatum(configDir, PATH_PROFILE, this.profileDatum);
 	}
 	
 	private void loadConfig(File configDir, String path, Config<?> instance) {
@@ -131,6 +136,7 @@ public abstract class SessionBase {
 			configDir.mkdirs();
 		
 		saveDatum(configDir, PATH_CLASS, this.classDatum);
+		saveDatum(configDir, PATH_PROFILE, this.profileDatum);
 	}
 	
 	private void saveConfig(File configDir, String path, Config<?> instance) {
