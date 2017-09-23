@@ -22,10 +22,12 @@ public class StatSet implements DataCompatible {
 	private int health;
 	private int maxMana;
 	private int mana;
+	private int maxStamina;
+	private int stamina;
 	private Map<Attributes, Integer> abilityScores;
 	
 	public StatSet() {
-		health = maxHealth = mana = maxMana = 1;
+		health = maxHealth = mana = maxMana = stamina = maxStamina = 1;
 		abilityScores = new EnumMap<>(Attributes.class);
 		
 		for (Attributes attrib : Attributes.values())
@@ -46,6 +48,22 @@ public class StatSet implements DataCompatible {
 
 	public void setHealth(int health) {
 		this.health = health;
+	}
+
+	public int getMaxStamina() {
+		return maxStamina;
+	}
+
+	public void setMaxStamina(int maxStamina) {
+		this.maxStamina = maxStamina;
+	}
+
+	public int getStamina() {
+		return stamina;
+	}
+
+	public void setStamina(int stamina) {
+		this.stamina = stamina;
 	}
 
 	public int getMaxMana() {
@@ -87,6 +105,14 @@ public class StatSet implements DataCompatible {
 		if (mana > this.maxMana)
 			this.mana = this.maxMana;
 	}
+	
+	public void addStamina(int amount) {
+		this.stamina += amount;
+		if (stamina < 0)
+			stamina = 0;
+		if (stamina > this.maxStamina)
+			stamina = this.maxStamina;
+	}
 
 	@Override
 	public void load(DataNode root) {
@@ -106,6 +132,12 @@ public class StatSet implements DataCompatible {
 		if (null != (node = root.getChild("maxmana"))) {
 			this.maxMana = DataNode.parseInt(node);
 		}
+		if (null != (node = root.getChild("stamina"))) {
+			this.stamina = DataNode.parseInt(node);
+		}
+		if (null != (node = root.getChild("maxstamina"))) {
+			this.maxStamina = DataNode.parseInt(node);
+		}
 		
 		for (Attributes attr : Attributes.values()) {
 			if (null != (node = root.getChild(attr.name()))) {
@@ -123,6 +155,8 @@ public class StatSet implements DataCompatible {
 		list.add(new DataNode("maxhealth", "" + this.maxHealth, null));
 		list.add(new DataNode("mana", "" + this.mana, null));
 		list.add(new DataNode("maxmana", "" + this.maxHealth, null));
+		list.add(new DataNode("stamina", "" + this.stamina, null));
+		list.add(new DataNode("maxstamina", "" + this.maxStamina, null));
 		
 		for (Attributes attr : Attributes.values()) {
 			list.add(new DataNode(attr.name(), "" + this.abilityScores.get(attr), null));

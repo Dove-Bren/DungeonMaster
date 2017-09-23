@@ -18,12 +18,14 @@ public class Mob extends NPC {
 	private boolean isAlly;
 	private int xp;
 	
-	public Mob(int hp, int mp, int xp, boolean ally) {
+	public Mob(int hp, int mp, int stamina, int xp, boolean ally) {
 		super();
 		this.stats.setHealth(hp);
 		this.stats.setMaxHealth(hp);
 		this.stats.setMaxMana(mp);
 		this.stats.setMana(mp);
+		this.stats.setStamina(stamina);
+		this.stats.setMaxStamina(stamina);
 		this.xp = xp;
 		this.isAlly = ally;
 		this.undead = false;
