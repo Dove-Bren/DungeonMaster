@@ -27,6 +27,9 @@ public class StatSet implements DataCompatible {
 	public StatSet() {
 		health = maxHealth = mana = maxMana = 1;
 		abilityScores = new EnumMap<>(Attributes.class);
+		
+		for (Attributes attrib : Attributes.values())
+			abilityScores.put(attrib, 0);
 	}
 
 	public int getMaxHealth() {

@@ -1,10 +1,15 @@
 package com.smanzana.dungeonmaster.pawn;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
+import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.Notable;
+import com.smanzana.dungeonmaster.utils.NoteUtil;
+import com.smanzana.dungeonmaster.utils.StatSet;
 
 /**
  * Base entity class.
@@ -12,16 +17,25 @@ import com.smanzana.dungeonmaster.utils.Notable;
  * @author Skyler
  *
  */
-public abstract class Pawn implements Notable {
+public abstract class Pawn implements Notable, DataCompatible {
 	
 	private boolean canDie;
 	protected boolean dead;
-	protected int maxHealth;
-	protected int health;
-	protected int maxMana;
-	protected int mana;
+	
+	private StatSet stats;
 	
 	private List<String> notes;
+		
+	/**
+	 * Creates generic Pawn that cannot die.
+	 */
+	public Pawn()
+	{
+		dead = false;
+		canDie = false;
+		notes = new LinkedList<>();
+		this.stats = new StatSet();
+	}
 	
 	/**
 	 * Creates a pawn with the given max attributes.
@@ -30,23 +44,12 @@ public abstract class Pawn implements Notable {
 	 */
 	public Pawn(int maxHealth, int maxMana)
 	{
-		dead = false;
+		this();
 		canDie = true;
-		this.health = this.maxHealth = maxHealth;
-		this.mana = this.maxMana = maxMana;
-		notes = new LinkedList<>();
-	}
-	
-	/**
-	 * Creates generic Pawn that cannot die.
-	 */
-	public Pawn()
-	{
-		dead = false;
-		canDie = false;
-		this.health = this.maxHealth = 1;
-		this.mana = this.maxMana = 1;
-		notes = new LinkedList<>();
+		stats.setHealth(maxHealth);
+		stats.setMaxHealth(maxHealth);
+		stats.setMana(maxMana);
+		stats.setMaxMana(maxMana);
 	}
 	
 	public boolean getCanDie()
@@ -82,5 +85,44 @@ public abstract class Pawn implements Notable {
 	@Override
 	public Collection<String> getNotes() {
 		return notes;
+	}
+	
+	/**
+	 * Creates a DataNode and writes in base objects.
+	 * Suggested do this before adding subclass objects
+	 * @param key
+	 * @return
+	 */
+	protected DataNode writeBase(String key) {
+		List<DataNode> list = new ArrayList<>(4);
+		
+		list.add(new DataNode("killable", this.canDie + "", null));
+		list.add(new DataNode("dead", this.dead + "", null));
+		list.add(this.stats.write("stats"));
+		list.add(new DataNode("notes", NoteUtil.serializeNotes(notes), null));
+		
+		return new DataNode(key, null, list);
+	}
+	
+	protected void readBase(DataNode root) {
+		DataNode node;
+		this.canDie = false;
+		this.dead = false;
+		
+		if (null != (node = root.getChild("killable"))) {
+			this.canDie = node.getValue().trim().equalsIgnoreCase("true");
+		}
+		
+		if (null != (node = root.getChild("dead"))) {
+			this.canDie = node.getValue().trim().equalsIgnoreCase("true");
+		}
+		
+		if (null != (node = root.getChild("stats"))) {
+			this.stats.load(node);
+		}
+		
+		if (null != (node = root.getChild("notes"))) {
+			this.notes = NoteUtil.deserializeNotes(node.getValue());
+		}
 	}
 }

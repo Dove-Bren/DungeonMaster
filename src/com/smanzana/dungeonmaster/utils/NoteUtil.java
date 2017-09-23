@@ -1,6 +1,5 @@
 package com.smanzana.dungeonmaster.utils;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,7 +12,7 @@ public class NoteUtil {
 
 	private static final String DELIM = "$";
 	
-	public static String serializeNotes(Collection<String> notes) {
+	public static String serializeNotes(List<String> notes) {
 		String buf = "";
 		for (String s : notes)
 			buf += s + DELIM;
@@ -21,7 +20,7 @@ public class NoteUtil {
 		return buf;
 	}
 	
-	public static Collection<String> deserializeNotes(String serial) {
+	public static List<String> deserializeNotes(String serial) {
 		List<String> list = new LinkedList<String>();
 		//serial.trim(); dont. Keep user whitespace
 		
