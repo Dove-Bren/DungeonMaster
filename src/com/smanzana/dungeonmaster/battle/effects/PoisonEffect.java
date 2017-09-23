@@ -6,6 +6,19 @@ import com.smanzana.dungeonmaster.utils.ValueCapsule;
 
 public class PoisonEffect extends Effect {
 
+	private static class Factory implements EffectFactory<PoisonEffect> {
+
+		@Override
+		public PoisonEffect construct() {
+			return new PoisonEffect("", "", 0, 0);
+		}
+		
+	}
+	
+	{
+		Effect.registerEffect(getClassKey(), new Factory());
+	}
+	
 	// damage per turn
 	private int damage;
 	

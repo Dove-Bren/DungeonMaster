@@ -14,6 +14,19 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
 public abstract class Equipment extends Item {
 	
+	private static class Factory implements ItemFactory<Equipment> {
+
+		@Override
+		public Equipment construct(DataNode data) {
+			return Equipment.fromData(data);
+		}
+		
+	}
+	
+	{
+		Item.registerType(getClassKey(), new Factory());
+	}
+	
 	public enum Slot
 	{
 		HEAD(true),
@@ -223,5 +236,17 @@ public abstract class Equipment extends Item {
 	@Override
 	protected String getClassKey() {
 		return "equipment";
+	}
+	
+	public static Equipment fromData(DataNode node) {
+		// use slot to determine if weapon or armor
+		if (null == node.getChild("slot"))
+			return null;
+		
+		Slot slot = Slot.valueOf(node.getValue());
+		Equipment equip = (slot.getIsArmor() ? new Armor() : new Weapon());
+		equip.load(node);
+		
+		return equip;
 	}
 }

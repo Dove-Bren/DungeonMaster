@@ -5,9 +5,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import com.smanzana.dungeonmaster.inventory.item.Armor;
 import com.smanzana.dungeonmaster.inventory.item.Equipment;
-import com.smanzana.dungeonmaster.inventory.item.Weapon;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
@@ -31,13 +29,10 @@ public class EquipmentSet implements DataCompatible {
 	public void load(DataNode root) {
 		this.equips.clear();
 		DataNode node;
-		
-		Equipment piece;
+
 		for (Equipment.Slot slot : Equipment.Slot.values()) {
 			if (null != (node = root.getChild(slot.name()))) {
-				piece = (slot.getIsArmor() ? new Armor() : new Weapon());
-				piece.load(node);
-				equips.put(slot, piece);
+				equips.put(slot, Equipment.fromData(node));
 			}
 		}
 		

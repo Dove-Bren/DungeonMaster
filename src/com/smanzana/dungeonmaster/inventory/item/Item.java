@@ -15,7 +15,7 @@ public abstract class Item implements Notable, DataCompatible {
 	
 	protected static interface ItemFactory<T extends Item> {
 		
-		public T construct();
+		public T construct(DataNode data);
 		
 	}
 	
@@ -35,9 +35,7 @@ public abstract class Item implements Notable, DataCompatible {
 		if (key == null || !factories.containsKey(key))
 			return null;
 		
-		Item item = factories.get(key).construct();
-		item.load(node);
-		return item;
+		return factories.get(key).construct(node);
 	}
 	
 	protected String name;
