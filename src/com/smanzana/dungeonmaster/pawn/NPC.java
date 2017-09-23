@@ -28,7 +28,8 @@ public class NPC extends Pawn {
 		}
 		
 		if (null != (node = root.getChild("inventory"))) {
-			this.inventory = (new Inventory()).load(node);
+			this.inventory = new Inventory();
+			this.inventory.load(node);
 		}
 		
 	}
@@ -39,7 +40,7 @@ public class NPC extends Pawn {
 		
 		base.addChild(new DataNode("race", this.race, null));
 		base.addChild(new DataNode("name", this.name, null));
-		base.addChild(this.inventory.write("inventory")));
+		base.addChild(this.inventory.write("inventory"));
 		
 		return base;
 	}
