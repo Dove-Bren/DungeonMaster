@@ -95,16 +95,16 @@ public class StatSet implements DataCompatible {
 		health = maxHealth = mana = maxMana = 1;
 		
 		if (null != (node = root.getChild("health"))) {
-			this.health = Integer.parseInt(node.getValue());
+			this.health = DataNode.parseInt(node);
 		}
 		if (null != (node = root.getChild("maxhealth"))) {
-			this.maxHealth = Integer.parseInt(node.getValue());
+			this.maxHealth = DataNode.parseInt(node);
 		}
 		if (null != (node = root.getChild("mana"))) {
-			this.mana = Integer.parseInt(node.getValue());
+			this.mana = DataNode.parseInt(node);
 		}
 		if (null != (node = root.getChild("maxmana"))) {
-			this.maxMana = Integer.parseInt(node.getValue());
+			this.maxMana = DataNode.parseInt(node);
 		}
 		
 		for (Attributes attr : Attributes.values()) {

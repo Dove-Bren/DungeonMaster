@@ -1,8 +1,10 @@
 package com.smanzana.dungeonmaster.inventory.item;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
@@ -10,6 +12,33 @@ import com.smanzana.dungeonmaster.utils.Notable;
 import com.smanzana.dungeonmaster.utils.NoteUtil;
 
 public abstract class Item implements Notable, DataCompatible {
+	
+	protected static interface ItemFactory<T extends Item> {
+		
+		public T construct();
+		
+	}
+	
+	private static Map<String, ItemFactory<?>> factories = new HashMap<>();
+	
+	protected static void registerType(String typeKey, ItemFactory<?> factory) {
+		factories.put(typeKey, factory);
+	}
+	
+	public static Item fromData(DataNode node) {
+		String key = null;
+		
+		if (node.getChild("type") != null) {
+			key = node.getChild("type").getValue();
+		}
+		
+		if (key == null || !factories.containsKey(key))
+			return null;
+		
+		Item item = factories.get(key).construct();
+		item.load(node);
+		return item;
+	}
 	
 	protected String name;
 	protected String description;
@@ -69,12 +98,7 @@ public abstract class Item implements Notable, DataCompatible {
 		}
 		
 		if (null != (node = root.getChild("value"))) {
-			try {
-				this.value = Integer.parseInt(node.getValue());
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				System.out.println("Failed to convert " + node.getValue() + " to an int");
-			}
+			this.value = DataNode.parseInt(node);
 		}
 		
 		if (null != (node = root.getChild("notes"))) {
@@ -87,6 +111,7 @@ public abstract class Item implements Notable, DataCompatible {
 	public DataNode write(String key) {
 		List<DataNode> list = new LinkedList<>();
 		
+		list.add(new DataNode("type", getClassKey(), null));
 		list.add(new DataNode("name", name, null));
 		list.add(new DataNode("description", description, null));
 		list.add(new DataNode("value", value + "", null));
@@ -94,5 +119,7 @@ public abstract class Item implements Notable, DataCompatible {
 		
 		return new DataNode(key, null, list);
 	}
+	
+	protected abstract String getClassKey();
 	
 }

@@ -128,11 +128,11 @@ public abstract class Pawn implements Notable, DataCompatible {
 		this.dead = false;
 		
 		if (null != (node = root.getChild("killable"))) {
-			this.canDie = node.getValue().trim().equalsIgnoreCase("true");
+			this.canDie = DataNode.parseBool(node);
 		}
 		
 		if (null != (node = root.getChild("dead"))) {
-			this.canDie = node.getValue().trim().equalsIgnoreCase("true");
+			this.canDie = DataNode.parseBool(node);
 		}
 		
 		if (null != (node = root.getChild("stats"))) {

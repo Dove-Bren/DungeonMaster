@@ -33,12 +33,7 @@ public class PoisonEffect extends Effect {
 		
 		DataNode node = root.getChild("damage");
 		if (node != null)
-			try {
-				this.damage = Integer.parseInt(node.getValue());
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				System.out.println("Could not convert " + node.getValue() + " to an int");
-			}
+			this.damage = DataNode.parseInt(node);
 	}
 	
 	@Override

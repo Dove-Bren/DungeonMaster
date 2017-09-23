@@ -26,12 +26,7 @@ public class Weapon extends Equipment {
 		DataNode node;
 		
 		if (null != (node = root.getChild("attack"))) {
-			try {
-				this.attack = Integer.parseInt(node.getValue());
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				System.out.println("Failed to convert " + node.getValue() + " to a number");
-			}
+			this.attack = DataNode.parseInt(node);
 		}
 		
 	}

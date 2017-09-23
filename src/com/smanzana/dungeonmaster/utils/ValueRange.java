@@ -49,13 +49,13 @@ public class ValueRange implements DataCompatible {
 		
 		// get min
 		if ((node = root.getChild("min")) != null) {
-			this.min = Integer.parseInt(node.getValue());
+			this.min = DataNode.parseInt(node);
 			foundNew = true;
 		}
 		
 		// get range
 		if ((node = root.getChild("range")) != null) {
-			this.range = Integer.parseInt(node.getValue());
+			this.range = DataNode.parseInt(node);
 			foundNew = true;
 		}
 		

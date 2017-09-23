@@ -170,21 +170,11 @@ public abstract class Equipment extends Item {
 		}
 		
 		if (null != (node = root.getChild("durability"))) {
-			try {
-				this.durability = Integer.parseInt(node.getValue());
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				System.out.println("Failed to convert " + node.getValue() + " to a number");
-			}
+			this.durability = DataNode.parseInt(node);
 		}
 		
 		if (null != (node = root.getChild("maxdurability"))) {
-			try {
-				this.maxDurability = Integer.parseInt(node.getValue());
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				System.out.println("Failed to convert " + node.getValue() + " to a number");
-			}
+			this.maxDurability = DataNode.parseInt(node);
 		}
 		
 		if (null != (node = root.getChild("effects"))) {
@@ -206,12 +196,7 @@ public abstract class Equipment extends Item {
 		}
 		
 		if (null != (node = root.getChild("levelrequirement"))) {
-			try {
-				this.levelRequirement = Integer.parseInt(node.getValue());
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				System.out.println("Failed to convert " + node.getValue() + " to a number");
-			}
+			this.levelRequirement = DataNode.parseInt(node);
 		}
 		
 	}
@@ -223,11 +208,7 @@ public abstract class Equipment extends Item {
 		base.addChild(new DataNode("slot", slot.name(), null));
 		base.addChild(new DataNode("durability", this.durability + "", null));
 		base.addChild(new DataNode("maxdurability", this.maxDurability + "", null));
-		
-		List<DataNode> list = new LinkedList<>();
-		for (Effect effect : effects)
-			list.add(effect.write("effect"));
-		base.addChild(new DataNode("effects", null, list));
+		base.addChild(DataNode.serializeAll("effects", "effect", effects));
 		
 		DataNode reqs = new DataNode("abilityrequirements", null, new LinkedList<>());
 		for (Attributes attr : Attributes.values())
@@ -238,4 +219,9 @@ public abstract class Equipment extends Item {
 		
 		return base;
 	}	
+	
+	@Override
+	protected String getClassKey() {
+		return "equipment";
+	}
 }

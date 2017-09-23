@@ -1,6 +1,5 @@
 package com.smanzana.dungeonmaster.inventory;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,7 +58,22 @@ public class Inventory implements DataCompatible {
 
 	@Override
 	public void load(DataNode root) {
-		// TODO Auto-generated method stub
+		DataNode node;
+		heldItems.clear();
+		
+		if (null != (node = root.getChild("gold"))) {
+			this.gold = DataNode.parseInt(node);
+		}
+		
+		if (null != (node = root.getChild("equipment"))) {
+			this.equipment.load(node);
+		}
+		
+		if (null != (node = root.getChild("items"))) {
+			for (DataNode child : node.getChildren()) {
+				heldItems.add(Item.fromData(child));
+			}
+		}
 		
 	}
 
@@ -69,19 +83,8 @@ public class Inventory implements DataCompatible {
 		
 		list.add(new DataNode("gold", this.gold + "", null));
 		list.add(this.equipment.write("equipment"));
-		list.add(writeItems("items"));
+		list.add(DataNode.serializeAll("items", "item", heldItems));
 		
 		return new DataNode(key, null, list);
-	}
-	
-	private DataNode writeItems(String key) {
-		List<DataNode> list = new ArrayList<>(this.heldItems.size());
-		
-		for (Item item : heldItems) {
-			list.add(item.write("item"));
-		}
-		
-		return new DataNode(key, null, list);
-	}
-	
+	}	
 }

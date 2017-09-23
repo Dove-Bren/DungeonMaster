@@ -1,6 +1,5 @@
 package com.smanzana.dungeonmaster.pawn;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.smanzana.dungeonmaster.battle.effects.Effect;
@@ -85,15 +84,11 @@ public class Mob extends NPC {
 		this.activeEffects.clear();
 		
 		if (null != (node = root.getChild("xp"))) {
-			try {
-				this.xp = Integer.parseInt(node.getValue());
-			} catch (NumberFormatException e) {
-				System.out.println("Could not convert " + node.getValue() + " to an int");
-			}
+			this.xp = DataNode.parseInt(node);
 		}
 		
 		if (null != (node = root.getChild("undead"))) {
-			this.undead = (node.getValue().trim().equalsIgnoreCase("true"));
+			this.undead = DataNode.parseBool(node);
 		}
 		
 		if (null != (node = root.getChild("effects"))) {
@@ -111,12 +106,7 @@ public class Mob extends NPC {
 		
 		base.addChild(new DataNode("xp", this.xp + "", null));
 		base.addChild(new DataNode("undead", this.undead + "", null));
-		
-		List<DataNode> list = new ArrayList<>(this.activeEffects.size());
-		for (Effect ef : this.activeEffects)
-			list.add(ef.write("effect"));
-		
-		base.addChild(new DataNode("effects", null, list));
+		base.addChild(DataNode.serializeAll("effects", "effect", activeEffects));
 		
 		return base;
 	}

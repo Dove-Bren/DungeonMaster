@@ -155,12 +155,7 @@ public abstract class Effect implements DataCompatible {
 		}
 		
 		if (null != (node = root.getChild("durationcount"))) {
-			try {
-				this.durationCount = Integer.parseInt(node.getValue());
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-				System.out.println("Could not convert " + node.getValue() + " to an int");
-			}
+			this.durationCount = DataNode.parseInt(node);
 		}
 	}
 	

@@ -193,30 +193,19 @@ public class ClassDatumData implements DatumData {
 	@Override
 	public DataNode write(String key) {
 		List<DataNode> nodes = new ArrayList<>(5);
-		DataNode node;
 		
-		//Name
-		node = new DataNode("name", this.name);
-		nodes.add(node);
+		nodes.add(new DataNode("name", this.name));
+		nodes.add(new DataNode("description", this.description));
 		
-		//Description
-		node = new DataNode("description", this.description);
-		nodes.add(node);
-		
-		//Base & Growth
-		{
-			List<DataNode> baseList = new ArrayList<>(Attributes.values().length),
-					growthList = new ArrayList<>(Attributes.values().length);
-			for (Attributes attr : Attributes.values()) {
-				baseList.add(startRanges.get(attr).write(attr.name()));
-				growthList.add(growthRanges.get(attr).write(attr.name()));
-			}
-			
-			node = new DataNode("stats_base", null, baseList);
-			nodes.add(node);
-			node = new DataNode("stats_growth", null, growthList);
-			nodes.add(node);
+		List<DataNode> baseList = new ArrayList<>(Attributes.values().length),
+				growthList = new ArrayList<>(Attributes.values().length);
+		for (Attributes attr : Attributes.values()) {
+			baseList.add(startRanges.get(attr).write(attr.name()));
+			growthList.add(growthRanges.get(attr).write(attr.name()));
 		}
+		
+		nodes.add(new DataNode("stats_base", null, baseList));
+		nodes.add(new DataNode("stats_growth", null, growthList));
 		
 		//Promotions
 		{
@@ -225,8 +214,7 @@ public class ClassDatumData implements DatumData {
 				list.add(new DataNode("promotion", promo, null));
 			}
 			
-			node = new DataNode("promotions", null, list);
-			nodes.add(node);
+			nodes.add(new DataNode("promotions", null, list));
 		}
 		
 		return new DataNode(key, null, nodes);
