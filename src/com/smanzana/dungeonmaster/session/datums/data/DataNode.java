@@ -210,4 +210,8 @@ public class DataNode {
 		return this.children;
 	}
 	
+	public void addChild(DataNode child) {
+		this.children.add(child);
+	}
+	
 }
