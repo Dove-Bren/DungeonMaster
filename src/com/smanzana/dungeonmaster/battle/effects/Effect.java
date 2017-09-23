@@ -18,7 +18,8 @@ public abstract class Effect implements DataCompatible {
 		BEFORE_DAMAGE,
 		AFTER_DAMAGE,
 		TURN_START,
-		TURN_END;
+		TURN_END,
+		ON_USE,
 	}
 
 	private static Map<String, EffectFactory<?>> factories = new HashMap<>();
@@ -75,6 +76,13 @@ public abstract class Effect implements DataCompatible {
 	public static void doTurnEndEffects(Collection<Effect> effects, Pawn caster, Pawn target, ValueCapsule value) {
 		for (Effect e : effects) {
 			e.doAction(Phase.TURN_END, caster, target, value);
+		}
+		cleanEffects(effects);
+	}
+	
+	public static void doOnUseEffects(Collection<Effect> effects, Pawn caster, Pawn target, ValueCapsule value) {
+		for (Effect e : effects) {
+			e.doAction(Phase.ON_USE, caster, target, value);
 		}
 		cleanEffects(effects);
 	}

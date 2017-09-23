@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.smanzana.dungeonmaster.battle.effects.Effect;
 import com.smanzana.dungeonmaster.pawn.Attributes;
+import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
@@ -139,14 +140,16 @@ public abstract class Equipment extends Item {
 	 * For armor, this likely means the armor blocked a blow.
 	 * Weapons, then, use this when they are used to attack.
 	 * Subclasses are encouraged to implement and call this function.
-	 * The stub from Equipment only does durability accounting
+	 * The stub from Equipment only does durability accounting and effect triggering
+	 * @param user who's using the equipment
 	 * @return True if the equipment has broken
 	 */
-	public boolean use() {
-		// Do durability damage if config says to
-		// TODO
+	public boolean use(Pawn user) {
+		if (MechanicsConfig.instance().getBool(MechanicsKey.DURABILITY_ENABLED)
+				&& MechanicsConfig.instance().getBool(MechanicsKey.EQUIPMENT_USE_DURABILITY))
+			this.damageDurability();
 		
-		// TODO also hook into effects
+		Effect.doOnUseEffects(effects, user, null, null);
 		
 		return this.durability <= 0;
 	}
