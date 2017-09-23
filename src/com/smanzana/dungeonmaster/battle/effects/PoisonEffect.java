@@ -23,7 +23,7 @@ public class PoisonEffect extends Effect {
 	protected void doAction(Phase phase, Pawn caster, Pawn target, ValueCapsule value) {
 		if (phase == Phase.TURN_START) {
 			this.decrementDuration();
-			target.damage(damage);
+			target.damage(caster, damage);
 		}
 	}
 	

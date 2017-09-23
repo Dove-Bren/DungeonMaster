@@ -17,13 +17,15 @@ public class Mob extends NPC {
 	List<Effect> activeEffects;
 	private boolean undead;
 	private boolean isAlly;
+	private int xp;
 	
-	public Mob(int hp, int mp, boolean ally) {
+	public Mob(int hp, int mp, int xp, boolean ally) {
 		super();
 		this.stats.setHealth(hp);
 		this.stats.setMaxHealth(hp);
 		this.stats.setMaxMana(mp);
 		this.stats.setMana(mp);
+		this.xp = xp;
 		this.isAlly = ally;
 		this.undead = false;
 	}
@@ -44,6 +46,10 @@ public class Mob extends NPC {
 		this.isAlly = ally;
 	}
 	
+	public int getXP() {
+		return this.xp;
+	}
+	
 	@Override
 	public boolean damage(Pawn source, int amount) {
 		
@@ -59,7 +65,6 @@ public class Mob extends NPC {
 
 	@Override
 	public boolean heal(Pawn source, int amount) {
-		
 		ValueCapsule capsule = new ValueCapsule(amount);
 		Effect.doPreEffects(activeEffects, source, this, capsule);
 		
@@ -79,6 +84,14 @@ public class Mob extends NPC {
 		DataNode node;
 		this.activeEffects.clear();
 		
+		if (null != (node = root.getChild("xp"))) {
+			try {
+				this.xp = Integer.parseInt(node.getValue());
+			} catch (NumberFormatException e) {
+				System.out.println("Could not convert " + node.getValue() + " to an int");
+			}
+		}
+		
 		if (null != (node = root.getChild("undead"))) {
 			this.undead = (node.getValue().trim().equalsIgnoreCase("true"));
 		}
@@ -96,6 +109,7 @@ public class Mob extends NPC {
 	public DataNode write(String key) {
 		DataNode base = super.write(key);
 		
+		base.addChild(new DataNode("xp", this.xp + "", null));
 		base.addChild(new DataNode("undead", this.undead + "", null));
 		
 		List<DataNode> list = new ArrayList<>(this.activeEffects.size());

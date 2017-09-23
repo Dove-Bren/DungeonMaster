@@ -1,7 +1,9 @@
 package com.smanzana.dungeonmaster.session.datums.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Like a JS object with a name, or a single key:value pair.
@@ -46,6 +48,45 @@ public class DataNode {
 			return nodes.iterator().next();
 		
 		return null;
+	}
+	
+	/**
+	 * Takes all elements of collection and convert them into DataNodes (call .write()).
+	 * Then return a DataNode wrapper. E.g. returned datanode's children are a DataNode for each
+	 * element in the passed in collection
+	 * @param collection
+	 * @return
+	 */
+	public static DataNode serializeAll(String key, String childKey, Collection<? extends DataCompatible> collection) {
+		List<DataNode> list = new ArrayList<>(collection.size());
+		
+		for (DataCompatible data : collection)
+			list.add(data.write(childKey));
+		
+		return new DataNode(key, null, list);
+	}
+	
+	public static int parseInt(DataNode node) {
+		int value = 0;
+		
+		if (node != null && node.getValue() != null)
+			try {
+				value = Integer.parseInt(node.getValue());
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+				System.out.println("Could not convert " + node.getValue() + " to an int");
+			}
+		
+		return value;
+	}
+	
+	public static boolean parseBool(DataNode node) {
+		boolean value = false;
+		
+		if (node != null && node.getValue() != null)
+			value = node.getValue().equalsIgnoreCase("true");
+		
+		return value;
 	}
 	
 	/**
