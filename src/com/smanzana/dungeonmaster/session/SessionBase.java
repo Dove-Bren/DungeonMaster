@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import com.smanzana.dungeonmaster.session.configuration.CombatBonusConfig;
 import com.smanzana.dungeonmaster.session.configuration.Config;
+import com.smanzana.dungeonmaster.session.configuration.KeywordConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
 import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
@@ -18,6 +19,7 @@ public abstract class SessionBase {
 	private static final String PATH_MECHS = "mechanics.cfg";
 	private static final String PATH_COMBONUS = "combatbonuses.cfg";
 	private static final String PATH_ROLLTABLE = "rolltables.cfg";
+	private static final String PATH_KEYWORDS = "keywords.cfg";
 	
 	// Datum paths
 	private static final String PATH_CLASS = "class.dat";
@@ -113,6 +115,7 @@ public abstract class SessionBase {
 		loadConfig(configDir, PATH_MECHS, MechanicsConfig.instance());
 		loadConfig(configDir, PATH_COMBONUS, CombatBonusConfig.instance());
 		loadConfig(configDir, PATH_ROLLTABLE, RollTableConfig.instance());
+		loadConfig(configDir, PATH_KEYWORDS, KeywordConfig.instance());
 	}
 	
 	protected void save() {
@@ -157,5 +160,6 @@ public abstract class SessionBase {
 		saveConfig(configDir, PATH_MECHS, MechanicsConfig.instance());
 		saveConfig(configDir, PATH_COMBONUS, CombatBonusConfig.instance());
 		saveConfig(configDir, PATH_ROLLTABLE, RollTableConfig.instance());
+		saveConfig(configDir, PATH_KEYWORDS, KeywordConfig.instance());
 	}
 }
