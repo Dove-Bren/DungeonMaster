@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.smanzana.dungeonmaster.battle.effects.Effect;
-import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
 /**
@@ -84,7 +83,7 @@ public class Mob extends NPC {
 		if (null != (node = root.getChild("effects"))) {
 			for (DataNode child : node.getChildren()) {
 				// each child is an effect
-				this.activeEffects.add(Effect.load(child));
+				this.activeEffects.add(Effect.fromData(child));
 			}
 		}
 		
