@@ -61,18 +61,22 @@ public class Action extends SubAction {
 		return targetType;
 	}
 	
-	public void addSubAction(SubAction sub) {
+	public Action addSubAction(SubAction sub) {
 		subActions.add(sub);
+		return this;
 	}
 	
-	public void clearSubActions() {
+	public Action clearSubActions() {
 		subActions.clear();
+		return this;
 	}
 	
-	public void setSubActions(SubAction ...actions) {
+	public Action setSubActions(SubAction ...actions) {
 		subActions.clear();
 		for (SubAction action : actions)
 			subActions.add(action);
+		
+		return this;
 	}
 	
 	// TODO protected abstract IMG getIcon();
@@ -86,18 +90,18 @@ public class Action extends SubAction {
 		// Figure out who to apply to based on targetType
 		switch (targetType) {
 		case SELF:
-			apply(source);
+			apply(source, source);
 			break;
 		case TARGET:
-			apply(selectTarget());
+			apply(source, selectTarget());
 			break;
 		case PARTY:
 			for (Pawn pc : DungeonMaster.getActiveSession().getParty())
-				apply(pc);
+				apply(source, pc);
 			break;
 		case MULTI:
 			for (Pawn targ : selectMultiTargets())
-				apply(targ);
+				apply(source, targ);
 			break;
 		}
 	}
@@ -106,10 +110,10 @@ public class Action extends SubAction {
 	 * @param target
 	 */
 	@Override
-	public void apply(Pawn target) {
+	public void apply(Pawn source, Pawn target) {
 		// Apply subactions
 		for (SubAction action : subActions)
-			action.apply(target);
+			action.apply(source, target);
 	}
 	
 }

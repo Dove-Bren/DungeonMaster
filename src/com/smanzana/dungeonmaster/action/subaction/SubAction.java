@@ -11,6 +11,6 @@ import com.smanzana.dungeonmaster.pawn.Pawn;
  */
 public abstract class SubAction {
 	
-	public abstract void apply(Pawn target);
+	public abstract void apply(Pawn source, Pawn target);
 	
 }
