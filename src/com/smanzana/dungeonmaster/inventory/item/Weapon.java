@@ -74,11 +74,8 @@ public class Weapon extends Equipment {
 			if (this.isShield)
 				return false;
 			// fall through
-		case OFF_HAND:
-			return true;
-		
 		default:
-			return false;
+			return super.fitsSlot(slot);
 		}
 	}
 

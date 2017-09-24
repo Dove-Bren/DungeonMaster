@@ -253,5 +253,10 @@ public abstract class Equipment extends Item {
 		return equip;
 	}
 	
-	public abstract boolean fitsSlot(Slot slot);
+	public boolean fitsSlot(Slot slot) {
+		if (slot == Slot.MAIN_HAND || slot == Slot.OFF_HAND)
+			return this.slot == Slot.MAIN_HAND || this.slot == Slot.OFF_HAND;
+		
+		return (this.slot == slot);
+	}
 }
