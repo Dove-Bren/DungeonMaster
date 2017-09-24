@@ -1,6 +1,7 @@
 package com.smanzana.dungeonmaster.inventory.item;
 
 import com.smanzana.dungeonmaster.action.Action;
+import com.smanzana.dungeonmaster.action.ActionRegistry;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
@@ -28,7 +29,7 @@ public class Usable extends Item {
 		
 		// Link action based on name
 		if (actionName != null) {
-			action = lookupAction(actionName);
+			action = ActionRegistry.instance().lookupAction(actionName);
 		} else
 			action = null;
 	}
