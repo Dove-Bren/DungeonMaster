@@ -5,7 +5,9 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import com.smanzana.dungeonmaster.inventory.item.Armor;
 import com.smanzana.dungeonmaster.inventory.item.Equipment;
+import com.smanzana.dungeonmaster.inventory.item.Weapon;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
@@ -53,6 +55,18 @@ public class EquipmentSet implements DataCompatible {
 	
 	public int getTotalDefense() {
 		// Sum equipment INCLUDING offhand (if it's a shield)
+		int sum = 0;
+		for (Equipment.Slot slot : Equipment.Slot.values()) {
+			if (slot == Equipment.Slot.MAIN_HAND)
+				continue;
+			if (slot == Equipment.Slot.OFF_HAND) {
+				if (null != getPiece(slot) && ( (Weapon) getPiece(slot)).isShield())
+					sum += ((Weapon) getPiece(slot)).getAttack().fetchValue();
+			} else if (getPiece(slot) != null)
+				sum += ((Armor) getPiece(slot)).getDefense();
+		}
+		
+		return sum;
 	}
 	
 }
