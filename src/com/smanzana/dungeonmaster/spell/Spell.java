@@ -88,4 +88,25 @@ public class Spell implements DataCompatible {
 		return node;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Spell) {
+			Spell other = (Spell) o;
+			return (other.name.equals(name) &&
+					other.description.equals(description) &&
+					other.level == level &&
+					other.manaCost == manaCost
+					);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return name.hashCode()
+				+ 7 * description.hashCode()
+				+ 23 * level
+				+ 37 * manaCost;
+	}
 }

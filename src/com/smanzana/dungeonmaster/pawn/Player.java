@@ -11,6 +11,7 @@ import com.smanzana.dungeonmaster.inventory.item.Item;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.spell.Spell;
 import com.smanzana.dungeonmaster.utils.ValueCapsule;
 
 public class Player extends Pawn {
@@ -53,11 +54,13 @@ public class Player extends Pawn {
 	private int maxXP;
 	private int level;
 	private Map<Integer, SpellSlot> spellSlots;
+	private List<Spell> spells;
 	
 	public Player() {
 		effects = new LinkedList<>();
 		inventory = new Inventory();
 		this.spellSlots = new HashMap<>();
+		this.spells = new LinkedList<>();
 		this.zombie = false;
 		this.xp = 0;
 	}
@@ -101,6 +104,16 @@ public class Player extends Pawn {
 	
 	public void setSpellSlots(int level, int count) {
 		spellSlots.put(level, new SpellSlot(count));
+	}
+	
+	public void clearSpells() {
+		spells.clear();
+	}
+	
+	public void awardSpell(Spell spell) {
+		if (spells.contains(spell))
+			return;
+		spells.add(spell);
 	}
 	
 	/**
