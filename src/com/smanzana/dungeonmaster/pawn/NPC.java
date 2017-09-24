@@ -44,6 +44,18 @@ public class NPC extends Pawn {
 		
 		return base;
 	}
+	
+	public Inventory getInventory() {
+		return this.inventory;
+	}
+
+	public String getRace() {
+		return race;
+	}
+
+	public String getName() {
+		return name;
+	}
 
 	@Override
 	public boolean damage(Pawn source, int amount) {

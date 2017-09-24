@@ -1,10 +1,12 @@
 package com.smanzana.dungeonmaster.inventory.item;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.utils.ValueConstant;
+import com.smanzana.dungeonmaster.utils.ValueSpecifier;
 
 public class Weapon extends Equipment {
 
-	private int attack;
+	private ValueSpecifier attack;
 	private boolean isShield;
 	
 	public Weapon() {
@@ -22,12 +24,16 @@ public class Weapon extends Equipment {
 	 * @param isShield
 	 */
 	public Weapon(String name, String description, int value, Slot slot, int durability, int attack, boolean isShield) {
+		this(name, description, value, slot, durability, new ValueConstant(attack), isShield);
+	}
+	
+	public Weapon(String name, String description, int value, Slot slot, int durability, ValueSpecifier attack, boolean isShield) {
 		super(name, description, value, slot, durability);
 		this.attack = attack;
 		this.isShield = isShield;
 	}
 	
-	public int getAttack()
+	public ValueSpecifier getAttack()
 	{
 		return attack;
 	}
@@ -42,7 +48,7 @@ public class Weapon extends Equipment {
 		DataNode node;
 		
 		if (null != (node = root.getChild("attack"))) {
-			this.attack = DataNode.parseInt(node);
+			this.attack = ValueSpecifier.fromData(node);
 		}
 		
 		if (null != (node = root.getChild("isshield"))) {
@@ -55,7 +61,7 @@ public class Weapon extends Equipment {
 	public DataNode write(String key) {
 		DataNode base = super.write(key);
 		
-		base.addChild(new DataNode("attack", this.attack + "", null));
+		base.addChild(this.attack.write("attack"));
 		base.addChild(new DataNode("isshield", this.isShield + "", null));
 		
 		return base;
