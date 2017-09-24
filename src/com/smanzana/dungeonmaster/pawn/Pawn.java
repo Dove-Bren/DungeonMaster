@@ -1,8 +1,10 @@
 package com.smanzana.dungeonmaster.pawn;
 
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
@@ -17,6 +19,87 @@ import com.smanzana.dungeonmaster.utils.StatSet;
  *
  */
 public abstract class Pawn implements Notable, DataCompatible {
+	
+	/**
+	 * Packages all set-able stats.
+	 * When applied, only changes values with new values present
+	 * @author Skyler
+	 *
+	 */
+	public static class PawnOverlay {
+		private Boolean killable;
+		private Boolean dead;
+		private Integer hp;
+		private Integer maxhp;
+		private Integer mp;
+		private Integer maxmp;
+		private Integer stamina;
+		private Integer maxstamina;
+		private Map<Attributes, Integer> scores;
+		
+		public PawnOverlay() {
+			scores = new EnumMap<>(Attributes.class);
+		}
+
+		public PawnOverlay(Boolean killable, Boolean dead, Integer hp, Integer maxhp, Integer mp, Integer maxmp,
+				Integer stamina, Integer maxstamina, Map<Attributes, Integer> scores) {
+			this.killable = killable;
+			this.dead = dead;
+			this.hp = hp;
+			this.maxhp = maxhp;
+			this.mp = mp;
+			this.maxmp = maxmp;
+			this.stamina = stamina;
+			this.maxstamina = maxstamina;
+			this.scores = scores;
+		}
+		
+		public PawnOverlay killable(boolean killable) {
+			this.killable = killable;
+			return this;
+		}
+
+		public PawnOverlay dead(boolean dead) {
+			this.dead = dead;
+			return this;
+		}
+		
+		public PawnOverlay hp(int hp) {
+			this.hp = hp;
+			return this;
+		}
+		
+		public PawnOverlay maxhp(int maxhp) {
+			this.maxhp = maxhp;
+			return this;
+		}
+		
+		public PawnOverlay mp(int mp) {
+			this.mp = mp;
+			return this;
+		}
+		
+		public PawnOverlay maxmp(int maxmp) {
+			this.maxmp = maxmp;
+			return this;
+		}
+		
+		public PawnOverlay stamina(int stamina) {
+			this.stamina = stamina;
+			return this;
+		}
+		
+		public PawnOverlay maxstamina(int maxstamina) {
+			this.maxstamina = maxstamina;
+			return this;
+		}
+		
+		public PawnOverlay score(Attributes attr, int score) {
+			this.scores.put(attr, score);
+			return this;
+		}
+		
+	}
 	
 	protected boolean canDie;
 	protected boolean dead;
@@ -119,6 +202,38 @@ public abstract class Pawn implements Notable, DataCompatible {
 	@Override
 	public Collection<String> getNotes() {
 		return notes;
+	}
+	
+	public void applyOverlay(PawnOverlay overlay) {
+		if (overlay.killable != null)
+			this.canDie = overlay.killable;
+		
+		if (overlay.dead != null)
+			this.dead = overlay.dead;
+		
+		if (overlay.hp != null)
+			this.stats.setHealth(overlay.hp);
+		
+		if (overlay.maxhp != null)
+			this.stats.setMaxHealth(overlay.maxhp);
+		
+		if (overlay.mp != null)
+			this.stats.setMana(overlay.mp);
+		
+		if (overlay.maxmp != null)
+			this.stats.setMaxMana(overlay.maxmp);
+		
+		if (overlay.stamina != null)
+			this.stats.setStamina(overlay.stamina);
+		
+		if (overlay.maxstamina != null)
+			this.stats.setMaxStamina(overlay.maxstamina);
+		
+		if (overlay.scores != null && !overlay.scores.isEmpty()) {
+			for (Attributes attr : overlay.scores.keySet())
+				if (overlay.scores.get(attr) != null)
+					stats.setAbilityScore(attr, overlay.scores.get(attr));
+		}
 	}
 	
 	/**
