@@ -13,6 +13,7 @@ import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
 import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
 import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
+import com.smanzana.dungeonmaster.session.datums.SpellDatumData;
 
 public abstract class SessionBase {
 	
@@ -26,11 +27,13 @@ public abstract class SessionBase {
 	private static final String PATH_CLASS = "class.dat";
 	private static final String PATH_PROFILE = "profiles.dat";
 	private static final String PATH_ACTIONS = "actions.dat";
+	private static final String PATH_SPELLS = "spells.dat";
 	
 	// Datums
 	protected Datum<ClassDatumData> classDatum;
 	protected Datum<ProfileDatumData> profileDatum;
 	protected Datum<ActionDatumData> actionDatum;
+	protected Datum<SpellDatumData> spellDatum;
 	
 	protected File root;
 	protected String configDir;
@@ -42,6 +45,7 @@ public abstract class SessionBase {
 		this.classDatum = new Datum<ClassDatumData>("class", new ClassDatumData.ClassDatumFactory());
 		this.profileDatum = new Datum<ProfileDatumData>("profile", new ProfileDatumData.ProfileDatumFactory());
 		this.actionDatum = new Datum<>("action", new ActionDatumData.ActionDatumFactory());
+		this.spellDatum = new Datum<>("spell", new SpellDatumData.SpellDatumFactory());
 	}
 	
 	public File getRoot() {
@@ -88,6 +92,7 @@ public abstract class SessionBase {
 		loadDatum(configDir, PATH_CLASS, this.classDatum);
 		loadDatum(configDir, PATH_PROFILE, this.profileDatum);
 		loadDatum(configDir, PATH_ACTIONS, this.actionDatum);
+		loadDatum(configDir, PATH_SPELLS, this.spellDatum);
 	}
 	
 	private void loadConfig(File configDir, String path, Config<?> instance) {
@@ -146,6 +151,7 @@ public abstract class SessionBase {
 		saveDatum(configDir, PATH_CLASS, this.classDatum);
 		saveDatum(configDir, PATH_PROFILE, this.profileDatum);
 		saveDatum(configDir, PATH_ACTIONS, this.actionDatum);
+		saveDatum(configDir, PATH_SPELLS, this.spellDatum);
 	}
 	
 	private void saveConfig(File configDir, String path, Config<?> instance) {

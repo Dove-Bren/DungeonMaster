@@ -33,7 +33,7 @@ public abstract class SubAction implements DataCompatible {
 		if (!factories.containsKey(data.getChild("type").getValue()))
 			return null;
 		
-		return factories.get(data.getChild("type")).construct(data);
+		return factories.get(data.getChild("type").getValue()).construct(data);
 		
 	}
 	
