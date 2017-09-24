@@ -55,6 +55,7 @@ public class Player extends Pawn {
 	private int level;
 	private Map<Integer, SpellSlot> spellSlots;
 	private List<Spell> spells;
+	private PlayerClass playerClass;
 	
 	public Player() {
 		effects = new LinkedList<>();
@@ -62,6 +63,7 @@ public class Player extends Pawn {
 		this.spellSlots = new HashMap<>();
 		this.spells = new LinkedList<>();
 		this.zombie = false;
+		this.playerClass = null;
 		this.xp = 0;
 	}
 
@@ -72,6 +74,14 @@ public class Player extends Pawn {
 		this.background = background;
 		this.maxXP = maxXP;
 		this.level = level;
+	}
+	
+	public PlayerClass getPlayerClass() {
+		return playerClass;
+	}
+	
+	public void setPlayerClass(PlayerClass clazz) {
+		playerClass = clazz;
 	}
 	
 	public Inventory getInventory() {
@@ -253,7 +263,11 @@ public class Player extends Pawn {
 			for (DataNode effect : node.getChildren()) {
 				this.effects.add(Effect.fromData(effect));
 			}
-		}		
+		}
+		
+		if (null != (node = root.getChild("class"))) {
+			this.playerClass = new PlayerClass(getSession().lookupClass(node.getValue()));
+		}	
 	}
 
 	@Override
@@ -269,6 +283,7 @@ public class Player extends Pawn {
 		base.addChild(new DataNode("zombie", "" + zombie, null));
 		base.addChild(inventory.write("inventory"));
 		base.addChild(DataNode.serializeAll("effects", "effect", effects));
+		base.addChild(new DataNode("class", playerClass.getName(), null));
 		
 		return base;
 	}

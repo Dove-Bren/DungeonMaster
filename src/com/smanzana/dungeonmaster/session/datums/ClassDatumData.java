@@ -149,6 +149,10 @@ public class ClassDatumData implements DatumData {
 	public void addSpellUnlock(int level, String spell) {
 		spellUnlocks.put(level, spell);
 	}
+	
+	public String getSpellUnlock(int level) {
+		return spellUnlocks.get(level);
+	}
 
 	@Override
 	public void load(DataNode root) {
