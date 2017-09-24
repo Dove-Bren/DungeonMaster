@@ -1,6 +1,7 @@
 package com.smanzana.dungeonmaster.action.subaction;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import com.smanzana.dungeonmaster.pawn.Pawn;
@@ -50,13 +51,13 @@ public abstract class SubAction implements DataCompatible {
 		factories.put(classKey, factory);
 	}
 
-//	@Override
-//	public DataNode write(String key) {
-//		DataNode base = new DataNode(key, null, new LinkedList<>());
-//		
-//		base.addChild(new DataNode("type", getClassKey(), null));
-//		
-//		return base;
-//	}
+	@Override
+	public DataNode write(String key) {
+		DataNode base = new DataNode(key, null, new LinkedList<>());
+		
+		base.addChild(new DataNode("type", getClassKey(), null));
+		
+		return base;
+	}
 	
 }
