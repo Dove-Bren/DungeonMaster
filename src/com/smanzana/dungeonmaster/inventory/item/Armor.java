@@ -39,5 +39,24 @@ public class Armor extends Equipment {
 		
 		return base;
 	}
+	
+	@Override
+	public boolean fitsSlot(Slot slot) {
+		switch (slot) {
+		case HEAD:
+		case CHEST:
+		case LEGS:
+		case ARMS:
+		case RING_LEFT:
+		case RING_RIGHT:
+		case BRACELET:
+		case AMULET:
+		case CAPE:
+			return true;
+		
+		default:
+			return false;
+		}
+	}
 
 }

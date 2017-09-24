@@ -252,4 +252,6 @@ public abstract class Equipment extends Item {
 		
 		return equip;
 	}
+	
+	public abstract boolean fitsSlot(Slot slot);
 }

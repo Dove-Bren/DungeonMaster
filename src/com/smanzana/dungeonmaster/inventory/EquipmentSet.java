@@ -51,6 +51,8 @@ public class EquipmentSet implements DataCompatible {
 		return new DataNode(key, null, list);
 	}
 	
-	
+	public int getTotalDefense() {
+		// Sum equipment INCLUDING offhand (if it's a shield)
+	}
 	
 }
