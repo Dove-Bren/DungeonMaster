@@ -98,6 +98,14 @@ public abstract class Pawn implements Notable, DataCompatible {
 	 */
 	public abstract boolean heal(Pawn source, int amount);
 	
+	public void restoreMana(Pawn source, int amount) {
+		stats.addMana(amount);
+	}
+	
+	public void restoreStamina(Pawn source, int amount) {
+		stats.addStamina(amount);
+	}
+	
 	@Override
 	public void addNote(String note) {
 		notes.add(note);

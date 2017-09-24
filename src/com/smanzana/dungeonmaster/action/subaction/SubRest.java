@@ -1,9 +1,9 @@
 package com.smanzana.dungeonmaster.action.subaction;
 
 import com.smanzana.dungeonmaster.pawn.Pawn;
+import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
-import com.smanzana.dungeonmaster.utils.ValueSpecifier;
 
 /**
  * Full rest.
@@ -24,13 +24,14 @@ public class SubRest extends SubAction {
 			target.heal(source, target.getMaxHealth());
 		
 		if (MechanicsConfig.instance().getBool(MechanicsKey.USE_MANA))
-			target.recoverMana(source, target.getMaxMana());
+			target.restoreMana(source, target.getMaxMana());
 			
 		if (MechanicsConfig.instance().getBool(MechanicsKey.USE_STAMINA))
-			target.recoverStamina(source, target.getMaxStamina());
+			target.restoreStamina(source, target.getMaxStamina());
 		
 		if (MechanicsConfig.instance().getBool(MechanicsKey.USE_SPELL_SLOTS))
-			target.recoverSpellSlots();
+			if (target instanceof Player)
+				((Player) target).recoverSpellSlots();
 	}	
 	
 }
