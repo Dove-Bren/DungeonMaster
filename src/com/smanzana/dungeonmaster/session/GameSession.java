@@ -207,6 +207,38 @@ public class GameSession extends SessionBase implements Notable {
 	//              Commands             //
 	///////////////////////////////////////
 	
+	/**
+	 * Generate a key that's not in use.
+	 * Does not return 0 (which is error key)
+	 * @return
+	 */
+	private int generatePawnKey() {
+		int key;
+		Random rand = new Random();
+		
+		key = rand.nextInt();
+		while (key == 0 || this.activePawns.containsKey(key)) {
+			key = rand.nextInt();
+		}
+		
+		return key;		
+	}
+	
+	public void removePawn(int key) {
+		// Handle if they're a player that has a comm!!!!
+		// TODO
+		
+		if (key == 0)
+			return;
+		
+		if (this.activePawns.isEmpty())
+			return;
+		
+		this.activePawns.remove(key);
+		
+		broadcast();
+	}
+	
 	// All of these happen on main thread.
 	// To call from UI, etc, use request queue
 	// Simple as wrapping call in anon class
@@ -287,16 +319,20 @@ public class GameSession extends SessionBase implements Notable {
 		}
 	}
 	
+	
+	// DM commands
 	public void broadcastLog(String line) {
-		
+		// TODO
+		junk();
 	}
 	
 	public void broadcastInventory(Inventory inv) {
-		
+		// TODO
+		junk();
 	}
 	
 	public void broadcastScreenClear() {
-		
+		junk();
 	}
 	
 	public void modifyPawn(int pawnID, Pawn.PawnOverlay data) {
@@ -353,6 +389,33 @@ public class GameSession extends SessionBase implements Notable {
 		
 		((Mob) pawn).applyOverlay(data);
 	}
+	
+	/**
+	 * Adds the pawn to the list of active pawns
+	 * Returns pawn key, in case you want it
+	 * @param pawn
+	 * @return 0 on error, non-zero key on success
+	 */
+	public int addActivePawn(Pawn pawn) {
+		if (pawn == null)
+			return 0;
+		
+		int key = this.generatePawnKey();
+		this.activePawns.put(key, pawn);
+		
+		broadcast();
+		return key;
+	}
+	
+	/**
+	 * Clears all pawns that aren't part of the party from
+	 * the active list
+	 */
+	public void clearNonParty() {
+		this.activePawns.entrySet().removeIf(e -> !party.contains(e.getValue()));
+		broadcast();
+	}
+	
 	
 	///////////////////////////////////////
 	//             Threading             //
