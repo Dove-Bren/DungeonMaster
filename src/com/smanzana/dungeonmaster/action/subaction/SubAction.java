@@ -24,25 +24,17 @@ public abstract class SubAction implements DataCompatible {
 		public T construct(DataNode data);
 	}
 	
-	private static Map<String, SubAction> registeredSubactions = new HashMap<>();
 	private static Map<String, SubActionFactory<?>> factories = new HashMap<>();
 	
 	public static SubAction fromData(DataNode data) {
 		if (data == null)
 			return null;
 		
-		if (null != data.getChild("type"))
-			return registeredSubactions.get(data.getChild("type").getValue());
-		
 		if (!factories.containsKey(data.getChild("type").getValue()))
 			return null;
 		
 		return factories.get(data.getChild("type")).construct(data);
 		
-	}
-	
-	protected static void registerSubaction(String name, SubAction subaction) {
-		registeredSubactions.put(name, subaction);
 	}
 	
 	protected abstract String getClassKey();
