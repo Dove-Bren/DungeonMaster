@@ -48,8 +48,35 @@ public class MechanicsConfig extends Config<MechanicsKey> {
 	
 	protected void setupDefaults()
 	{
-		setValue(MechanicsKey.DURABILITY_ENABLED, Boolean.TRUE);
-		setValue(MechanicsKey.EQUIPMENT_USE_DURABILITY, Boolean.TRUE);
+		for (MechanicsKey key : MechanicsKey.values())
+			setValue(key, Boolean.FALSE);
+
+		// D&D 5E
+		setValue(MechanicsKey.ALLOW_PC_CONTROL, Boolean.TRUE);
+		
+		setValue(MechanicsKey.USE_ABILITY_SCORES, Boolean.TRUE);
+		setValue(MechanicsKey.USE_HEALTH, Boolean.TRUE);
+		setValue(MechanicsKey.USE_OFFDEF, Boolean.TRUE);
+		setValue(MechanicsKey.USE_AC, Boolean.TRUE);
+
+		setValue(MechanicsKey.USE_LEVELS, Boolean.TRUE);
+		setValue(MechanicsKey.USE_LEVELS, Boolean.TRUE);
+		setValue(MechanicsKey.HP_FROM_CONSTITUTION, Boolean.TRUE);
+
+		setValue(MechanicsKey.USE_COMBAT_ACTIONS, Boolean.TRUE);
+		setValue(MechanicsKey.USE_DAMAGE_CALC, Boolean.TRUE);
+		setValue(MechanicsKey.USE_ENEMY_ACTIONS, Boolean.TRUE);
+		setValue(MechanicsKey.ENEMY_TARGET_RANDOM, Boolean.TRUE);
+		setValue(MechanicsKey.DROP_LOOT, Boolean.TRUE);
+		setValue(MechanicsKey.USE_INITIATIVE, Boolean.TRUE);
+
+		setValue(MechanicsKey.USE_ACTIONS, Boolean.TRUE);
+		setValue(MechanicsKey.AUTO_ACTIONS, Boolean.TRUE);
+
+		setValue(MechanicsKey.ITEMS_DROPABLE, Boolean.TRUE);
+		setValue(MechanicsKey.ITEMS_TRADING, Boolean.TRUE);
+		setValue(MechanicsKey.ITEMS_SELLABLE, Boolean.TRUE);
+		setValue(MechanicsKey.EQUIP_RESTRICT_SCORE, Boolean.TRUE);
 	}
 
 	@Override

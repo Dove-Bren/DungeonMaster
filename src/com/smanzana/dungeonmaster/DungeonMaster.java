@@ -1,5 +1,9 @@
 package com.smanzana.dungeonmaster;
 
+import java.io.File;
+
+import com.smanzana.dungeonmaster.session.GameSession;
+
 /**
  * D&D Companion Program.
  * Models D&D data
@@ -16,7 +20,7 @@ public class DungeonMaster {
 		// Creation mode: Create templates
 		// DM mode: Spawn a session from a template OR load an existing session
 		
-		//new GameSession(new File("testsession"));
+		new GameSession(new File("testsession"));
 	}
 		
 }
