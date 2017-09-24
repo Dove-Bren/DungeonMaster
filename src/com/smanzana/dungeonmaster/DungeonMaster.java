@@ -11,6 +11,7 @@ import com.smanzana.dungeonmaster.session.GameSession;
  */
 public class DungeonMaster {
 
+	private static GameSession activeSession = null;
 	
 	public static void main(String[] args) {
 		// Two modes:
@@ -20,7 +21,11 @@ public class DungeonMaster {
 		// Creation mode: Create templates
 		// DM mode: Spawn a session from a template OR load an existing session
 		
-		new GameSession(new File("testsession"));
+		activeSession = new GameSession(new File("testsession"));
+	}
+	
+	public static GameSession getActiveSession() {
+		return activeSession;
 	}
 		
 }

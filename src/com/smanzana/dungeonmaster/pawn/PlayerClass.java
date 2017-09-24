@@ -2,10 +2,11 @@ package com.smanzana.dungeonmaster.pawn;
 
 import java.util.List;
 
+import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
 import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
-import com.smanzana.dungeonmaster.spell.Spell;
+import com.smanzana.dungeonmaster.session.datums.SpellDatumData;
 
 /**
  * A character class
@@ -51,8 +52,8 @@ public class PlayerClass {
 		}
 		
 		if (null != data.getSpellUnlock(player.getLevel())) {
-			Spell spell = getSession().lookupSpell(data.getSpellUnlock(player.getLevel()));
-			player.awardSpell(spell);
+			SpellDatumData spell = DungeonMaster.getActiveSession().lookupSpell(data.getSpellUnlock(player.getLevel()));
+			player.awardSpell(spell.getSpell());
 		}
 	}
 }

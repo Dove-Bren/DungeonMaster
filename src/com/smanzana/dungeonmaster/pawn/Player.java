@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.battle.effects.Effect;
 import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.inventory.item.Item;
@@ -266,7 +267,7 @@ public class Player extends Pawn {
 		}
 		
 		if (null != (node = root.getChild("class"))) {
-			this.playerClass = new PlayerClass(getSession().lookupClass(node.getValue()));
+			this.playerClass = new PlayerClass(DungeonMaster.getActiveSession().lookupClass(node.getValue()));
 		}	
 	}
 
