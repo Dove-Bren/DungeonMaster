@@ -5,7 +5,7 @@ import java.util.Random;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
-public class Dice implements DataCompatible {
+public class Dice implements DataCompatible, ValueSpecifier {
 
 	private int dieCount;
 	private int dieFaces;
@@ -80,6 +80,11 @@ public class Dice implements DataCompatible {
 	public DataNode write(String key) {
 		// 1d3, 2d4, 5d5: (includes 0)
 		return new DataNode(key, this.dieFaces + "d" + this.dieCount + (this.includeZero ? ":" : ""), null);
+	}
+
+	@Override
+	public int fetchValue() {
+		return this.roll();
 	}
 	
 }

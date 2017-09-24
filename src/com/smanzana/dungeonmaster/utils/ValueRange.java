@@ -12,7 +12,7 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
  * @author Skyler
  *
  */
-public class ValueRange implements DataCompatible {
+public class ValueRange implements DataCompatible, ValueSpecifier {
 
 	private int min;
 	private int range;
@@ -86,6 +86,9 @@ public class ValueRange implements DataCompatible {
 		
 		return new DataNode(key, null, nodes);
 	}
-	
-	
+
+	@Override
+	public int fetchValue() {
+		return this.getRandom();
+	}
 }
