@@ -13,7 +13,7 @@ import com.smanzana.dungeonmaster.utils.ValueCapsule;
  */
 public class Mob extends NPC {
 	
-	List<Effect> activeEffects;
+	private List<Effect> activeEffects;
 	private boolean undead;
 	private boolean isAlly;
 	private int xp;
@@ -77,6 +77,10 @@ public class Mob extends NPC {
 		Effect.doPostEffects(activeEffects, source, this, capsule);
 		
 		return this.stats.getHealth() <= 0;
+	}
+	
+	public void addEffect(Effect effect) {
+		this.activeEffects.add(effect);
 	}
 	
 	@Override

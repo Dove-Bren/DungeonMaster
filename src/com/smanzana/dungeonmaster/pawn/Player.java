@@ -190,5 +190,9 @@ public class Player extends Pawn {
 		
 		return this.stats.getHealth() <= 0;
 	}
+	
+	public void addEffect(Effect effect) {
+		this.effects.add(effect);
+	}
 		
 }

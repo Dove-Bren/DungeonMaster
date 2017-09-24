@@ -66,6 +66,14 @@ public abstract class Pawn implements Notable, DataCompatible {
 		return stats.getMaxMana();
 	}
 	
+	public int getStamina() {
+		return stats.getStamina();
+	}
+	
+	public int getMaxStamina() {
+		return stats.getMaxStamina();
+	}
+	
 	public int getAbilityScore(Attributes attrib) {
 		return stats.getAbilityScore(attrib);
 	}

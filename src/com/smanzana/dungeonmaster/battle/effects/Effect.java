@@ -167,4 +167,6 @@ public abstract class Effect implements DataCompatible {
 		}
 	}
 	
+	public abstract Effect clone();
+	
 }
