@@ -1,7 +1,9 @@
 package com.smanzana.dungeonmaster.pawn;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.smanzana.dungeonmaster.battle.effects.Effect;
 import com.smanzana.dungeonmaster.inventory.Inventory;
@@ -10,6 +12,34 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.ValueCapsule;
 
 public class Player extends Pawn {
+	
+	private static class SpellSlot {
+		
+		private int total;
+		private int remaining;
+		
+		public SpellSlot(int total) {
+			this.remaining = this.total = total;
+		}
+		
+		public int getTotal() {
+			return this.total;
+		}
+		
+		public int getRemaining() {
+			return this.remaining;
+		}
+		
+		public void decrement() {
+			remaining--;
+			if (remaining < 0)
+				remaining = 0;
+		}
+		
+		public void refresh() {
+			remaining = total;
+		}
+	}
 	
 	private String name;
 	private String race;
@@ -20,10 +50,12 @@ public class Player extends Pawn {
 	private int xp;
 	private int maxXP;
 	private int level;
+	private Map<Integer, SpellSlot> spellSlots;
 	
 	public Player() {
 		effects = new LinkedList<>();
 		inventory = new Inventory();
+		this.spellSlots = new HashMap<>();
 		this.zombie = false;
 		this.xp = 0;
 	}
@@ -43,6 +75,56 @@ public class Player extends Pawn {
 	
 	public void addToInventory(Item item) {
 		inventory.addItem(item);
+	}
+	
+	public int getTotalSlots(int slotLevel) {
+		if (!spellSlots.containsKey(slotLevel))
+			return 0;
+		
+		return spellSlots.get(slotLevel).getTotal();
+	}
+	
+	public int getRemainingSlots(int slotLevel) {
+		if (!spellSlots.containsKey(slotLevel))
+			return 0;
+		
+		return spellSlots.get(slotLevel).getRemaining();
+	}
+	
+	public void recoverSpellSlots() {
+		for (Integer level : spellSlots.keySet()) {
+			spellSlots.get(level).refresh();
+		}
+	}
+	
+	public void setSpellSlots(int level, int count) {
+		spellSlots.put(level, new SpellSlot(count));
+	}
+	
+	/**
+	 * Tries to use tightest-fitting spell slot.
+	 * @param level
+	 * @return true if slot found and consumed. False is none are available
+	 */
+	public boolean consumeSpellSlot(int level) {
+		int minLevel = Integer.MAX_VALUE; // min level with available slot (> level)
+		for (Integer l : spellSlots.keySet()) {
+			if (l < level)
+				continue;
+			
+			if (l > minLevel)
+				continue;
+			
+			if (spellSlots.get(l).getRemaining() > 0) {
+				minLevel = l;
+			}
+		}
+		
+		if (minLevel == Integer.MAX_VALUE)
+			return false;
+		
+		spellSlots.get(minLevel).decrement();
+		return true;
 	}
 	
 	public int getLevel() {
