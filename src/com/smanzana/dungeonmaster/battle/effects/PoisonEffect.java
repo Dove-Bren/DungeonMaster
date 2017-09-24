@@ -58,4 +58,9 @@ public class PoisonEffect extends Effect {
 		return base;
 	}
 	
+	@Override
+	public Effect clone() {
+		return new PoisonEffect(this.getName(), this.getDescription(), this.getDurationCount(), this.damage);
+	}
+	
 }
