@@ -10,6 +10,7 @@ import java.util.Map;
 import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
+import com.smanzana.dungeonmaster.utils.Dice;
 import com.smanzana.dungeonmaster.utils.ValueRange;
 
 /**
@@ -44,6 +45,7 @@ public class ClassDatumData implements DatumData {
 	private Map<Attributes, ValueRange> growthRanges;
 	private Map<Integer, String> spellUnlocks;
 	private List<String> promotions;
+	private Dice hitdice;
 	
 	public ClassDatumData() {
 		this.startRanges = new EnumMap<>(Attributes.class);
@@ -65,13 +67,14 @@ public class ClassDatumData implements DatumData {
 	}
 	
 	public ClassDatumData(String name, String description, Map<Attributes, ValueRange> startRanges,
-			Map<Attributes, ValueRange> growthRanges, Map<Integer, String> spellUnlocks, List<String> promotions) {
+			Map<Attributes, ValueRange> growthRanges, Map<Integer, String> spellUnlocks, List<String> promotions, Dice hitdice) {
 		this.name = name;
 		this.description = description;
 		this.startRanges = startRanges;
 		this.growthRanges = growthRanges;
 		this.spellUnlocks = spellUnlocks;
 		this.promotions = promotions;
+		this.hitdice = hitdice;
 		
 		// For safety, make sure ranges are filled with enum values
 		for (Attributes at : Attributes.values()) {
@@ -153,6 +156,18 @@ public class ClassDatumData implements DatumData {
 	public String getSpellUnlock(int level) {
 		return spellUnlocks.get(level);
 	}
+	
+	public Dice getHitDice() {
+		return this.hitdice;
+	}
+	
+	/**
+	 * Die used to roll for additional hp per level
+	 * @param hitdice
+	 */
+	public void setHitDice(Dice hitdice) {
+		this.hitdice = hitdice;
+	}
 
 	@Override
 	public void load(DataNode root) {
@@ -217,6 +232,11 @@ public class ClassDatumData implements DatumData {
 			for (DataNode child : node.getChildren())
 				this.addPromotion(child.getValue());
 		}
+
+		if ((node = root.getChild("hitdice")) != null) {
+			this.hitdice = new Dice(1,1, false);
+			hitdice.load(node);
+		}
 	}
 
 	@Override
@@ -246,6 +266,9 @@ public class ClassDatumData implements DatumData {
 			nodes.add(new DataNode("promotions", null, list));
 		}
 		
+		if (hitdice != null)
+			nodes.add(hitdice.write("hitdice"));
+		
 		return new DataNode(key, null, nodes);
 	}
 
@@ -268,6 +291,11 @@ public class ClassDatumData implements DatumData {
 		data.setStatGrowth(Attributes.WISDOM, 5, 10);
 		data.setStatGrowth(Attributes.INTELLIGENCE, 5, 10);
 		data.setStatGrowth(Attributes.CONSTITUTION, 5, 10);
+		
+		data.addSpellUnlock(5, "Fireball");
+		data.addSpellUnlock(10, "Fireball II");
+		
+		data.setHitDice(new Dice(1,12,false));
 		
 		return data;
 	}

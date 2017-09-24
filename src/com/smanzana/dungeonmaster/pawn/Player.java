@@ -11,8 +11,10 @@ import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.inventory.item.Item;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
+import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.spell.Spell;
+import com.smanzana.dungeonmaster.utils.Dice;
 import com.smanzana.dungeonmaster.utils.ValueCapsule;
 
 public class Player extends Pawn {
@@ -57,6 +59,7 @@ public class Player extends Pawn {
 	private Map<Integer, SpellSlot> spellSlots;
 	private List<Spell> spells;
 	private PlayerClass playerClass;
+	private int rawHitDice; // amount of health from hitdice alone. No modifiers.
 	
 	public Player() {
 		effects = new LinkedList<>();
@@ -66,6 +69,7 @@ public class Player extends Pawn {
 		this.zombie = false;
 		this.playerClass = null;
 		this.xp = 0;
+		this.rawHitDice = 0;
 	}
 
 	public Player(String name, String race, String background, int maxXP, int level) {
@@ -171,8 +175,37 @@ public class Player extends Pawn {
 	}
 	
 	public void levelup() {
-		// TODO hooks!
-		// TODO do things based on config
+		this.level++;
+		
+		if (this.playerClass != null)
+			this.playerClass.applyLevel(this);
+		
+		if (MechanicsConfig.instance().getBool(MechanicsKey.HP_FROM_CONSTITUTION)) {
+			int scale = MechanicsConfig.instance().getInt(MechanicsKey.HP_FROM_CONSTITUTION_SCALE);
+			if (scale == 0)
+				System.out.println("Told to set HP from constitution, but scale set to 0!");
+			else
+				stats.setMaxHealth(stats.getAbilityScore(Attributes.CONSTITUTION) * scale);
+		} else if (MechanicsConfig.instance().getBool(MechanicsKey.HP_FROM_HITDICE)) {
+			Dice dice = this.playerClass.getHitDice();
+			if (dice == null)
+				System.out.println("Told to use hitdice for max health, but hitdice aren't defined (for class " + playerClass.getName() + ")");
+			else {
+				int max;
+				
+				// first roll HD and add to raw
+				this.rawHitDice += dice.roll();
+				
+				// now calculate max from raw HD + cons modifier * level
+				max = rawHitDice;
+				if (MechanicsConfig.instance().getBool(MechanicsKey.HP_FROM_HITDICE_BONUS))
+					max += (level * RollTableConfig.instance().getBonus(Attributes.CONSTITUTION, stats.getAbilityScore(Attributes.CONSTITUTION)));
+				
+				stats.setMaxHealth(max);
+			}
+		}
+		
+		stats.setHealth(stats.getMaxHealth());
 	}
 	
 	public void awardXP(int amount) {
@@ -248,6 +281,10 @@ public class Player extends Pawn {
 			this.maxXP = DataNode.parseInt(node);
 		}
 		
+		if (null != (node = root.getChild("rawhitdice"))) {
+			this.rawHitDice = DataNode.parseInt(node);
+		}
+		
 		if (null != (node = root.getChild("level"))) {
 			this.level = DataNode.parseInt(node);
 		}
@@ -280,6 +317,7 @@ public class Player extends Pawn {
 		base.addChild(new DataNode("background", background, null));
 		base.addChild(new DataNode("xp", "" + xp, null));
 		base.addChild(new DataNode("maxxp", "" + maxXP, null));
+		base.addChild(new DataNode("rawhitdice", "" + rawHitDice, null));
 		base.addChild(new DataNode("level", "" + level, null));
 		base.addChild(new DataNode("zombie", "" + zombie, null));
 		base.addChild(inventory.write("inventory"));

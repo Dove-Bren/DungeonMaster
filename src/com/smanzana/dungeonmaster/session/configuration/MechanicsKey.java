@@ -18,10 +18,18 @@ public enum MechanicsKey {
 	// Progression
 	USE_LEVELS("Turns on level tracking", "When turned off, leveling'up (including adjusting stats) must be done", "entirely by the DM"),
 	USE_XP("Turns on XP tracking", "When disabled, DM is responsible for triggering 'level ups' (if enabled)", "Requires USE_LEVELS"),
-	LEVEL_ABILITY_SCORES("Does leveling increase ability scores?", "Amounts are configured in rolltables.cfg", "Requires USE_LEVELS, USE_ABILITY_SCORES"),
-	HP_FROM_CONSTITUTION("Is max health based off of constitution?", "Configure scale below", "Requires USE_ABILITY_SCORES, USE_HEALTH"),
+	LEVEL_ABILITY_SCORES("Does leveling automatically increase ability scores?", "Amounts are configured in rolltables.cfg", "Requires USE_LEVELS, USE_ABILITY_SCORES"),
+	LEVEL_ALLOCATE_POINTS("On level, do players get points to spend how they choose?", "Works along side LEVEL_ABILITY_SCORES", "Requires USE_LEVELS, USE_ABILITY_SCORES"),
+	LEVEL_ALLOCATE_POINTS_AMOUNT("How many points are players given to allocate?", "Requires LEVEL_aLLOCATE_POINTS"),
+	LEVEL_ALLOCATE_POINTS_INTERVAL("How many levels between point allocation?", "Requires LEVEL_ALLOCATE_POINTS"),
+	HP_FROM_HITDICE("Is max health obtained by rolling hitdice?", "If so, each level a new HD is rolled and added to max health", "Requires USE_ABILITY_SCORES, USE_HEALTH,"),
+	HP_FROM_HITDICE_BONUS("Should constitution modifier be added to health?", "Requires HP_FROM_HITDICE"),
+	HP_FROM_CONSTITUTION("Is max health based off of constitution?", "Configure scale below", "Conflicts with HP_FROM_HITDICE. If set, HitDice are ignored", "Requires USE_ABILITY_SCORES, USE_HEALTH"),
+	HP_FROM_CONSTITUTION_SCALE("How many hp are given per constitution", "Requires HP_FROM_CONSTITUTION, USE_ABILITY_SCORES, USE_HEALTH"),
 	MP_FROM_WISDOM("Is max mana based off of wisdom?", "Configure scale below", "Requires USE_ABILITY_SCORES, USE_MANA"),
+	MP_FROM_WISDOM_SCALE("How many mp are given per wisdom", "Requires MP_FROM_WISDOM, USE_ABILITY_SCORES, USE_MANA"),
 	STAMINA_FROM_DEXTERITY("Is max stamina based off of dexterity?", "Configure scale below", "Requires USE_ABILITY_SCORES, USE_STAMINA"),
+	STAMINA_FROM_DEXTERITY_SCALE("How much stamina is given per dexterity", "Requires STAMINA_FROM_DEXTERITY, USE_ABILITY_SCORES, USE_STAMINA"),
 	
 	// Setting (place, location, etc)
 	// TODO
