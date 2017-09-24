@@ -2,6 +2,7 @@ package com.smanzana.dungeonmaster.session.datums;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,11 +42,13 @@ public class ClassDatumData implements DatumData {
 	private String description;
 	private Map<Attributes, ValueRange> startRanges;
 	private Map<Attributes, ValueRange> growthRanges;
+	private Map<Integer, String> spellUnlocks;
 	private List<String> promotions;
 	
 	public ClassDatumData() {
 		this.startRanges = new EnumMap<>(Attributes.class);
 		this.growthRanges = new EnumMap<>(Attributes.class);
+		this.spellUnlocks = new HashMap<>();
 		
 		for (Attributes at : Attributes.values()) {
 			startRanges.put(at, new ValueRange(0, 0));
@@ -62,11 +65,12 @@ public class ClassDatumData implements DatumData {
 	}
 	
 	public ClassDatumData(String name, String description, Map<Attributes, ValueRange> startRanges,
-			Map<Attributes, ValueRange> growthRanges, List<String> promotions) {
+			Map<Attributes, ValueRange> growthRanges, Map<Integer, String> spellUnlocks, List<String> promotions) {
 		this.name = name;
 		this.description = description;
 		this.startRanges = startRanges;
 		this.growthRanges = growthRanges;
+		this.spellUnlocks = spellUnlocks;
 		this.promotions = promotions;
 		
 		// For safety, make sure ranges are filled with enum values
@@ -137,6 +141,14 @@ public class ClassDatumData implements DatumData {
 	public ValueRange getGrowthRange(Attributes attrib) {
 		return this.growthRanges.get(attrib);
 	}
+	
+	public void clearSpellUnlocks() {
+		spellUnlocks.clear();
+	}
+	
+	public void addSpellUnlock(int level, String spell) {
+		spellUnlocks.put(level, spell);
+	}
 
 	@Override
 	public void load(DataNode root) {
@@ -179,6 +191,19 @@ public class ClassDatumData implements DatumData {
 				ValueRange range = new ValueRange(0, 0);
 				range.load(aNode);
 				this.setStatGrowth(attr, range);
+			}
+		}
+		
+		spellUnlocks.clear();
+		if ((node = root.getChild("spell_unlocks")) != null) {
+			for (DataNode child : node.getChildren()) {
+				// have level, spell name
+				if (child.getChild("name") == null || child.getChild("spell") == null)
+					continue;
+				
+				spellUnlocks.put(
+						DataNode.parseInt(child.getChild("name")),
+						child.getChild("spell").getValue());
 			}
 		}
 		
