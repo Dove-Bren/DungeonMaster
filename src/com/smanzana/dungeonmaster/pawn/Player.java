@@ -19,6 +19,110 @@ import com.smanzana.dungeonmaster.utils.ValueCapsule;
 
 public class Player extends Pawn {
 	
+	public static class PlayerOverlay {
+		private String name;
+		private String race;
+		private String background;
+		//private Inventory inventory;
+		private List<Effect> effects;
+		private Boolean zombie;
+		private Integer xp;
+		private Integer maxXP;
+		private Integer level;
+		private Map<Integer, SpellSlot> spellSlots;
+		private List<Spell> spells;
+		private PlayerClass playerClass;
+		
+		public PlayerOverlay() {
+			effects = new LinkedList<>();
+			spellSlots = new HashMap<>();
+			spells = new LinkedList<>();
+		}
+
+		public PlayerOverlay(String name, String race, String background, List<Effect> effects, boolean zombie, int xp,
+				int maxXP, int level, Map<Integer, SpellSlot> spellSlots, List<Spell> spells, PlayerClass playerClass) {
+			this.name = name;
+			this.race = race;
+			this.background = background;
+			this.effects = effects;
+			this.zombie = zombie;
+			this.xp = xp;
+			this.maxXP = maxXP;
+			this.level = level;
+			this.spellSlots = spellSlots;
+			this.spells = spells;
+			this.playerClass = playerClass;
+		}
+
+		public PlayerOverlay name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public PlayerOverlay race(String race) {
+			this.race = race;
+			return this;
+		}
+
+		public PlayerOverlay background(String background) {
+			this.background = background;
+			return this;
+		}
+
+		public PlayerOverlay addEffect(Effect effect) {
+			this.effects.add(effect);
+			return this;
+		}
+
+		public PlayerOverlay zombie(boolean zombie) {
+			this.zombie = zombie;
+			return this;
+		}
+
+		public PlayerOverlay xp(int xp) {
+			this.xp = xp;
+			return this;
+		}
+
+		public PlayerOverlay maxxp(int maxXP) {
+			this.maxXP = maxXP;
+			return this;
+		}
+
+		public PlayerOverlay level(int level) {
+			this.level = level;
+			return this;
+		}
+
+		public PlayerOverlay spellSlotsMax(int level, int max) {
+			if (!this.spellSlots.containsKey(level))
+				this.spellSlots.put(level, new SpellSlot(max));
+			else
+				this.spellSlots.get(level).total = max;
+			return this;
+		}
+
+		public PlayerOverlay spellSlotsAvailable(int level, int remaining) {
+			if (!this.spellSlots.containsKey(level))
+				this.spellSlots.put(level, new SpellSlot(remaining));
+			else
+				this.spellSlots.get(level).remaining = remaining;
+			return this;
+		}
+
+		public PlayerOverlay addSpell(Spell spell) {
+			this.spells.add(spell);
+			return this;
+		}
+
+		public PlayerOverlay setPlayerClass(PlayerClass playerClass) {
+			this.playerClass = playerClass;
+			return this;
+		}
+		
+		
+	}
+	
 	private static class SpellSlot {
 		
 		private int total;
@@ -358,5 +462,50 @@ public class Player extends Pawn {
 	public void addEffect(Effect effect) {
 		this.effects.add(effect);
 	}
+	
+	public void applyOverlay(PlayerOverlay data) {
 		
+		if (data.name != null)
+			this.name = data.name;
+		
+		if (data.race != null)
+			this.race = data.race;
+		
+		if (data.background != null)
+			this.background = data.background;
+
+		if (data.zombie != null)
+			this.zombie = data.zombie;
+
+		if (data.xp != null)
+			this.xp = data.xp;
+
+		if (data.maxXP != null)
+			this.maxXP = data.maxXP;
+
+		if (data.level != null)
+			this.level = data.level;
+
+		if (data.playerClass != null)
+			this.playerClass = data.playerClass;
+		
+		if (data.effects != null && !data.effects.isEmpty()) {
+			this.effects.clear();
+			for (Effect e : data.effects)
+				this.effects.add(e);
+		}
+		
+		if (data.spells != null && !data.spells.isEmpty()) {
+			this.spells.clear();
+			for (Spell s : data.spells)
+				this.spells.add(s);
+		}
+		
+		if (data.spellSlots != null && !data.spells.isEmpty()) {
+			for (int level : data.spellSlots.keySet()) {
+				// overwrite what we have
+				this.spellSlots.put(level, data.spellSlots.get(level));
+			}
+		}
+	}
 }

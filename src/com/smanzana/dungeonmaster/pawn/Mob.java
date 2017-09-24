@@ -1,5 +1,6 @@
 package com.smanzana.dungeonmaster.pawn;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.dungeonmaster.battle.effects.Effect;
@@ -12,6 +13,44 @@ import com.smanzana.dungeonmaster.utils.ValueCapsule;
  *
  */
 public class Mob extends NPC {
+	
+	public static class MobOverlay {
+		private Boolean undead;
+		private Boolean isAlly;
+		private Integer xp;
+		private List<Effect> effects;
+		
+		public MobOverlay() {
+			effects = new LinkedList<>();
+		}
+
+		public MobOverlay(Boolean undead, Boolean isAlly, Integer xp, List<Effect> effects) {
+			this.undead = undead;
+			this.isAlly = isAlly;
+			this.xp = xp;
+			this.effects = effects;
+		}
+		
+		public MobOverlay addEffect(Effect effect) {
+			this.effects.add(effect);
+			return this;
+		}
+
+		public MobOverlay undead(boolean undead) {
+			this.undead = undead;
+			return this;
+		}
+
+		public MobOverlay ally(boolean ally) {
+			this.isAlly = ally;
+			return this;
+		}
+
+		public MobOverlay xp(int xp) {
+			this.xp = xp;
+			return this;
+		}
+	}
 	
 	private List<Effect> activeEffects;
 	private boolean undead;
@@ -115,6 +154,24 @@ public class Mob extends NPC {
 		base.addChild(DataNode.serializeAll("effects", "effect", activeEffects));
 		
 		return base;
+	}
+	
+	public void applyOverlay(MobOverlay data) {
+		if (data.isAlly != null)
+			this.isAlly = data.isAlly;
+		
+		if (data.xp != null)
+			this.xp = data.xp;
+
+		if (data.undead != null)
+			this.undead = data.undead;
+		
+		if (data.effects != null && !data.effects.isEmpty()) {
+			this.activeEffects.clear();
+			for (Effect e : data.effects)
+				this.activeEffects.add(e);
+		}
+		
 	}
 	
 }

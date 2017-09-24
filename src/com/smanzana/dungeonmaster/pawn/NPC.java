@@ -9,6 +9,30 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
  *
  */
 public class NPC extends Pawn {
+	
+	public static class NPCOverlay {
+		private String race;
+		private String name;
+		
+		public NPCOverlay() {
+			;
+		}
+		
+		public NPCOverlay(String race, String name) {
+			this.name= name;
+			this.race = race;
+		}
+		
+		public NPCOverlay name(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public NPCOverlay race(String race) {
+			this.race = race;
+			return this;
+		}
+	}
 
 	private Inventory inventory;
 	private String race;
@@ -67,6 +91,14 @@ public class NPC extends Pawn {
 	public boolean heal(Pawn source, int amount) {
 		; // do nothing. Again, not a mob
 		return false;
+	}
+	
+	public void applyOverlay(NPCOverlay data) {
+		if (data.race != null)
+			this.race = data.race;
+		
+		if (data.name != null)
+			this.name = data.name;
 	}
 
 }
