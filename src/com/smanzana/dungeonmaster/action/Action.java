@@ -3,8 +3,10 @@ package com.smanzana.dungeonmaster.action;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.action.subaction.SubAction;
 import com.smanzana.dungeonmaster.pawn.Pawn;
+import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
 /**
  * Generic Action.
@@ -21,6 +23,19 @@ import com.smanzana.dungeonmaster.pawn.Pawn;
  * Building subaction from serial would mean parsing script of sorts. This is harder (and maybe not needed?)
  */
 public class Action extends SubAction {
+	
+	private static class Factory implements SubActionFactory<Action> {
+		@Override
+		public Action construct(DataNode data) {
+			Action ret = new Action();
+			ret.load(data);
+			return ret;
+		}
+	}
+	
+	{
+		SubAction.registerFactory(getClassKey(), new Factory());
+	}
 
 	public static enum TargetType {
 		SELF,
@@ -33,6 +48,10 @@ public class Action extends SubAction {
 	private String description;
 	private List<SubAction> subActions;
 	private TargetType targetType;
+	
+	private Action() {
+		this.subActions = new LinkedList<>();
+	}
 	
 	protected Action(String name, String description, TargetType type) {
 		this.subActions = new LinkedList<>();
@@ -114,6 +133,51 @@ public class Action extends SubAction {
 		// Apply subactions
 		for (SubAction action : subActions)
 			action.apply(source, target);
+	}
+
+	@Override
+	public void load(DataNode root) {
+		DataNode node;
+		
+		if (null != (node = root.getChild("name"))) {
+			name = node.getValue();
+		}
+		
+		if (null != (node = root.getChild("description"))) {
+			description = node.getValue();
+		}
+		
+		this.subActions.clear();
+		if (null != (node = root.getChild("subactions"))) {
+			for (DataNode child : node.getChildren())
+				subActions.add(SubAction.fromData(child));
+		}
+		
+		if (null != (node = root.getChild("targettype"))) {
+			try {
+				targetType = TargetType.valueOf(node.getValue());
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+				System.out.println("Cannot convert " + node.getValue() + " to a target type");
+			}
+		}
+	}
+
+	@Override
+	public DataNode write(String key) {
+		DataNode base = super.write(key);
+		
+		base.addChild(new DataNode("name", name, null));
+		base.addChild(new DataNode("description", description, null));
+		base.addChild(DataNode.serializeAll("subactions", "subaction", subActions));
+		base.addChild(new DataNode("targettype", targetType.name(), null));
+		
+		return base;
+	}
+
+	@Override
+	protected String getClassKey() {
+		return "action";
 	}
 	
 }

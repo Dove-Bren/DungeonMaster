@@ -1,8 +1,10 @@
 package com.smanzana.dungeonmaster.action;
 
+import com.smanzana.dungeonmaster.action.subaction.SubAction;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
+import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
 /**
  * Action performed by the whole party.
@@ -14,6 +16,19 @@ import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
  *
  */
 public class PartyAction extends Action {
+	
+	private static class Factory implements SubActionFactory<PartyAction> {
+		@Override
+		public PartyAction construct(DataNode data) {
+			PartyAction ret = new PartyAction(null, null, TargetType.SELF);
+			ret.load(data);
+			return ret;
+		}
+	}
+	
+	{
+		SubAction.registerFactory(getClassKey(), new Factory());
+	}
 
 	public PartyAction(String name, String description, TargetType targetType) {
 		super(name, description, targetType);
@@ -29,6 +44,11 @@ public class PartyAction extends Action {
 		}
 		
 		super.perform(source);
+	}
+
+	@Override
+	protected String getClassKey() {
+		return "partyaction";
 	}
 	
 }
