@@ -1,16 +1,12 @@
 package com.smanzana.dungeonmaster.session.datums;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import com.smanzana.dungeonmaster.action.subaction.SubAction;
-import com.smanzana.dungeonmaster.pawn.Attributes;
+import com.smanzana.dungeonmaster.action.subaction.SubRest;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
-import com.smanzana.dungeonmaster.utils.ValueRange;
 
 /**
  * Stores:
@@ -114,28 +110,13 @@ public class ActionDatumData implements DatumData {
 		node.addChild(new DataNode("description", this.description));
 		node.addChild(DataNode.serializeAll("subactions", "subaction", subactions));
 		
-		return new DataNode(key, null, nodes);
+		return node;
 	}
 
 	public static DatumData getExampleData() {
-		ActionDatumData data = new ActionDatumData("Class-Example", "Just an example class");
+		ActionDatumData data = new ActionDatumData("Rest At Inn", "Purchase a room and sleep, recovering health and spell slots.");
 		
-		data.addPromotion("Class2");
-		data.addPromotion("Class3");
-		
-		data.setStatBase(Attributes.STRENGTH, 5, 10);
-		data.setStatBase(Attributes.CHARISMA, 10, 12);
-		data.setStatBase(Attributes.DEXTERITY, 5, 10);
-		data.setStatBase(Attributes.WISDOM, 5, 10);
-		data.setStatBase(Attributes.INTELLIGENCE, 5, 10);
-		data.setStatBase(Attributes.CONSTITUTION, 5, 10);
-		
-		data.setStatGrowth(Attributes.STRENGTH, 5, 10);
-		data.setStatGrowth(Attributes.CHARISMA, 10, 12);
-		data.setStatGrowth(Attributes.DEXTERITY, 5, 10);
-		data.setStatGrowth(Attributes.WISDOM, 5, 10);
-		data.setStatGrowth(Attributes.INTELLIGENCE, 5, 10);
-		data.setStatGrowth(Attributes.CONSTITUTION, 5, 10);
+		data.addSubaction(new SubRest());
 		
 		return data;
 	}
