@@ -32,6 +32,7 @@ public class ProfileDatumData implements DatumData {
 		
 	}
 	
+	private String profileName;
 	private String race;
 	private NameSet first;
 	private List<NameSet> additional;
@@ -40,9 +41,14 @@ public class ProfileDatumData implements DatumData {
 		this.additional = new LinkedList<>();
 	}
 	
-	public ProfileDatumData(String race) {
+	public ProfileDatumData(String profileName, String race) {
 		this();
+		this.profileName = profileName;
 		this.race = race;
+	}
+	
+	public String getProfileName() {
+		return this.profileName;
 	}
 	
 	public String getGeneratedName() {
@@ -78,6 +84,11 @@ public class ProfileDatumData implements DatumData {
 		race = "";
 		
 		DataNode node;
+
+		if ((node = root.getChild("profilename")) != null) {
+			this.profileName = node.getValue();
+		}
+		
 		if ((node = root.getChild("race")) != null) {
 			this.race = node.getValue();
 		}
@@ -111,7 +122,8 @@ public class ProfileDatumData implements DatumData {
 			buf += " {" + set.serialize() + "}";
 		}
 		
-		List<DataNode> children = new ArrayList<>(2);
+		List<DataNode> children = new ArrayList<>(3);
+		children.add(new DataNode("profilename", this.profileName, null));
 		children.add(new DataNode("race", this.race, null));
 		children.add(new DataNode("names", buf, null));
 		
@@ -119,9 +131,10 @@ public class ProfileDatumData implements DatumData {
 	}
 
 	public static DatumData getExampleData() {
-		ProfileDatumData data = new ProfileDatumData("");
+		ProfileDatumData data = new ProfileDatumData();
 		
-		List<DataNode> list = new ArrayList<>(2);
+		List<DataNode> list = new ArrayList<>(3);
+		list.add(new DataNode("profilename", "example", null));
 		list.add(new DataNode("race", "Example Race", null));
 		list.add(new DataNode("names", "{Rgathr:Vratt:Bryton:Lanctifer} {The Brave:Nostrilstrong:Groverton}", null));
 		

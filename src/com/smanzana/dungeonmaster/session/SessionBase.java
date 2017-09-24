@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.smanzana.dungeonmaster.action.Action;
+import com.smanzana.dungeonmaster.action.ActionRegistry;
 import com.smanzana.dungeonmaster.session.configuration.CombatBonusConfig;
 import com.smanzana.dungeonmaster.session.configuration.Config;
 import com.smanzana.dungeonmaster.session.configuration.KeywordConfig;
@@ -46,6 +48,37 @@ public abstract class SessionBase {
 		this.profileDatum = new Datum<ProfileDatumData>("profile", new ProfileDatumData.ProfileDatumFactory());
 		this.actionDatum = new Datum<>("action", new ActionDatumData.ActionDatumFactory());
 		this.spellDatum = new Datum<>("spell", new SpellDatumData.SpellDatumFactory());
+	}
+	
+	public ClassDatumData lookupClass(String className) {
+		for (ClassDatumData data : classDatum.getData()) {
+			if (data.getName().equals(className))
+				return data;
+		}
+		
+		return null;
+	}
+	
+	public ProfileDatumData lookupProfile(String profileName) {
+		for (ProfileDatumData profile : profileDatum.getData()) {
+			if (profile.getProfileName().equals(profileName))
+				return profile;
+		}
+		
+		return null;
+	}
+	
+	public SpellDatumData lookupSpell(String spellName) {
+		for (SpellDatumData data : spellDatum.getData()) {
+			if (data.getSpell().getName().equals(spellName))
+				return data;
+		}
+		
+		return null;
+	}
+	
+	public Action lookupAction(String actionName) {
+		return ActionRegistry.instance().lookupAction(actionName);
 	}
 	
 	public File getRoot() {
