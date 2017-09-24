@@ -8,6 +8,8 @@ import java.util.Map;
 import com.smanzana.dungeonmaster.battle.effects.Effect;
 import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.inventory.item.Item;
+import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
+import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.ValueCapsule;
 
@@ -105,8 +107,21 @@ public class Player extends Pawn {
 	 * Tries to use tightest-fitting spell slot.
 	 * @param level
 	 * @return true if slot found and consumed. False is none are available
+	 * Always returns false if config doesn't use slots
 	 */
 	public boolean consumeSpellSlot(int level) {
+		if (!MechanicsConfig.instance().getBool(MechanicsKey.USE_SPELL_SLOTS))
+			return false;
+		
+		// must have spell slot of right size
+		if (getRemainingSlots(level) > 0) {
+			spellSlots.get(level).decrement();
+			return true;
+		}
+		
+		if (!MechanicsConfig.instance().getBool(MechanicsKey.USE_SPELL_SLOTS_LARGER))
+			return false; // don't get to try and find a bigger one
+		
 		int minLevel = Integer.MAX_VALUE; // min level with available slot (> level)
 		for (Integer l : spellSlots.keySet()) {
 			if (l < level)
@@ -115,7 +130,7 @@ public class Player extends Pawn {
 			if (l > minLevel)
 				continue;
 			
-			if (spellSlots.get(l).getRemaining() > 0) {
+			if (getRemainingSlots(l) > 0) {
 				minLevel = l;
 			}
 		}

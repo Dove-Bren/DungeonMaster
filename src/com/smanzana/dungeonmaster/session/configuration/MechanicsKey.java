@@ -45,6 +45,10 @@ public enum MechanicsKey {
 	USE_ACTIONS("Enables or disables all actions", "When false, DM is responsible for ALL modification of inventory, effects, etc."),
 	AUTO_ACTIONS("Actions are pulled from relevant NPCs and objects when possible", "DM can still add manual actions", "Example: NPCs that sell will auto create a 'buy/sell' action", "Requires USE_ACTIONS"),
 	
+	// Magic
+	USE_SPELL_SLOTS("Casting spells consume spell slots", "If USE_MANA is true, spells will also cost mana.", "Requires USE_ACTIONS"),
+	USE_SPELL_SLOTS_LARGER("If the appropriate spell slot is not available to cast a spell, should", "a large one be used instead?", "Requires USE_SPELL_SLOTS"),
+	
 	// Items
 	ITEMS_DROPABLE("Can PCs drop items?", "If false, items must be removed by DM", "Requires ALLOW_PC_CONTROL"),
 	ITEMS_TRADING("Enables buy/sell of items", "Only NPCs marked as merchants will present this action", "If false, DM can remove item and add gold manually", "Requires ALLOW_PC_CONTROL"),
