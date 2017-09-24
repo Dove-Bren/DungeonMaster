@@ -283,7 +283,7 @@ public class GameSession extends SessionBase implements Notable {
 		if (inv == null) {
 			System.out.println("Cannot perform " + operation.name() + " on null inventory");
 		} else {
-			inv.performOperation(operation, slowID);
+			inv.performOperation(operation, slotID);
 		}
 	}
 	
@@ -339,7 +339,7 @@ public class GameSession extends SessionBase implements Notable {
 		((NPC) pawn).applyOverlay(data);
 	}
 	
-	public void modifyNPC(int pawnID, Mob.MobOverlay data) {
+	public void modifyMob(int pawnID, Mob.MobOverlay data) {
 		Pawn pawn = this.lookupPawn(pawnID);
 		if (pawn == null) {
 			System.out.println("Cannot perform pawn data overlay on null pawn");
