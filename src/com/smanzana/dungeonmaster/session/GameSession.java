@@ -434,6 +434,27 @@ public class GameSession extends SessionBase implements Notable {
 		return actions;
 	}
 	
+	/**
+	 * First, clears current setting. If clearPawns, also clears non-party pawns.
+	 * Then, sets setting to new setting if it can be found.
+	 * @param newSettingTitle
+	 */
+	public void moveSetting(String newSettingTitle, boolean clearPawns) {
+		this.setting = null;
+		this.clearNonParty();
+		
+		this.setting = this.lookupSetting(newSettingTitle);
+		broadcast();
+	}
+	
+	/**
+	 * Can be null. Clients should show nothing when null
+	 * @return
+	 */
+	public Setting getCurrentSetting() {
+		return setting;
+	}
+	
 	///////////////////////////////////////
 	//             Threading             //
 	///////////////////////////////////////

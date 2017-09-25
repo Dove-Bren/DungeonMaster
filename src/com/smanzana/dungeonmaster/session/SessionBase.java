@@ -17,6 +17,7 @@ import com.smanzana.dungeonmaster.session.datums.Datum;
 import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
 import com.smanzana.dungeonmaster.session.datums.SettingDatumData;
 import com.smanzana.dungeonmaster.session.datums.SpellDatumData;
+import com.smanzana.dungeonmaster.setting.Setting;
 
 public abstract class SessionBase {
 	
@@ -83,6 +84,15 @@ public abstract class SessionBase {
 	
 	public Action lookupAction(String actionName) {
 		return ActionRegistry.instance().lookupAction(actionName);
+	}
+	
+	public Setting lookupSetting(String settingTitle) {
+		for (SettingDatumData data : settingDatum.getData()) {
+			if (data.getSetting().getTitle().equals(settingTitle))
+				return data.getSetting();
+		}
+		
+		return null;
 	}
 	
 	public File getRoot() {
