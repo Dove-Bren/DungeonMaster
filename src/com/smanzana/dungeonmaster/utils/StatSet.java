@@ -154,7 +154,7 @@ public class StatSet implements DataCompatible {
 		list.add(new DataNode("health", "" + this.health, null));
 		list.add(new DataNode("maxhealth", "" + this.maxHealth, null));
 		list.add(new DataNode("mana", "" + this.mana, null));
-		list.add(new DataNode("maxmana", "" + this.maxHealth, null));
+		list.add(new DataNode("maxmana", "" + this.maxMana, null));
 		list.add(new DataNode("stamina", "" + this.stamina, null));
 		list.add(new DataNode("maxstamina", "" + this.maxStamina, null));
 		
