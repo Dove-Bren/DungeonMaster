@@ -24,6 +24,9 @@ public class NoteUtil {
 		List<String> list = new LinkedList<String>();
 		//serial.trim(); dont. Keep user whitespace
 		
+		if (serial == null || serial.trim().isEmpty())
+			return list;
+		
 		int pos = 0;
 		String sub;
 		while ((pos = serial.indexOf(DELIM)) != -1) {

@@ -66,6 +66,22 @@ public class DataNode {
 		return new DataNode(key, null, list);
 	}
 	
+	/**
+	 * Takes all strings in a list and wraps them into a series of nodes with set values
+	 * Then return a DataNode wrapper. E.g. returned datanode's children are a DataNode for each
+	 * element in the passed in collection
+	 * @param collection
+	 * @return
+	 */
+	public static DataNode serializeAllStrings(String key, String childKey, Collection<String> collection) {
+		List<DataNode> list = new ArrayList<>(collection.size());
+		
+		for (String data : collection)
+			list.add(new DataNode(childKey, data, null));
+		
+		return new DataNode(key, null, list);
+	}
+	
 	public static int parseInt(DataNode node) {
 		int value = 0;
 		

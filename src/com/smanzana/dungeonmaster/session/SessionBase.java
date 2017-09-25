@@ -15,6 +15,7 @@ import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
 import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
 import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
+import com.smanzana.dungeonmaster.session.datums.SettingDatumData;
 import com.smanzana.dungeonmaster.session.datums.SpellDatumData;
 
 public abstract class SessionBase {
@@ -30,12 +31,14 @@ public abstract class SessionBase {
 	private static final String PATH_PROFILE = "profiles.dat";
 	private static final String PATH_ACTIONS = "actions.dat";
 	private static final String PATH_SPELLS = "spells.dat";
+	private static final String PATH_SETTING = "setting.dat";
 	
 	// Datums
 	protected Datum<ClassDatumData> classDatum;
 	protected Datum<ProfileDatumData> profileDatum;
 	protected Datum<ActionDatumData> actionDatum;
 	protected Datum<SpellDatumData> spellDatum;
+	protected Datum<SettingDatumData> settingDatum;
 	
 	protected File root;
 	protected String configDir;
@@ -48,6 +51,7 @@ public abstract class SessionBase {
 		this.profileDatum = new Datum<ProfileDatumData>("profile", new ProfileDatumData.ProfileDatumFactory());
 		this.actionDatum = new Datum<>("action", new ActionDatumData.ActionDatumFactory());
 		this.spellDatum = new Datum<>("spell", new SpellDatumData.SpellDatumFactory());
+		this.settingDatum = new Datum<>("setting", new SettingDatumData.SettingDatumFactory());
 	}
 	
 	public ClassDatumData lookupClass(String className) {
@@ -126,6 +130,7 @@ public abstract class SessionBase {
 		loadDatum(configDir, PATH_PROFILE, this.profileDatum);
 		loadDatum(configDir, PATH_ACTIONS, this.actionDatum);
 		loadDatum(configDir, PATH_SPELLS, this.spellDatum);
+		loadDatum(configDir, PATH_SETTING, this.settingDatum);
 	}
 	
 	private void loadConfig(File configDir, String path, Config<?> instance) {
@@ -185,6 +190,7 @@ public abstract class SessionBase {
 		saveDatum(configDir, PATH_PROFILE, this.profileDatum);
 		saveDatum(configDir, PATH_ACTIONS, this.actionDatum);
 		saveDatum(configDir, PATH_SPELLS, this.spellDatum);
+		saveDatum(configDir, PATH_SETTING, this.settingDatum);
 	}
 	
 	private void saveConfig(File configDir, String path, Config<?> instance) {

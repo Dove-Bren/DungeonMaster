@@ -22,16 +22,12 @@ public class Usable extends Item {
 		Item.registerType(getClassKey(), new Factory());
 	}
 	
-	private Action action;
+	private String action;
 
 	public Usable(String name, String description, int value, String actionName) {
 		super(name, description, value);
 		
-		// Link action based on name
-		if (actionName != null) {
-			action = ActionRegistry.instance().lookupAction(actionName);
-		} else
-			action = null;
+		action = actionName;
 	}
 	
 	@Override
@@ -40,7 +36,21 @@ public class Usable extends Item {
 	}
 	
 	public void use(Pawn user) {
-		action.perform(user);
+		Action fetched = ActionRegistry.instance().lookupAction(action);
+		
+		if (fetched == null) {
+			System.out.println("Failed to lookup action " + action);
+		} else {
+			fetched.perform(user);
+		}
+	}
+	
+	@Override
+	public void load(DataNode root) {
+		super.load(root);
+		
+		if (root.getChild("action") != null)
+			this.action = root.getChild("action").getValue();
 	}
 
 }

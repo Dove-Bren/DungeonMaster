@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.dungeonmaster.action.Action;
+import com.smanzana.dungeonmaster.action.ActionRegistry;
 import com.smanzana.dungeonmaster.action.Interactable;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
@@ -22,8 +23,8 @@ public class Setting implements Notable, DataCompatible, Interactable {
 	private String title;
 	private String description;
 	private List<String> notes;
-	private List<Action> playerActions;
-	private List<Action> adminActions;
+	private List<String> playerActions;
+	private List<String> adminActions;
 	
 	public Setting() {
 		this.notes = new LinkedList<>();
@@ -54,21 +55,41 @@ public class Setting implements Notable, DataCompatible, Interactable {
 	}
 	
 	public void addPlayerAction(Action action) {
-		this.playerActions.add(action);
+		this.playerActions.add(action.getName());
+	}
+	
+	public void addPlayerAction(String actionName) {
+		this.playerActions.add(actionName);
 	}
 	
 	public void addAdminAction(Action action) {
-		this.adminActions.add(action);
+		this.adminActions.add(action.getName());
+	}
+	
+	public void addAdminAction(String actionName) {
+		this.adminActions.add(actionName);
+	}
+	
+	private List<Action> fetchActions(List<String> names) {
+		List<Action> actions = new LinkedList<>();
+		
+		for (String name : names) {
+			Action action = ActionRegistry.instance().lookupAction(name);
+			if (action != null)
+				actions.add(action);
+		}
+		
+		return actions;
 	}
 	
 	@Override
 	public Collection<Action> getActions(boolean admin) {
 		if (!admin)
-			return this.playerActions;
+			return fetchActions(this.playerActions);
 		
 		List<Action> actions = new ArrayList<>(playerActions.size() + adminActions.size());
-		actions.addAll(adminActions);
-		actions.addAll(playerActions);
+		actions.addAll(fetchActions(adminActions));
+		actions.addAll(fetchActions(playerActions));
 		
 		return actions;
 	}
@@ -107,14 +128,14 @@ public class Setting implements Notable, DataCompatible, Interactable {
 		playerActions.clear();
 		if (null != (node = root.getChild("playeractions"))) {
 			for (DataNode child : node.getChildren()) {
-				playerActions.add((Action) Action.fromData(child));
+				playerActions.add(child.getValue());
 			}
 		}
 		
 		adminActions.clear();
 		if (null != (node = root.getChild("adminactions"))) {
 			for (DataNode child : node.getChildren()) {
-				adminActions.add((Action) Action.fromData(child));
+				adminActions.add(child.getValue());
 			}
 		}
 	}
@@ -126,8 +147,8 @@ public class Setting implements Notable, DataCompatible, Interactable {
 		base.addChild(new DataNode("title", title, null));
 		base.addChild(new DataNode("description", description, null));
 		base.addChild(new DataNode("notes", NoteUtil.serializeNotes(notes), null));
-		base.addChild(DataNode.serializeAll("playeractions", "action", playerActions));
-		base.addChild(DataNode.serializeAll("adminactions", "action", adminActions));
+		base.addChild(DataNode.serializeAllStrings("playeractions", "action", playerActions));
+		base.addChild(DataNode.serializeAllStrings("adminactions", "action", adminActions));
 		
 		return base;
 	}
