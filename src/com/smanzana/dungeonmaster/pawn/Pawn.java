@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.smanzana.dungeonmaster.action.Interactable;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.Notable;
@@ -18,7 +19,7 @@ import com.smanzana.dungeonmaster.utils.StatSet;
  * @author Skyler
  *
  */
-public abstract class Pawn implements Notable, DataCompatible {
+public abstract class Pawn implements Notable, DataCompatible, Interactable {
 	
 	/**
 	 * Packages all set-able stats.
