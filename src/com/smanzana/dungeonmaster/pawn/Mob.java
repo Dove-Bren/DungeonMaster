@@ -3,7 +3,10 @@ package com.smanzana.dungeonmaster.pawn;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.battle.effects.Effect;
+import com.smanzana.dungeonmaster.session.datums.NPCDatumData;
+import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.ValueCapsule;
 
@@ -57,8 +60,13 @@ public class Mob extends NPC {
 	private boolean isAlly;
 	private int xp;
 	
-	public Mob(int hp, int mp, int stamina, int xp, boolean ally) {
+	protected Mob() {
 		super();
+		this.activeEffects = new LinkedList<>();
+	}
+	
+	public Mob(int hp, int mp, int stamina, int xp, boolean ally) {
+		this();
 		this.stats.setHealth(hp);
 		this.stats.setMaxHealth(hp);
 		this.stats.setMaxMana(mp);
@@ -88,6 +96,10 @@ public class Mob extends NPC {
 	
 	public int getXP() {
 		return this.xp;
+	}
+	
+	public void setXP(int xp) {
+		this.xp = xp;
 	}
 	
 	@Override
@@ -172,6 +184,59 @@ public class Mob extends NPC {
 				this.activeEffects.add(e);
 		}
 		
+	}
+	
+	/**
+	 * De-escalates this mob into an out-of-combat NPC
+	 */
+	public NPC toNPC() {
+		
+		NPC npc = new NPC();
+		npc.templateName = templateName;
+
+		PawnOverlay po = (new PawnOverlay())
+				.dead(dead)
+				.hp(getHealth())
+				.maxhp(getMaxHealth())
+				.mp(getMana())
+				.maxmp(getMana())
+				.stamina(getStamina())
+				.maxstamina(getMaxStamina())
+				.killable(canDie);
+		for (Attributes attr : Attributes.values())
+			po.score(attr, stats.getAbilityScore(attr));
+		npc.applyOverlay(po);
+		
+		npc.applyOverlay((new NPCOverlay())
+				.name(this.getName())
+				.race(this.getRace())
+				.trades(this.willTrade())
+				);
+		
+		return npc;
+	}
+	
+	public static Mob spawn(NPCDatumData data, boolean ally) {
+		if (data == null)
+			return null;
+		
+		Mob mob = new Mob();
+		mob.templateName = data.getTemplateName();
+		mob.dead = false;
+		ProfileDatumData prof = DungeonMaster.getActiveSession().lookupProfile(data.getProfileName());
+		if (prof != null) {
+			mob.setName(prof.getGeneratedName());
+			mob.setRace(prof.getRace());
+		}
+		
+		mob.inventory = data.getInventory();
+		mob.stats = data.getStats();
+		mob.setWillTrade(data.isWillTrade());
+		
+		mob.isAlly = ally;
+		mob.xp = data.getXp();
+		
+		return mob;
 	}
 	
 }

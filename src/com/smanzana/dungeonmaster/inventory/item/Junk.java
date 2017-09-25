@@ -18,6 +18,14 @@ public class Junk extends Item {
 		Item.registerType(getClassKey(), new Factory());
 	}
 	
+	public Junk() {
+		super("Junk", "Worthless junk", 0);
+	}
+	
+	public Junk(String name, String desc, int value) {
+		super(name, desc, value);
+	}
+	
 	@Override
 	protected String getClassKey() {
 		return "junk";

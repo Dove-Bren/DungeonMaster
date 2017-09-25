@@ -14,6 +14,7 @@ import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
 import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
 import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
+import com.smanzana.dungeonmaster.session.datums.NPCDatumData;
 import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
 import com.smanzana.dungeonmaster.session.datums.SettingDatumData;
 import com.smanzana.dungeonmaster.session.datums.SpellDatumData;
@@ -33,6 +34,8 @@ public abstract class SessionBase {
 	private static final String PATH_ACTIONS = "actions.dat";
 	private static final String PATH_SPELLS = "spells.dat";
 	private static final String PATH_SETTING = "setting.dat";
+	private static final String PATH_NPC = "npc.dat";
+	private static final String PATH_ITEM = "items.dat";
 	
 	// Datums
 	protected Datum<ClassDatumData> classDatum;
@@ -40,6 +43,8 @@ public abstract class SessionBase {
 	protected Datum<ActionDatumData> actionDatum;
 	protected Datum<SpellDatumData> spellDatum;
 	protected Datum<SettingDatumData> settingDatum;
+	protected Datum<NPCDatumData> npcDatum;
+	//protected Datum<ItemDatumData> itemDatum;
 	
 	protected File root;
 	protected String configDir;
@@ -53,6 +58,8 @@ public abstract class SessionBase {
 		this.actionDatum = new Datum<>("action", new ActionDatumData.ActionDatumFactory());
 		this.spellDatum = new Datum<>("spell", new SpellDatumData.SpellDatumFactory());
 		this.settingDatum = new Datum<>("setting", new SettingDatumData.SettingDatumFactory());
+		this.npcDatum = new Datum<>("npc", new NPCDatumData.NPCDatumFactory());
+		//this.itemDatum = new Datum<>("item", new ItemDatumData.ItemDatumFactory());
 	}
 	
 	public ClassDatumData lookupClass(String className) {
@@ -90,6 +97,15 @@ public abstract class SessionBase {
 		for (SettingDatumData data : settingDatum.getData()) {
 			if (data.getSetting().getTitle().equals(settingTitle))
 				return data.getSetting();
+		}
+		
+		return null;
+	}
+	
+	public NPCDatumData lookupNPC(String templateName) {
+		for (NPCDatumData data : npcDatum.getData()) {
+			if (data.getTemplateName().equals(templateName))
+				return data;
 		}
 		
 		return null;
@@ -141,6 +157,8 @@ public abstract class SessionBase {
 		loadDatum(configDir, PATH_ACTIONS, this.actionDatum);
 		loadDatum(configDir, PATH_SPELLS, this.spellDatum);
 		loadDatum(configDir, PATH_SETTING, this.settingDatum);
+		loadDatum(configDir, PATH_NPC, this.npcDatum);
+		//loadDatum(configDir, PATH_ITEM, this.itemDatum);
 	}
 	
 	private void loadConfig(File configDir, String path, Config<?> instance) {
@@ -201,6 +219,8 @@ public abstract class SessionBase {
 		saveDatum(configDir, PATH_ACTIONS, this.actionDatum);
 		saveDatum(configDir, PATH_SPELLS, this.spellDatum);
 		saveDatum(configDir, PATH_SETTING, this.settingDatum);
+		saveDatum(configDir, PATH_SETTING, this.settingDatum);
+		//saveDatum(configDir, PATH_ITEM, this.itemDatum);
 	}
 	
 	private void saveConfig(File configDir, String path, Config<?> instance) {
