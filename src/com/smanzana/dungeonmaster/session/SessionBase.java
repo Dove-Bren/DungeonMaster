@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import com.smanzana.dungeonmaster.action.Action;
 import com.smanzana.dungeonmaster.action.ActionRegistry;
+import com.smanzana.dungeonmaster.inventory.item.Item;
 import com.smanzana.dungeonmaster.session.configuration.CombatBonusConfig;
 import com.smanzana.dungeonmaster.session.configuration.Config;
 import com.smanzana.dungeonmaster.session.configuration.KeywordConfig;
@@ -14,6 +15,7 @@ import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
 import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
 import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
+import com.smanzana.dungeonmaster.session.datums.ItemDatumData;
 import com.smanzana.dungeonmaster.session.datums.NPCDatumData;
 import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
 import com.smanzana.dungeonmaster.session.datums.SettingDatumData;
@@ -44,7 +46,7 @@ public abstract class SessionBase {
 	protected Datum<SpellDatumData> spellDatum;
 	protected Datum<SettingDatumData> settingDatum;
 	protected Datum<NPCDatumData> npcDatum;
-	//protected Datum<ItemDatumData> itemDatum;
+	protected Datum<ItemDatumData> itemDatum;
 	
 	protected File root;
 	protected String configDir;
@@ -59,7 +61,7 @@ public abstract class SessionBase {
 		this.spellDatum = new Datum<>("spell", new SpellDatumData.SpellDatumFactory());
 		this.settingDatum = new Datum<>("setting", new SettingDatumData.SettingDatumFactory());
 		this.npcDatum = new Datum<>("npc", new NPCDatumData.NPCDatumFactory());
-		//this.itemDatum = new Datum<>("item", new ItemDatumData.ItemDatumFactory());
+		this.itemDatum = new Datum<>("item", new ItemDatumData.ItemDatumFactory());
 	}
 	
 	public ClassDatumData lookupClass(String className) {
@@ -106,6 +108,15 @@ public abstract class SessionBase {
 		for (NPCDatumData data : npcDatum.getData()) {
 			if (data.getTemplateName().equals(templateName))
 				return data;
+		}
+		
+		return null;
+	}
+	
+	public Item lookupItem(String name) {
+		for (ItemDatumData data : itemDatum.getData()) {
+			if (data.getItem().getName().equals(name))
+				return data.getItem();
 		}
 		
 		return null;
@@ -158,7 +169,7 @@ public abstract class SessionBase {
 		loadDatum(configDir, PATH_SPELLS, this.spellDatum);
 		loadDatum(configDir, PATH_SETTING, this.settingDatum);
 		loadDatum(configDir, PATH_NPC, this.npcDatum);
-		//loadDatum(configDir, PATH_ITEM, this.itemDatum);
+		loadDatum(configDir, PATH_ITEM, this.itemDatum);
 	}
 	
 	private void loadConfig(File configDir, String path, Config<?> instance) {
@@ -220,7 +231,7 @@ public abstract class SessionBase {
 		saveDatum(configDir, PATH_SPELLS, this.spellDatum);
 		saveDatum(configDir, PATH_SETTING, this.settingDatum);
 		saveDatum(configDir, PATH_SETTING, this.settingDatum);
-		//saveDatum(configDir, PATH_ITEM, this.itemDatum);
+		saveDatum(configDir, PATH_ITEM, this.itemDatum);
 	}
 	
 	private void saveConfig(File configDir, String path, Config<?> instance) {
