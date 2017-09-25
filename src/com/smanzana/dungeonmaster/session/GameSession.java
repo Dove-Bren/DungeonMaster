@@ -15,6 +15,7 @@ import com.smanzana.dungeonmaster.pawn.Mob;
 import com.smanzana.dungeonmaster.pawn.NPC;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
+import com.smanzana.dungeonmaster.setting.Setting;
 import com.smanzana.dungeonmaster.utils.Notable;
 
 public class GameSession extends SessionBase implements Notable {
@@ -35,6 +36,7 @@ public class GameSession extends SessionBase implements Notable {
 	
 	private List<String> notes;
 	private List<Pawn> party;
+	private Setting setting;
 
 	/**
 	 * Queue for requests from UI/clients
@@ -416,6 +418,21 @@ public class GameSession extends SessionBase implements Notable {
 		broadcast();
 	}
 	
+	/**
+	 * Gets all available actions based on active pawns and setting
+	 * @return
+	 */
+	public List<Action> getAvailableActions(boolean admin) {
+		List<Action> actions = new LinkedList<>();
+		
+		if (setting != null)
+			actions.addAll(setting.getActions(admin));
+		
+		for (Pawn p : activePawns.values())
+			actions.addAll(p.getActions(admin));
+		
+		return actions;
+	}
 	
 	///////////////////////////////////////
 	//             Threading             //
