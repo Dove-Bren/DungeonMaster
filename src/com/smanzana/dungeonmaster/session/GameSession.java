@@ -312,12 +312,12 @@ public class GameSession extends SessionBase implements Notable {
 		}		
 	}
 	
-	public void interactInventory(Pawn owner, int slotID, InventoryOperation operation) {
+	public void interactInventory(Pawn actor, Pawn owner, int slotID, InventoryOperation operation) {
 		Inventory inv = fetchInventory(owner);
 		if (inv == null) {
 			System.out.println("Cannot perform " + operation.name() + " on null inventory");
 		} else {
-			inv.performOperation(operation, slotID);
+			inv.performOperation(actor, operation, slotID);
 		}
 	}
 	

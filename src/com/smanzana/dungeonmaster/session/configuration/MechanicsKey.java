@@ -61,6 +61,8 @@ public enum MechanicsKey {
 	ITEMS_DROPABLE("Can PCs drop items?", "If false, items must be removed by DM", "Requires ALLOW_PC_CONTROL"),
 	ITEMS_TRADING("Enables buy/sell of items", "Only NPCs marked as merchants will present this action", "If false, DM can remove item and add gold manually", "Requires ALLOW_PC_CONTROL"),
 	ITEMS_SELLABLE("Can PCs sell items?", "If false, they can't. If ITEMS_TRADING is true, PCs can still buy", "Requires ALLOW_PC_CONTROL, ITEMS_TRADING"),
+	ITEMS_USABLE("Can PCs use usable items?", "Requires ALLOW_PC_CONTROL, USE_ACTIONS"),
+	ITEMS_STEALABLE("Can PCs steal items from NPCs?", "Under regualar circumstances, DMs are prompted for whether this succeeds or fails", "Requires ALLOW_PC_CONTROL"),
 	DURABILITY_ENABLED("Enables all other durability options"),
 	EQUIPMENT_USE_DURABILITY("In normal use, does equipment lose durability?", "This means when struck, when striking, etc", "If you want to hand-control durabilty, set to false"),
 	EQUIP_RESTRICT_LEVEL("Equipment performs a level check before being able to be used"),
