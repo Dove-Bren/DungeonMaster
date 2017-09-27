@@ -124,7 +124,7 @@ public class Player extends Pawn {
 		
 	}
 	
-	private static class SpellSlot {
+	public static class SpellSlot {
 		
 		private int total;
 		private int remaining;
@@ -246,6 +246,10 @@ public class Player extends Pawn {
 	
 	public void clearSpells() {
 		spells.clear();
+	}
+	
+	public List<String> getSpells() {
+		return spells;
 	}
 	
 	public void awardSpell(Spell spell) {

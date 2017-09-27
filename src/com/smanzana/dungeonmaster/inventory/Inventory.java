@@ -105,6 +105,12 @@ public class Inventory implements DataCompatible {
 		return this.gold;
 	}
 	
+	// Just for me <3.
+	// This isn't a clone. be careful
+	public Map<Integer, Item> getItemMap() {
+		return heldItems;
+	}
+	
 	public Collection<Item> getItems() {
 		return this.heldItems.values();
 	}

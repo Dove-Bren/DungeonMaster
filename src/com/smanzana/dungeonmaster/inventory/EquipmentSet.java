@@ -11,7 +11,7 @@ import com.smanzana.dungeonmaster.inventory.item.Weapon;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
-public class EquipmentSet implements DataCompatible {
+public class EquipmentSet implements DataCompatible, Cloneable {
 
 	private Map<Equipment.Slot, Equipment> equips;
 	
@@ -67,6 +67,14 @@ public class EquipmentSet implements DataCompatible {
 		}
 		
 		return sum;
+	}
+	
+	public EquipmentSet clone() {
+		DataNode serial = this.write("dummy");
+		EquipmentSet out = new EquipmentSet();
+		out.load(serial);
+		
+		return out;
 	}
 	
 }

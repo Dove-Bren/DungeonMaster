@@ -11,7 +11,7 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.Notable;
 import com.smanzana.dungeonmaster.utils.NoteUtil;
 
-public abstract class Item implements Notable, DataCompatible {
+public abstract class Item implements Notable, DataCompatible, Cloneable {
 	
 	protected static interface ItemFactory<T extends Item> {
 		
@@ -119,5 +119,12 @@ public abstract class Item implements Notable, DataCompatible {
 	}
 	
 	protected abstract String getClassKey();
+	
+	public Item clone() {
+		DataNode serial = this.write("dummy");
+		Item out = Item.fromData(serial);
+		
+		return out;
+	}
 	
 }
