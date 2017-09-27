@@ -8,6 +8,7 @@ import java.util.Map;
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.battle.effects.Effect;
 import com.smanzana.dungeonmaster.inventory.Inventory;
+import com.smanzana.dungeonmaster.inventory.Inventory.InventoryHook;
 import com.smanzana.dungeonmaster.inventory.item.Item;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
@@ -174,6 +175,24 @@ public class Player extends Pawn {
 		this.playerClass = null;
 		this.xp = 0;
 		this.rawHitDice = 0;
+
+		this.inventory.setInventoryHook(new InventoryHook() {
+
+			@Override
+			public boolean buy(Item item, Pawn actor) {
+				// This is a 'sell'
+				// Assume the player has triggered it
+				// or the DM is forcing it.
+				inventory.addGold(item.getValue());
+				return true;
+			}
+
+			@Override
+			public boolean steal(Item item, Pawn actor) {
+				return (askDM());
+			}
+			
+		});
 	}
 
 	public Player(String name, String race, String background, int maxXP, int level) {

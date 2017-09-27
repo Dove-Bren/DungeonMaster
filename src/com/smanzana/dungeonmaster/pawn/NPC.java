@@ -2,6 +2,8 @@ package com.smanzana.dungeonmaster.pawn;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.inventory.Inventory;
+import com.smanzana.dungeonmaster.inventory.Inventory.InventoryHook;
+import com.smanzana.dungeonmaster.inventory.item.Item;
 import com.smanzana.dungeonmaster.session.datums.NPCDatumData;
 import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
@@ -53,6 +55,23 @@ public class NPC extends Pawn {
 	public NPC() {
 		super();
 		this.inventory = new Inventory();
+		this.inventory.setInventoryHook(new InventoryHook() {
+
+			@Override
+			public boolean buy(Item item, Pawn actor) {
+				// We don't have any real reason to say no
+				// Config check already has happened
+				// Add value though
+				inventory.addGold(item.getValue());
+				return true;
+			}
+
+			@Override
+			public boolean steal(Item item, Pawn actor) {
+				return (askDM());
+			}
+			
+		});
 	}
 	
 	@Override
