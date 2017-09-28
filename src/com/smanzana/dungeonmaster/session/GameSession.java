@@ -205,6 +205,24 @@ public class GameSession extends SessionBase implements Notable {
 		return unregistered;
 	}
 	
+	/**
+	 * Returns the session (UI) key for the given player
+	 * If the player hasn't been registered, returns 0
+	 * @param p
+	 * @return
+	 */
+	public int lookupSessionKey(Player p) {
+		if (playerSessionKeys.isEmpty())
+			return 0;
+		
+		for (Integer key : playerSessionKeys.keySet()) {
+			if (playerSessionKeys.get(key).equals(p))
+				return key;
+		}
+		
+		return 0;
+	}
+	
 	///////////////////////////////////////
 	//              Commands             //
 	///////////////////////////////////////

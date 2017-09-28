@@ -1,7 +1,12 @@
 package com.smanzana.dungeonmaster.ui;
 
+import java.util.List;
+
+import com.smanzana.dungeonmaster.action.Action;
+import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.ui.common.InventoryView;
 import com.smanzana.dungeonmaster.ui.common.MessageBox;
+import com.smanzana.dungeonmaster.ui.common.NPCView;
 import com.smanzana.dungeonmaster.ui.common.PlayerView;
 
 /**
@@ -36,5 +41,13 @@ public abstract class Comm {
 	public abstract void showNPC(NPCView pawn);
 	
 	public abstract void setActions(List<Action> actions);
+	
+	// DM only actions
+	// Sending to player results in no op
+	
+	public abstract void promptRoll(Attributes suggestedAttrib, PlayerView player, String desc);
+	public abstract void promptRoll(Attributes suggestedAttrib, NPCView npc, String desc);
+	
+	
 	
 }
