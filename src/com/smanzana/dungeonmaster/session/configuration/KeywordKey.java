@@ -29,6 +29,8 @@ public enum KeywordKey {
 	GOLD("Currency name."),
 	DEFENSE("Ability to resist physical attacks."),
 	ATTACK("Ability to attack physically."),
+	SAVINGTHROW("Saving throw.", "Saving Throw"),
+	SAVINGTHROWVERB("Past-tense version of SAVINGTHROW. Default: resisted", "resisted"),
 	;
 	
 	private String def;

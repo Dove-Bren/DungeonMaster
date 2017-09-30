@@ -7,9 +7,12 @@ import java.util.List;
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.action.subaction.SubAction;
 import com.smanzana.dungeonmaster.mechanics.AI;
+import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.pawn.Mob;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
+import com.smanzana.dungeonmaster.session.configuration.KeywordConfig;
+import com.smanzana.dungeonmaster.session.configuration.KeywordKey;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.ui.UI;
 
@@ -54,16 +57,18 @@ public class Action extends SubAction {
 	private boolean beneficial;
 	private List<SubAction> subActions;
 	private TargetType targetType;
+	private Attributes attribute; // Contributing attribue
 	
 	private Action() {
 		this.subActions = new LinkedList<>();
 	}
 	
-	public Action(String name, String description, boolean beneficial, TargetType type) {
+	public Action(String name, String description, boolean beneficial, Attributes bonusAttrib, TargetType type) {
 		this.subActions = new LinkedList<>();
 		this.name = name;
 		this.description = description;
 		this.beneficial = beneficial;
+		this.attribute = bonusAttrib;
 		this.targetType = type;
 	}
 
@@ -105,6 +110,10 @@ public class Action extends SubAction {
 		return this;
 	}
 	
+	public Attributes getAttribute() {
+		return attribute;
+	}
+	
 	// TODO protected abstract IMG getIcon();
 	
 	/**
@@ -114,22 +123,39 @@ public class Action extends SubAction {
 	 */
 	public void perform(Pawn source) {
 		// Figure out who to apply to based on targetType
+		Pawn target;
 		switch (targetType) {
 		case SELF:
+			// Skip saving throw
 			apply(source, source);
 			break;
 		case TARGET:
-			apply(source, selectTarget(source, this.isBeneficial()));
+			target = selectTarget(source, this.isBeneficial());
+			if (performSavingThrow(source, target))
+				apply(source, target);
+			else
+				System.out.println(target.getName() + " " + KeywordConfig.instance().getKeyword(KeywordKey.SAVINGTHROWVERB)
+						+ " " + source.getName() + "'s " + getName());
 			break;
 		case PARTY:
 			for (Pawn pc : DungeonMaster.getActiveSession().getParty())
 				apply(source, pc);
 			break;
 		case MULTI:
-			for (Pawn targ : selectMultiTargets(source, this.isBeneficial()))
-				apply(source, targ);
+			for (Pawn targ : selectMultiTargets(source, this.isBeneficial())) {
+				if (performSavingThrow(source, targ))
+					apply(source, targ);
+				else
+					System.out.println(targ.getName() + " " + KeywordConfig.instance().getKeyword(KeywordKey.SAVINGTHROWVERB)
+							+ " " + source.getName() + "'s " + getName());
+			}
 			break;
 		}
+	}
+	
+	// Subclasses that DO have saving throws should override
+	protected boolean performSavingThrow(Pawn source, Pawn target) {
+		return true; // Regular actions have no saving throw
 	}
 	
 	private Pawn selectTarget(Pawn source, boolean beneficial) {
