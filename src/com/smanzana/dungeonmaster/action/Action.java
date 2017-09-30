@@ -33,8 +33,8 @@ public class Action extends SubAction {
 		}
 	}
 	
-	{
-		SubAction.registerFactory(getClassKey(), new Factory());
+	public static void register() {
+		SubAction.registerFactory(ClassKey(), new Factory());
 	}
 
 	public static enum TargetType {
@@ -177,6 +177,10 @@ public class Action extends SubAction {
 
 	@Override
 	protected String getClassKey() {
+		return ClassKey();
+	}
+	
+	protected static String ClassKey() {
 		return "action";
 	}
 	

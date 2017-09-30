@@ -5,6 +5,7 @@ import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.ui.UI;
 
 /**
  * Action performed by the whole party.
@@ -20,18 +21,21 @@ public class PartyAction extends Action {
 	private static class Factory implements SubActionFactory<PartyAction> {
 		@Override
 		public PartyAction construct(DataNode data) {
-			PartyAction ret = new PartyAction(null, null, TargetType.SELF);
+			PartyAction ret = new PartyAction(null, null, "", TargetType.SELF);
 			ret.load(data);
 			return ret;
 		}
 	}
 	
-	{
-		SubAction.registerFactory(getClassKey(), new Factory());
+	public static void register() {
+		SubAction.registerFactory(ClassKey(), new Factory());
 	}
+	
+	private String prompt;
 
-	public PartyAction(String name, String description, TargetType targetType) {
+	public PartyAction(String name, String description, String prompt, TargetType targetType) {
 		super(name, description, targetType);
+		this.prompt = prompt;
 	}
 	
 	@Override
@@ -39,7 +43,7 @@ public class PartyAction extends Action {
 		// Prompt for party agreement
 		
 		if (MechanicsConfig.instance().getBool(MechanicsKey.ALLOW_PC_CONTROL)) {
-			if (!getPartyConfirm())
+			if (!UI.instance().askParty(this.prompt))
 				return;
 		}
 		
@@ -48,7 +52,30 @@ public class PartyAction extends Action {
 
 	@Override
 	protected String getClassKey() {
+		return ClassKey();
+	}
+	
+	protected static String ClassKey() {
 		return "partyaction";
+	}
+	
+	@Override
+	public void load(DataNode root) {
+		super.load(root);
+		DataNode node;
+		
+		if (null != (node = root.getChild("prompt"))) {
+			prompt = node.getValue();
+		}
+	}
+
+	@Override
+	public DataNode write(String key) {
+		DataNode base = super.write(key);
+		
+		base.addChild(new DataNode("prompt", prompt, null));
+		
+		return base;
 	}
 	
 }

@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import com.smanzana.dungeonmaster.action.Action;
+import com.smanzana.dungeonmaster.action.CombatAction;
+import com.smanzana.dungeonmaster.action.PartyAction;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
@@ -44,6 +47,10 @@ public abstract class SubAction implements DataCompatible {
 		 SubHeal.register();
 		 SubMeleeAttack.register();
 		 SubCast.register();
+		 
+		 Action.register();
+		 CombatAction.register();
+		 PartyAction.register();
 	}
 	
 	public static SubAction fromData(DataNode data) {

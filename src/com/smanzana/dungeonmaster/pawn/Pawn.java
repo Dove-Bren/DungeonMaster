@@ -275,4 +275,6 @@ public abstract class Pawn implements Notable, DataCompatible, Interactable {
 			this.notes = NoteUtil.deserializeNotes(node.getValue());
 		}
 	}
+	
+	public abstract String getName();
 }

@@ -5,6 +5,7 @@ import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.ui.UI;
 
 /**
  * Action performed only in combat
@@ -22,8 +23,8 @@ public class CombatAction extends Action {
 		}
 	}
 	
-	{
-		SubAction.registerFactory(getClassKey(), new Factory());
+	public static void register() {
+		SubAction.registerFactory(ClassKey(), new Factory());
 	}
 
 	protected CombatAction(String name, String description, TargetType type) {
@@ -36,7 +37,8 @@ public class CombatAction extends Action {
 		
 		if (MechanicsConfig.instance().getBool(MechanicsKey.ALLOW_PC_CONTROL) &&
 				MechanicsConfig.instance().getBool(MechanicsKey.CONFIRM_PC_ACTION)) {
-			if (!getDMApproval())
+			if (!UI.instance().askDM(source.getName() + " is using combat action " + this.getName()
+					+ ". Please approve. (To turn off, turn of CONFIRM_PC_ACTION in the mechanics config)"))
 				return;
 		}
 		
@@ -45,6 +47,10 @@ public class CombatAction extends Action {
 
 	@Override
 	protected String getClassKey() {
+		return ClassKey();
+	}
+	
+	protected static String ClassKey() {
 		return "combataction";
 	}
 	
