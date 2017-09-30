@@ -130,6 +130,30 @@ public class Mob extends NPC {
 		return this.stats.getHealth() <= 0;
 	}
 	
+	@Override
+	public boolean recoverMana(Pawn source, int amount) {
+		ValueCapsule capsule = new ValueCapsule(amount);
+		Effect.doPreEffects(activeEffects, source, this, capsule);
+		
+		this.stats.addMana(capsule.getFinal());
+		
+		Effect.doPostEffects(activeEffects, source, this, capsule);
+		
+		return this.stats.getMana() <= 0;
+	}
+	
+	@Override
+	public boolean recoverStamina(Pawn source, int amount) {
+		ValueCapsule capsule = new ValueCapsule(amount);
+		Effect.doPreEffects(activeEffects, source, this, capsule);
+		
+		this.stats.addStamina(capsule.getFinal());
+		
+		Effect.doPostEffects(activeEffects, source, this, capsule);
+		
+		return this.stats.getStamina() <= 0;
+	}
+	
 	public void addEffect(Effect effect) {
 		this.activeEffects.add(effect);
 	}

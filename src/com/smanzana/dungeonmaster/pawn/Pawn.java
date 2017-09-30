@@ -181,6 +181,8 @@ public abstract class Pawn implements Notable, DataCompatible, Interactable {
 	 * @return true if the pawn dies
 	 */
 	public abstract boolean heal(Pawn source, int amount);
+	public abstract boolean recoverMana(Pawn source, int amount);
+	public abstract boolean recoverStamina(Pawn source, int amount);
 	
 	public void restoreMana(Pawn source, int amount) {
 		stats.addMana(amount);

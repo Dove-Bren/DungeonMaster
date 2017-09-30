@@ -1,12 +1,14 @@
 package com.smanzana.dungeonmaster.pawn;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
+import com.smanzana.dungeonmaster.battle.effects.Effect;
 import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.inventory.Inventory.InventoryHook;
 import com.smanzana.dungeonmaster.inventory.item.Item;
 import com.smanzana.dungeonmaster.session.datums.NPCDatumData;
 import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.utils.ValueCapsule;
 
 /**
  * Non-player character. 
@@ -108,6 +110,18 @@ public class NPC extends Entity {
 	@Override
 	public boolean heal(Pawn source, int amount) {
 		; // do nothing. Again, not a mob
+		return false;
+	}
+	
+	@Override
+	public boolean recoverMana(Pawn source, int amount) {
+		;
+		return false;
+	}
+	
+	@Override
+	public boolean recoverStamina(Pawn source, int amount) {
+		;
 		return false;
 	}
 	
