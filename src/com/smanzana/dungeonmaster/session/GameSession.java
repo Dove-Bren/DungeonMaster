@@ -79,6 +79,7 @@ public class GameSession extends SessionBase implements Notable {
 		load();
 		
 		int debug = 0;
+		System.out.println("5...");
 		while (runLoop()) {
 			try {
 				Thread.sleep(100);
@@ -86,8 +87,11 @@ public class GameSession extends SessionBase implements Notable {
 				; // who cares?
 			}
 			
-			if (debug < 50)
+			if (debug < 50) {
 				debug++;
+				if (debug % 10 == 0)
+					System.out.println(5 - (debug / 10) + "...");
+			}
 			else
 				break;
 		}

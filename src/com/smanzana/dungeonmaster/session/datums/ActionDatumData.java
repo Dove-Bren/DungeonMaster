@@ -205,8 +205,8 @@ public class ActionDatumData implements DatumData {
 		node.addChild(new DataNode("beneficial", this.beneficial + "", null));
 		node.addChild(new DataNode("isparty", this.isParty + "", null));
 		node.addChild(new DataNode("partyprompt", (partyPrompt == null ? "" : partyPrompt) + "", null));
-		node.addChild(new DataNode("targettype", this.targetType.name(), null));
-		node.addChild(new DataNode("attribute", this.getAttribute().name(), null));
+		node.addChild(new DataNode("targettype", (targetType == null ? "" : targetType.name()), null));
+		node.addChild(new DataNode("attribute", (attribute == null ? "" : attribute.name()), null));
 		node.addChild(DataNode.serializeAll("subactions", "subaction", subactions));
 		
 		return node;

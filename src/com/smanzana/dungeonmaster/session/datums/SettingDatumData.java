@@ -1,6 +1,5 @@
 package com.smanzana.dungeonmaster.session.datums;
 
-import com.smanzana.dungeonmaster.action.subaction.SubRest;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.setting.Setting;
@@ -64,9 +63,7 @@ public class SettingDatumData implements DatumData {
 		SettingDatumData data = new SettingDatumData();
 		
 		Setting example = new Setting("Cavern", "A deep, dark cavern that may be home to more than rats...");
-		ActionDatumData action = new ActionDatumData("Rest At Inn", "Purchase a room and sleep, recovering health and spell slots.");
 		
-		action.addSubaction(new SubRest());
 		example.addPlayerAction("Yell");
 		example.addPlayerAction("Unsafe Rest");
 		
