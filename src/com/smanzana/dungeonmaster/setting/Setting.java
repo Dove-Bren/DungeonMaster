@@ -78,6 +78,9 @@ public class Setting implements Notable, DataCompatible, Interactable {
 			Action action = ActionRegistry.instance().lookupAction(name);
 			if (action != null)
 				actions.add(action);
+			else
+				System.out.println("Could not resolve setting action \"" + name + "\" to a registered action. "
+						+ "Actions must be defined in actions.dat");
 		}
 		
 		return actions;

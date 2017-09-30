@@ -17,6 +17,7 @@ import com.smanzana.dungeonmaster.pawn.Mob;
 import com.smanzana.dungeonmaster.pawn.NPC;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
+import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
 import com.smanzana.dungeonmaster.setting.Setting;
 import com.smanzana.dungeonmaster.utils.Notable;
 
@@ -77,6 +78,26 @@ public class GameSession extends SessionBase implements Notable {
 	 */
 	public void run() {
 		load();
+		init();
+		
+		this.setting = this.lookupSetting("Cavern");
+		System.out.println("Checking for non-admin actions. Lots of null. How to handle?");
+		for (Action a : this.getAvailableActions(false)) {
+			if (a == null) {
+				System.out.println("null action...");
+			} else {
+				System.out.println("Action: " + a.getName());
+			}
+		}
+		System.out.println();
+		System.out.println("Checking for admin actions. Lots of null. How to handle?");
+		for (Action a : this.getAvailableActions(true)) {
+			if (a == null) {
+				System.out.println("null action...");
+			} else {
+				System.out.println("Action: " + a.getName());
+			}
+		}
 		
 		int debug = 0;
 		System.out.println("5...");
@@ -97,6 +118,15 @@ public class GameSession extends SessionBase implements Notable {
 		}
 		
 		save();
+	}
+	
+	private void init() {
+		// Export actions from datum to actionregistry
+		Action action;
+		for (ActionDatumData data : this.actionDatum.getData()) {
+			action = data.toAction();
+			ActionRegistry.instance().register(action.getName(), action);
+		}
 	}
 	
 	@Override
@@ -462,7 +492,7 @@ public class GameSession extends SessionBase implements Notable {
 		List<Action> actions = new LinkedList<>();
 		
 		if (setting != null)
-			actions.addAll(setting.getActions(admin));
+			actions.addAll(setting.getActions(admin, null));
 		
 		for (Pawn p : activePawns.values())
 			actions.addAll(p.getActions(admin, null));

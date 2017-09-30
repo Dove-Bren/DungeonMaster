@@ -168,8 +168,8 @@ public class ActionDatumData implements DatumData {
 		if ((node = root.getChild("targettype")) != null) {
 			try {
 				this.targetType = TargetType.valueOf(node.getValue());
-			} catch (IllegalArgumentException e) {
-				System.out.println("Cannot convert " + node.getValue() + " into an action target type");
+			} catch (Exception e) {
+				System.out.println("Cannot convert \"" + node.getValue() + "\" into an action target type");
 				this.targetType = TargetType.SELF;
 			}
 		}
@@ -178,7 +178,7 @@ public class ActionDatumData implements DatumData {
 		if ((node = root.getChild("attribute")) != null) {
 			try {
 				this.attribute = Attributes.valueOf(node.getValue());
-			} catch (IllegalArgumentException e) {
+			} catch (Exception e) {
 				System.out.println("Cannot convert " + node.getValue() + " into an attribute");
 				this.attribute = Attributes.STRENGTH;
 			}
