@@ -7,8 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
+import com.smanzana.dungeonmaster.inventory.Inventory;
+import com.smanzana.dungeonmaster.pawn.NPC;
 import com.smanzana.dungeonmaster.pawn.Player;
+import com.smanzana.dungeonmaster.ui.common.InventoryView;
 import com.smanzana.dungeonmaster.ui.common.MessageBox;
+import com.smanzana.dungeonmaster.ui.common.NPCView;
+import com.smanzana.dungeonmaster.ui.common.PlayerView;
 
 public class UI implements Runnable {
 	
@@ -284,5 +289,64 @@ public class UI implements Runnable {
 		return !hit;
 	}
 	
+	public void sendInventory(Player player, Inventory inventory) {
+		if (player == null || getPlayerComm(player) == null)
+			return;
+		
+		InventoryView inv = new InventoryView(inventory);
+		pushRequest(new UIRequest() {
+
+			@Override
+			public void callback(String serialResponse) {
+				; // Don't care
+			}
+
+			@Override
+			public void run(UICallback hook) {
+				getPlayerComm(player).showInventory(inv);
+			}
+			
+		});
+	}
+	
+	public void sendNPC(Player player, NPC npc) {
+		if (player == null || getPlayerComm(player) == null)
+			return;
+		
+		NPCView view = new NPCView(npc);
+		pushRequest(new UIRequest() {
+
+			@Override
+			public void callback(String serialResponse) {
+				; // Don't care
+			}
+
+			@Override
+			public void run(UICallback hook) {
+				getPlayerComm(player).showNPC(view);
+			}
+			
+		});
+	}
+	
+	public void sendPlayer(Player player, Player viewedPlayer) {
+		if (player == null || getPlayerComm(player) == null)
+			return;
+		
+		PlayerView view = new PlayerView(viewedPlayer);
+		pushRequest(new UIRequest() {
+
+			@Override
+			public void callback(String serialResponse) {
+				; // Don't care
+			}
+
+			@Override
+			public void run(UICallback hook) {
+				getPlayerComm(player).showPlayer(view);
+			}
+			
+		});
+	}
 	
 }

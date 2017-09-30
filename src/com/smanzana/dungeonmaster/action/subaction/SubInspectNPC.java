@@ -1,11 +1,8 @@
 package com.smanzana.dungeonmaster.action.subaction;
 
-import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.pawn.NPC;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
-import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
-import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.ui.UI;
 
