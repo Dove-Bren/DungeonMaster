@@ -21,7 +21,7 @@ public class PartyAction extends Action {
 	private static class Factory implements SubActionFactory<PartyAction> {
 		@Override
 		public PartyAction construct(DataNode data) {
-			PartyAction ret = new PartyAction(null, null, "", TargetType.SELF);
+			PartyAction ret = new PartyAction(null, null, true, "", TargetType.SELF);
 			ret.load(data);
 			return ret;
 		}
@@ -33,8 +33,8 @@ public class PartyAction extends Action {
 	
 	private String prompt;
 
-	public PartyAction(String name, String description, String prompt, TargetType targetType) {
-		super(name, description, targetType);
+	public PartyAction(String name, String description, boolean beneficial, String prompt, TargetType targetType) {
+		super(name, description, beneficial, targetType);
 		this.prompt = prompt;
 	}
 	

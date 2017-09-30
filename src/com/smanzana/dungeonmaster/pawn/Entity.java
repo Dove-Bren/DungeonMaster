@@ -87,4 +87,8 @@ public abstract class Entity extends Pawn {
 		this.name = name;
 	}
 	
+	public int getDefenseScore() {
+		return this.getInventory().getEquipment().getTotalDefense();
+	}
+	
 }

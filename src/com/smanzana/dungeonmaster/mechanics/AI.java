@@ -61,9 +61,9 @@ public final class AI {
 				
 				if (MechanicsConfig.instance().getBool(MechanicsKey.USE_OFFDEF)) {
 					if (asMob != null)
-						score -= Mechs.getDefenseScore(asMob);
+						score -= asMob.getDefenseScore();
 					else if (asPlayer != null)
-						score -= Mechs.getDefenseScore(asPlayer);
+						score -= asPlayer.getDefenseScore();
 				}
 				
 				if (score > maxScore) {

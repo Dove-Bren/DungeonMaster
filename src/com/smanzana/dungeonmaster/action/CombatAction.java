@@ -17,7 +17,7 @@ public class CombatAction extends Action {
 	private static class Factory implements SubActionFactory<CombatAction> {
 		@Override
 		public CombatAction construct(DataNode data) {
-			CombatAction ret = new CombatAction(null, null, TargetType.SELF);
+			CombatAction ret = new CombatAction(null, null, false, TargetType.SELF);
 			ret.load(data);
 			return ret;
 		}
@@ -27,8 +27,8 @@ public class CombatAction extends Action {
 		SubAction.registerFactory(ClassKey(), new Factory());
 	}
 
-	protected CombatAction(String name, String description, TargetType type) {
-		super(name, description, type);
+	protected CombatAction(String name, String description, boolean beneficial, TargetType type) {
+		super(name, description, beneficial, type);
 	}
 
 	@Override

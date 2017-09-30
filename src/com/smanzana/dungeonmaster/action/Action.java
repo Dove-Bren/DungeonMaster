@@ -51,6 +51,7 @@ public class Action extends SubAction {
 	
 	private String name;
 	private String description;
+	private boolean beneficial;
 	private List<SubAction> subActions;
 	private TargetType targetType;
 	
@@ -58,10 +59,11 @@ public class Action extends SubAction {
 		this.subActions = new LinkedList<>();
 	}
 	
-	public Action(String name, String description, TargetType type) {
+	public Action(String name, String description, boolean beneficial, TargetType type) {
 		this.subActions = new LinkedList<>();
 		this.name = name;
 		this.description = description;
+		this.beneficial = beneficial;
 		this.targetType = type;
 	}
 
@@ -178,7 +180,9 @@ public class Action extends SubAction {
 		return AI.selectMultiTargets(DungeonMaster.getActiveSession().getAllActivePawns(), ally, beneficial);
 	}
 	
-	public boolean isBeneficial();
+	public boolean isBeneficial() {
+		return beneficial;
+	}
 	
 	/**
 	 * @param target
@@ -200,6 +204,10 @@ public class Action extends SubAction {
 		
 		if (null != (node = root.getChild("description"))) {
 			description = node.getValue();
+		}
+		
+		if (null != (node = root.getChild("beneficial"))) {
+			beneficial = DataNode.parseBool(node);
 		}
 		
 		this.subActions.clear();
@@ -224,6 +232,7 @@ public class Action extends SubAction {
 		
 		base.addChild(new DataNode("name", name, null));
 		base.addChild(new DataNode("description", description, null));
+		base.addChild(new DataNode("beneficial", beneficial + "", null));
 		base.addChild(DataNode.serializeAll("subactions", "subaction", subActions));
 		base.addChild(new DataNode("targettype", targetType.name(), null));
 		
