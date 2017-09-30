@@ -34,22 +34,25 @@ public class ActionDatumData implements DatumData {
 	
 	private String name;
 	private String description;
+	private boolean beneficial;
 	private List<SubAction> subactions;
 	
 	public ActionDatumData() {
 		this.subactions = new LinkedList<>();
 	}
 	
-	public ActionDatumData(String name, String description) {
+	public ActionDatumData(String name, String description, boolean beneficial) {
 		this();
 		this.name = name;
 		this.description = description;
+		this.beneficial = beneficial;
 	}
 	
-	public ActionDatumData(String name, String description, List<SubAction> subactions) {
+	public ActionDatumData(String name, String description, boolean beneficial, List<SubAction> subactions) {
 		this.name = name;
 		this.description = description;
 		this.subactions = subactions;
+		this.beneficial = beneficial;
 	}
 	
 	public String getName() {
@@ -79,6 +82,14 @@ public class ActionDatumData implements DatumData {
 	public void clearSubactions() {
 		this.subactions.clear();
 	}
+	
+	public void setBeneficial(boolean bene) {
+		this.beneficial = bene;
+	}
+	
+	public boolean getBeneficial() {
+		return this.beneficial;
+	}
 
 	@Override
 	public void load(DataNode root) {
@@ -94,6 +105,11 @@ public class ActionDatumData implements DatumData {
 			this.description = node.getValue();
 		}
 		
+		// beneficial (primitive)
+		if ((node = root.getChild("beneficial")) != null) {
+			this.beneficial = DataNode.parseBool(node);
+		}
+		
 		//subactions
 		this.clearSubactions();
 		if ((node = root.getChild("subactions")) != null) {
@@ -106,15 +122,16 @@ public class ActionDatumData implements DatumData {
 	public DataNode write(String key) {
 		DataNode node = new DataNode(key, null, new LinkedList<>());
 		
-		node.addChild(new DataNode("name", this.name));
-		node.addChild(new DataNode("description", this.description));
+		node.addChild(new DataNode("name", this.name, null));
+		node.addChild(new DataNode("description", this.description, null));
+		node.addChild(new DataNode("beneficial", this.beneficial + "", null));
 		node.addChild(DataNode.serializeAll("subactions", "subaction", subactions));
 		
 		return node;
 	}
 
 	public static DatumData getExampleData() {
-		ActionDatumData data = new ActionDatumData("Rest At Inn", "Purchase a room and sleep, recovering health and spell slots.");
+		ActionDatumData data = new ActionDatumData("Rest At Inn", "Purchase a room and sleep, recovering health and spell slots.", true);
 		
 		data.addSubaction(new SubRest());
 		
