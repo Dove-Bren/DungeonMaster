@@ -6,7 +6,9 @@ import java.util.List;
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.action.subaction.SubAction;
 import com.smanzana.dungeonmaster.pawn.Pawn;
+import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.ui.UI;
 
 /**
  * Generic Action.
@@ -112,17 +114,37 @@ public class Action extends SubAction {
 			apply(source, source);
 			break;
 		case TARGET:
-			apply(source, selectTarget());
+			apply(source, selectTarget(source));
 			break;
 		case PARTY:
 			for (Pawn pc : DungeonMaster.getActiveSession().getParty())
 				apply(source, pc);
 			break;
 		case MULTI:
-			for (Pawn targ : selectMultiTargets())
+			for (Pawn targ : selectMultiTargets(source))
 				apply(source, targ);
 			break;
 		}
+	}
+	
+	private Pawn selectTarget(Pawn source) {
+		// Is player?
+		// If so, try to ask that player
+		// Otherwise fall back to AI
+		
+		if (source instanceof Player) {
+			Pawn targ = UI.instance().selectSingleTarget((Player) source, DungeonMaster.getActiveSession().getAllActivePawns());
+			if (targ != null) {
+				return targ;
+			} // else
+
+			// Failed for one reason or another
+			// Fall through to AI code
+		}
+	}
+	
+	private Pawn selectMultiTargets(Pawn source) {
+		
 	}
 	
 	/**

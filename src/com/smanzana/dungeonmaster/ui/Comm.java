@@ -1,5 +1,6 @@
 package com.smanzana.dungeonmaster.ui;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.smanzana.dungeonmaster.action.Action;
@@ -8,6 +9,7 @@ import com.smanzana.dungeonmaster.ui.common.InventoryView;
 import com.smanzana.dungeonmaster.ui.common.MessageBox;
 import com.smanzana.dungeonmaster.ui.common.NPCView;
 import com.smanzana.dungeonmaster.ui.common.PlayerView;
+import com.smanzana.dungeonmaster.ui.common.TargetView;
 
 /**
  * Communication endpoint between UI and a player.
@@ -41,6 +43,8 @@ public abstract class Comm {
 	public abstract void showNPC(NPCView pawn);
 	
 	public abstract void setActions(List<Action> actions);
+	
+	public abstract void showTargetSelect(Collection<TargetView<?>> targets, boolean multi, UICallback callback);
 	
 	// DM only actions
 	// Sending to player results in no op

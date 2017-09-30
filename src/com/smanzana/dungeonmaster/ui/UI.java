@@ -1,6 +1,7 @@
 package com.smanzana.dungeonmaster.ui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,11 +10,13 @@ import java.util.Map;
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.pawn.NPC;
+import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.ui.common.InventoryView;
 import com.smanzana.dungeonmaster.ui.common.MessageBox;
 import com.smanzana.dungeonmaster.ui.common.NPCView;
 import com.smanzana.dungeonmaster.ui.common.PlayerView;
+import com.smanzana.dungeonmaster.ui.common.TargetView;
 
 public class UI implements Runnable {
 	
@@ -347,6 +350,80 @@ public class UI implements Runnable {
 			}
 			
 		});
+	}
+	
+	public Pawn selectSingleTarget(Player picker, Collection<Pawn> targets) {
+		// convert into collection of TargetViews
+		// Then call comm and block
+		// on reply, look up returned string to match to targetview
+		// then return targetview->target
+		
+		if (picker == null || targets == null || targets.isEmpty() || getPlayerComm(picker) == null)
+			return null;
+		
+		List<TargetView<? extends Pawn>> views = new LinkedList<>();
+		for (Pawn targ : targets) {
+			views.add(new TargetView<>(targ));
+		}
+		
+		String selected = pushRequestBlocking(new UIRequestRun() {
+
+			@Override
+			public void run(UICallback hook) {
+				getPlayerComm(picker).showTargetSelect(views, false, hook);
+			}
+			
+		});
+		
+		if (selected == null || selected.isEmpty())
+			return null;
+		
+		selected = selected.trim();
+		
+		for (TargetView<? extends Pawn> view : views) {
+			if (view.getName().trim().equals(selected))
+				return view.getTarget();
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * @param picker
+	 * @param targets
+	 * @return Null on basic error. Empty list if no matches
+	 */
+	public Collection<Pawn> selectTargets(Player picker, Collection<Pawn> targets) {
+		if (picker == null || targets == null || targets.isEmpty() || getPlayerComm(picker) == null)
+			return null;
+		
+		List<TargetView<? extends Pawn>> views = new LinkedList<>();
+		for (Pawn targ : targets) {
+			views.add(new TargetView<>(targ));
+		}
+		
+		String selected = pushRequestBlocking(new UIRequestRun() {
+
+			@Override
+			public void run(UICallback hook) {
+				getPlayerComm(picker).showTargetSelect(views, true, hook);
+			}
+			
+		});
+		
+		if (selected == null || selected.isEmpty())
+			return null;
+		
+		selected = selected.trim();
+		
+		List<Pawn> selTargs = new LinkedList<>();
+		
+		for (TargetView<? extends Pawn> view : views) {
+			if (view.getName().trim().equals(selected))
+				selTargs.add(view.getTarget());
+		}
+		
+		return selTargs;
 	}
 	
 }

@@ -443,6 +443,14 @@ public class GameSession extends SessionBase implements Notable {
 	}
 	
 	/**
+	 * Includes players <3
+	 * @return
+	 */
+	public Collection<Pawn> getAllActivePawns() {
+		return activePawns.values();
+	}
+	
+	/**
 	 * Gets all available actions based on active pawns and setting
 	 * @return
 	 */
