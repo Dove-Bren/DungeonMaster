@@ -13,7 +13,7 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
  * @author Skyler
  *
  */
-public class NPC extends Pawn {
+public class NPC extends Entity {
 	
 	public static class NPCOverlay {
 		private String race;
@@ -47,87 +47,48 @@ public class NPC extends Pawn {
 	}
 
 	protected String templateName; // set when spawned from data, for lookup
-	protected Inventory inventory;
-	private String race;
-	private String name;
 	private boolean willTrade;
 	
 	public NPC() {
 		super();
-		this.inventory = new Inventory();
-		this.inventory.setInventoryHook(new InventoryHook() {
-
-			@Override
-			public boolean buy(Item item, Pawn actor) {
-				// We don't have any real reason to say no
-				// Config check already has happened
-				// Add value though
-				inventory.addGold(item.getValue());
-				return true;
-			}
-
-			@Override
-			public boolean steal(Item item, Pawn actor) {
-				return (askDM());
-			}
-			
-		});
+//		this.inventory = new Inventory();
+//		this.inventory.setInventoryHook(new InventoryHook() {
+//
+//			@Override
+//			public boolean buy(Item item, Pawn actor) {
+//				// We don't have any real reason to say no
+//				// Config check already has happened
+//				// Add value though
+//				inventory.addGold(item.getValue());
+//				return true;
+//			}
+//
+//			@Override
+//			public boolean steal(Item item, Pawn actor) {
+//				return (askDM());
+//			}
+//			
+//		});
 	}
 	
 	@Override
 	public void load(DataNode root) {
-		this.readBase(root);
+		super.load(root);
 		DataNode node;
-		
-		if (null != (node = root.getChild("race"))) {
-			this.race = node.getValue();
-		}
-		
-		if (null != (node = root.getChild("name"))) {
-			this.name = node.getValue();
-		}
 		
 		if (null != (node = root.getChild("willtrade"))) {
 			this.willTrade = DataNode.parseBool(node);
-		}
-		
-		if (null != (node = root.getChild("inventory"))) {
-			this.inventory = new Inventory();
-			this.inventory.load(node);
 		}
 		
 	}
 
 	@Override
 	public DataNode write(String key) {
-		DataNode base = this.writeBase(key);
+		DataNode base = super.write(key);
 		
-		base.addChild(new DataNode("race", this.race, null));
-		base.addChild(new DataNode("name", this.name, null));
 		base.addChild(new DataNode("willtrade", this.willTrade + "", null));
-		base.addChild(this.inventory.write("inventory"));
 		
 		return base;
-	}
-	
-	public Inventory getInventory() {
-		return this.inventory;
-	}
-
-	public String getRace() {
-		return race;
-	}
-
-	public String getName() {
-		return name;
-	}
-	
-	protected void setRace(String race) {
-		this.race = race;
-	}
-	
-	protected void setName(String name) {
-		this.name = name;
 	}
 	
 	public boolean willTrade() {
@@ -152,10 +113,10 @@ public class NPC extends Pawn {
 	
 	public void applyOverlay(NPCOverlay data) {
 		if (data.race != null)
-			this.race = data.race;
+			this.setRace(data.race);
 		
 		if (data.name != null)
-			this.name = data.name;
+			this.setName(data.name);
 		
 		if (data.willTrade != null)
 			this.willTrade = data.willTrade;
@@ -180,8 +141,8 @@ public class NPC extends Pawn {
 		mob.applyOverlay(po);
 		
 		mob.applyOverlay((new NPCOverlay())
-				.name(name)
-				.race(race)
+				.name(getName())
+				.race(getRace())
 				.trades(willTrade)
 				);
 		
@@ -209,8 +170,8 @@ public class NPC extends Pawn {
 		npc.dead = false;
 		ProfileDatumData prof = DungeonMaster.getActiveSession().lookupProfile(data.getProfileName());
 		if (prof != null) {
-			npc.name = prof.getGeneratedName();
-			npc.race = prof.getRace();
+			npc.setName(prof.getGeneratedName());
+			npc.setRace(prof.getRace());
 		}
 		
 		npc.willTrade = data.isWillTrade();

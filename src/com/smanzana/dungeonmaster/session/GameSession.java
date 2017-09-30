@@ -11,6 +11,8 @@ import java.util.Random;
 import com.smanzana.dungeonmaster.action.Action;
 import com.smanzana.dungeonmaster.action.ActionRegistry;
 import com.smanzana.dungeonmaster.inventory.Inventory;
+import com.smanzana.dungeonmaster.inventory.Inventory.InventoryOperation;
+import com.smanzana.dungeonmaster.pawn.Entity;
 import com.smanzana.dungeonmaster.pawn.Mob;
 import com.smanzana.dungeonmaster.pawn.NPC;
 import com.smanzana.dungeonmaster.pawn.Pawn;
@@ -326,10 +328,8 @@ public class GameSession extends SessionBase implements Notable {
 		if (pawn == null)
 			return null;
 		
-		if (pawn instanceof NPC) {
-			return ((NPC) pawn).getInventory();
-		} else if (pawn instanceof Player) {
-			return ((Player) pawn).getInventory();
+		if (pawn instanceof Entity) {
+			return ((Entity) pawn).getInventory();
 		} else {
 			System.out.println("Could not get inventory from " + pawn);
 			return null;
@@ -341,7 +341,7 @@ public class GameSession extends SessionBase implements Notable {
 		if (inv == null) {
 			System.out.println("Cannot perform " + operation.name() + " on null inventory");
 		} else {
-			inv.performOperation(actor, operation, slotID);
+			inv.performOperation(actor, slotID, operation);
 		}
 	}
 	

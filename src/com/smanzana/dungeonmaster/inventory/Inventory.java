@@ -11,6 +11,7 @@ import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.inventory.item.Equipment;
 import com.smanzana.dungeonmaster.inventory.item.Item;
 import com.smanzana.dungeonmaster.inventory.item.Usable;
+import com.smanzana.dungeonmaster.pawn.Entity;
 import com.smanzana.dungeonmaster.pawn.NPC;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
@@ -152,10 +153,8 @@ public class Inventory implements DataCompatible {
 					// Means DM is 'buying' it.
 					// no payment. no invenentory to transfer to (later).
 					actorInventory = null;
-				} else if (actor instanceof Player) {
-					actorInventory = ((Player) actor).getInventory();
-				} else if (actor instanceof NPC) {
-					actorInventory = ((NPC) actor).getInventory();
+				} else if (actor instanceof Entity) {
+					actorInventory = ((Entity) actor).getInventory();
 				} else {
 					System.out.println("Purchase made by unknown entity");
 					return false;

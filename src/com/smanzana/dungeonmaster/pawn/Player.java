@@ -18,7 +18,7 @@ import com.smanzana.dungeonmaster.spell.Spell;
 import com.smanzana.dungeonmaster.utils.Dice;
 import com.smanzana.dungeonmaster.utils.ValueCapsule;
 
-public class Player extends Pawn {
+public class Player extends Entity {
 	
 	public static class PlayerOverlay {
 		private String name;
@@ -152,10 +152,10 @@ public class Player extends Pawn {
 		}
 	}
 	
-	private String name;
-	private String race;
+	//private String name;
+	//private String race;
 	private String background;
-	private Inventory inventory;
+	//private Inventory inventory;
 	private List<Effect> effects;
 	private boolean zombie;
 	private int xp;
@@ -167,8 +167,8 @@ public class Player extends Pawn {
 	private int rawHitDice; // amount of health from hitdice alone. No modifiers.
 	
 	public Player() {
+		super();
 		effects = new LinkedList<>();
-		inventory = new Inventory();
 		this.spellSlots = new HashMap<>();
 		this.spells = new LinkedList<>();
 		this.zombie = false;
@@ -176,14 +176,15 @@ public class Player extends Pawn {
 		this.xp = 0;
 		this.rawHitDice = 0;
 
-		this.inventory.setInventoryHook(new InventoryHook() {
+		final Inventory inv = this.getInventory();
+		inv.setInventoryHook(new InventoryHook() {
 
 			@Override
 			public boolean buy(Item item, Pawn actor) {
 				// This is a 'sell'
 				// Assume the player has triggered it
 				// or the DM is forcing it.
-				inventory.addGold(item.getValue());
+				inv.addGold(item.getValue());
 				return true;
 			}
 
@@ -197,8 +198,8 @@ public class Player extends Pawn {
 
 	public Player(String name, String race, String background, int maxXP, int level) {
 		super();
-		this.name = name;
-		this.race = race;
+		setName(name);
+		setRace(race);
 		this.background = background;
 		this.maxXP = maxXP;
 		this.level = level;
@@ -210,14 +211,6 @@ public class Player extends Pawn {
 	
 	public void setPlayerClass(PlayerClass clazz) {
 		playerClass = clazz;
-	}
-	
-	public Inventory getInventory() {
-		return this.inventory;
-	}
-	
-	public void addToInventory(Item item) {
-		inventory.addItem(item);
 	}
 	
 	public int getTotalSlots(int slotLevel) {
@@ -359,22 +352,6 @@ public class Player extends Pawn {
 		this.zombie = zombie;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getRace() {
-		return race;
-	}
-
-	public void setRace(String race) {
-		this.race = race;
-	}
-
 	public String getBackground() {
 		return background;
 	}
@@ -385,16 +362,9 @@ public class Player extends Pawn {
 
 	@Override
 	public void load(DataNode root) {
+		super.load(root);
 		DataNode node;
 		this.effects.clear();
-		
-		if (null != (node = root.getChild("name"))) {
-			this.name = node.getValue();
-		}
-		
-		if (null != (node = root.getChild("race"))) {
-			this.race = node.getValue();
-		}
 		
 		if (null != (node = root.getChild("background"))) {
 			this.background = node.getValue();
@@ -420,10 +390,6 @@ public class Player extends Pawn {
 			this.zombie = DataNode.parseBool(node);
 		}
 		
-		if (null != (node = root.getChild("inventory"))) {
-			this.inventory.load(node);
-		}
-		
 		if (null != (node = root.getChild("effects"))) {
 			for (DataNode effect : node.getChildren()) {
 				this.effects.add(Effect.fromData(effect));
@@ -437,17 +403,14 @@ public class Player extends Pawn {
 
 	@Override
 	public DataNode write(String key) {
-		DataNode base = this.writeBase(key);
+		DataNode base = super.write(key);
 		
-		base.addChild(new DataNode("name", name, null));
-		base.addChild(new DataNode("race", race, null));
 		base.addChild(new DataNode("background", background, null));
 		base.addChild(new DataNode("xp", "" + xp, null));
 		base.addChild(new DataNode("maxxp", "" + maxXP, null));
 		base.addChild(new DataNode("rawhitdice", "" + rawHitDice, null));
 		base.addChild(new DataNode("level", "" + level, null));
 		base.addChild(new DataNode("zombie", "" + zombie, null));
-		base.addChild(inventory.write("inventory"));
 		base.addChild(DataNode.serializeAll("effects", "effect", effects));
 		base.addChild(new DataNode("class", playerClass.getName(), null));
 		
@@ -489,10 +452,10 @@ public class Player extends Pawn {
 	public void applyOverlay(PlayerOverlay data) {
 		
 		if (data.name != null)
-			this.name = data.name;
+			this.setName(data.name);
 		
 		if (data.race != null)
-			this.race = data.race;
+			this.setRace(data.race);
 		
 		if (data.background != null)
 			this.background = data.background;
