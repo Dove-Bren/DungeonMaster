@@ -1,10 +1,13 @@
 package com.smanzana.dungeonmaster.action;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.action.subaction.SubAction;
+import com.smanzana.dungeonmaster.mechanics.AI;
+import com.smanzana.dungeonmaster.pawn.Mob;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
@@ -114,20 +117,20 @@ public class Action extends SubAction {
 			apply(source, source);
 			break;
 		case TARGET:
-			apply(source, selectTarget(source));
+			apply(source, selectTarget(source, this.isBeneficial()));
 			break;
 		case PARTY:
 			for (Pawn pc : DungeonMaster.getActiveSession().getParty())
 				apply(source, pc);
 			break;
 		case MULTI:
-			for (Pawn targ : selectMultiTargets(source))
+			for (Pawn targ : selectMultiTargets(source, this.isBeneficial()))
 				apply(source, targ);
 			break;
 		}
 	}
 	
-	private Pawn selectTarget(Pawn source) {
+	private Pawn selectTarget(Pawn source, boolean beneficial) {
 		// Is player?
 		// If so, try to ask that player
 		// Otherwise fall back to AI
@@ -141,11 +144,41 @@ public class Action extends SubAction {
 			// Failed for one reason or another
 			// Fall through to AI code
 		}
+		
+		// Do AI resolution
+		boolean ally = false;
+		
+		if (source instanceof Mob)
+			ally = ((Mob) source).isAlly();
+		else if (source instanceof Player)
+			ally = true;
+		
+		return AI.selectTarget(DungeonMaster.getActiveSession().getAllActivePawns(), ally, beneficial);
 	}
 	
-	private Pawn selectMultiTargets(Pawn source) {
+	private Collection<Pawn> selectMultiTargets(Pawn source, boolean beneficial) {
 		
+		if (source instanceof Player) {
+			Collection<Pawn> targs = UI.instance().selectTargets((Player) source, DungeonMaster.getActiveSession().getAllActivePawns());
+			if (targs != null && !targs.isEmpty()) {
+				return targs;
+			} // else
+
+			// Failed for one reason or another
+			// Fall through to AI code
+		}
+		
+		boolean ally = false;
+		
+		if (source instanceof Mob)
+			ally = ((Mob) source).isAlly();
+		else if (source instanceof Player)
+			ally = true;
+		
+		return AI.selectMultiTargets(DungeonMaster.getActiveSession().getAllActivePawns(), ally, beneficial);
 	}
+	
+	public boolean isBeneficial();
 	
 	/**
 	 * @param target

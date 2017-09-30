@@ -87,6 +87,4 @@ public abstract class Entity extends Pawn {
 		this.name = name;
 	}
 	
-	
-	
 }

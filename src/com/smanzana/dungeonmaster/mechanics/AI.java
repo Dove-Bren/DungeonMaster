@@ -11,6 +11,7 @@ import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
+import com.smanzana.dungeonmaster.ui.UI;
 
 public final class AI {
 
@@ -29,7 +30,53 @@ public final class AI {
 			return it.next();
 		}
 		
-		// actual logic here
+		if (MechanicsConfig.instance().getBool(MechanicsKey.ENEMY_TARGET_WEAKEST)) {
+			int maxScore = Integer.MIN_VALUE;
+			Pawn max = null;
+			int score = 0;
+			for (Pawn pawn : filter) {
+				// Get a score for each pawn
+				// keep highest and use them
+				Mob asMob = null;
+				Player asPlayer = null;
+				
+				if (pawn instanceof Mob)
+					asMob = (Mob) pawn;
+				if (pawn instanceof Player)
+					asPlayer = (Player) pawn;
+				
+				score = 0;
+				if (MechanicsConfig.instance().getBool(MechanicsKey.USE_HEALTH))
+					score += Math.sqrt(Math.max(0, pawn.getMaxHealth() - pawn.getHealth()));
+				
+				if (MechanicsConfig.instance().getBool(MechanicsKey.USE_STAMINA))
+					score += .4 * Math.sqrt(Math.max(0, pawn.getMaxStamina() - pawn.getStamina()));
+
+				if (MechanicsConfig.instance().getBool(MechanicsKey.USE_MANA))
+					score += .4 * Math.sqrt(Math.max(0, pawn.getMaxMana() - pawn.getMana()));
+				
+				if (MechanicsConfig.instance().getBool(MechanicsKey.USE_LEVELS))
+					if (asPlayer != null)
+						score -= asPlayer.getLevel();
+				
+				if (MechanicsConfig.instance().getBool(MechanicsKey.USE_OFFDEF)) {
+					if (asMob != null)
+						score -= Mechs.getDefenseScore(asMob);
+					else if (asPlayer != null)
+						score -= Mechs.getDefenseScore(asPlayer);
+				}
+				
+				if (score > maxScore) {
+					maxScore = score;
+					max = pawn;
+				}
+			}
+			
+			return max;
+		}
+		
+		// else have DM pick
+		return UI.instance().selectSingleTarget(null, targs);
 	}
 	
 	public static Collection<Pawn> selectMultiTargets(Collection<Pawn> targs, boolean isAlly, boolean beneficial) {

@@ -352,13 +352,28 @@ public class UI implements Runnable {
 		});
 	}
 	
+	/**
+	 * 
+	 * @param picker Player picking. If null, asks DM
+	 * @param targets
+	 * @return
+	 */
 	public Pawn selectSingleTarget(Player picker, Collection<Pawn> targets) {
 		// convert into collection of TargetViews
 		// Then call comm and block
 		// on reply, look up returned string to match to targetview
 		// then return targetview->target
+				
+		if (targets == null || targets.isEmpty())
+			return null;
 		
-		if (picker == null || targets == null || targets.isEmpty() || getPlayerComm(picker) == null)
+		Comm comm;
+		if (picker == null)
+			comm = this.DMComm;
+		else
+			comm = getPlayerComm(picker);
+		
+		if (comm == null)
 			return null;
 		
 		List<TargetView<? extends Pawn>> views = new LinkedList<>();
@@ -370,7 +385,7 @@ public class UI implements Runnable {
 
 			@Override
 			public void run(UICallback hook) {
-				getPlayerComm(picker).showTargetSelect(views, false, hook);
+				comm.showTargetSelect(views, false, hook);
 			}
 			
 		});
@@ -389,12 +404,21 @@ public class UI implements Runnable {
 	}
 	
 	/**
-	 * @param picker
+	 * @param picker Player picking. If null, asks DM
 	 * @param targets
 	 * @return Null on basic error. Empty list if no matches
 	 */
 	public Collection<Pawn> selectTargets(Player picker, Collection<Pawn> targets) {
-		if (picker == null || targets == null || targets.isEmpty() || getPlayerComm(picker) == null)
+		if (targets == null || targets.isEmpty())
+			return null;
+		
+		Comm comm;
+		if (picker == null)
+			comm = this.DMComm;
+		else
+			comm = getPlayerComm(picker);
+		
+		if (comm == null)
 			return null;
 		
 		List<TargetView<? extends Pawn>> views = new LinkedList<>();
@@ -406,7 +430,7 @@ public class UI implements Runnable {
 
 			@Override
 			public void run(UICallback hook) {
-				getPlayerComm(picker).showTargetSelect(views, true, hook);
+				comm.showTargetSelect(views, true, hook);
 			}
 			
 		});
