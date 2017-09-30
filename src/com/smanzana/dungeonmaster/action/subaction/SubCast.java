@@ -11,6 +11,8 @@ import com.smanzana.dungeonmaster.utils.ValueSpecifier;
  */
 public class SubCast extends SubAction {
 
-	
+	public static void register() {
+		
+	}
 	
 }

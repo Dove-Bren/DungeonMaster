@@ -19,7 +19,15 @@ public abstract class Item implements Notable, DataCompatible, Cloneable {
 		
 	}
 	
-	private static Map<String, ItemFactory<?>> factories = new HashMap<>();
+	private static Map<String, ItemFactory<?>> factories = null;
+	
+	private static void init() {
+		factories = new HashMap<>();
+		
+		Junk.register();
+		Usable.register();
+		Equipment.register();
+	}
 	
 	protected static void registerType(String typeKey, ItemFactory<?> factory) {
 		factories.put(typeKey, factory);
@@ -27,6 +35,12 @@ public abstract class Item implements Notable, DataCompatible, Cloneable {
 	
 	public static Item fromData(DataNode node) {
 		String key = null;
+		
+		if (node == null)
+			return null;
+		
+		if (factories == null)
+			init();
 		
 		if (node.getChild("type") != null) {
 			key = node.getChild("type").getValue();

@@ -47,7 +47,7 @@ public class ItemDatumData implements DatumData {
 
 	@Override
 	public void load(DataNode root) {
-		Item.fromData(root);
+		item = Item.fromData(root);
 	}
 
 	@Override

@@ -76,12 +76,18 @@ public class GameSession extends SessionBase implements Notable {
 	public void run() {
 		load();
 		
+		int debug = 0;
 		while (runLoop()) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				; // who cares?
 			}
+			
+			if (debug < 50)
+				debug++;
+			else
+				break;
 		}
 		
 		save();

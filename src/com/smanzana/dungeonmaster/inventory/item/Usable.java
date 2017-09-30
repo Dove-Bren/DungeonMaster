@@ -32,7 +32,15 @@ public class Usable extends Item {
 	
 	@Override
 	protected String getClassKey() {
+		return ClassKey();
+	}
+	
+	protected static String ClassKey() {
 		return "usable";
+	}
+	
+	protected static void register() {
+		Item.registerType(ClassKey(), new Factory());
 	}
 	
 	public void use(Pawn user) {

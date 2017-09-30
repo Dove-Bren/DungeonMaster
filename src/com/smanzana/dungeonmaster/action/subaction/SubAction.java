@@ -19,16 +19,39 @@ public abstract class SubAction implements DataCompatible {
 	
 	public abstract void apply(Pawn source, Pawn target);
 	
+	/**
+	 * Must have empty constructor. Will be constructed with no arguments
+	 * @author Skyler
+	 *
+	 * @param <T>
+	 */
 	protected static interface SubActionFactory<T extends SubAction> {
 		
 		public T construct(DataNode data);
 	}
 	
-	private static Map<String, SubActionFactory<?>> factories = new HashMap<>();
+	private static Map<String, SubActionFactory<?>> factories = null;
+	
+	private static void init() {
+		 factories = new HashMap<>();
+		 
+		 // compile-time enumeration :(
+		 // Could make cooler with class annotations, but then have to iterate over all
+		 // classpath locations or use a library
+		 SubRest.register();
+		 SubApplyEffect.register();
+		 SubDamage.register();
+		 SubHeal.register();
+		 SubMeleeAttack.register();
+		 SubCast.register();
+	}
 	
 	public static SubAction fromData(DataNode data) {
 		if (data == null)
 			return null;
+		
+		if (factories == null)
+			init();
 		
 		if (!factories.containsKey(data.getChild("type").getValue()))
 			return null;

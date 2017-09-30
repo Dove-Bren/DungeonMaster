@@ -22,8 +22,8 @@ public class SubHeal extends SubAction {
 		}
 	}
 	
-	{
-		SubAction.registerFactory(getClassKey(), new Factory());
+	protected static void register() {
+		SubAction.registerFactory(ClassKey(), new Factory());
 	}
 
 	private ValueSpecifier hp;
@@ -78,7 +78,11 @@ public class SubHeal extends SubAction {
 
 	@Override
 	protected String getClassKey() {
+		return SubHeal.ClassKey();
+	}
+	
+	protected static String ClassKey() {
 		return "heal";
-	}	
+	}
 	
 }

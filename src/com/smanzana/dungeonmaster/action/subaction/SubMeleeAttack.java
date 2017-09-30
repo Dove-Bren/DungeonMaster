@@ -24,8 +24,8 @@ public class SubMeleeAttack extends SubAction {
 		}
 	}
 	
-	{
-		SubAction.registerFactory(getClassKey(), new Factory());
+	protected static void register() {
+		SubAction.registerFactory(ClassKey(), new Factory());
 	}
 
 	public SubMeleeAttack() {
@@ -82,6 +82,10 @@ public class SubMeleeAttack extends SubAction {
 
 	@Override
 	protected String getClassKey() {
+		return SubMeleeAttack.ClassKey();
+	}
+	
+	protected static String ClassKey() {
 		return "melee";
 	}
 	

@@ -14,10 +14,6 @@ public class Junk extends Item {
 		
 	}
 	
-	{
-		Item.registerType(getClassKey(), new Factory());
-	}
-	
 	public Junk() {
 		super("Junk", "Worthless junk", 0);
 	}
@@ -28,9 +24,15 @@ public class Junk extends Item {
 	
 	@Override
 	protected String getClassKey() {
+		return ClassKey();
+	}
+	
+	protected static String ClassKey() {
 		return "junk";
 	}
 	
-	
+	protected static void register() {
+		Item.registerType(ClassKey(), new Factory());
+	}
 
 }

@@ -25,6 +25,7 @@ public class DungeonMaster {
 		// DM mode: Spawn a session from a template OR load an existing session
 		
 		activeSession = new GameSession(new File("testsession"));
+		runSession(activeSession);
 	}
 	
 	public static GameSession getActiveSession() {
@@ -33,7 +34,15 @@ public class DungeonMaster {
 	
 	private static void runSession(GameSession session) {
 		launchSession(session);
-		session.run();
+		
+		try {
+			session.run();
+		} catch (RuntimeException e) {
+			System.out.println("Uncaught Exception:");
+			e.printStackTrace();
+		}
+		
+		shutdown();
 	}
 	
 	/**
@@ -42,7 +51,7 @@ public class DungeonMaster {
 	 * @param session
 	 */
 	private static void launchSession(GameSession session) {
-		UIThread = new Thread(UI.instance());
+		UIThread = new Thread(UI.instance(), "UI Thread");
 		UIThread.start();
 	}
 	

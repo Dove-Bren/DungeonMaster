@@ -20,8 +20,8 @@ public class SubDamage extends SubAction {
 		}
 	}
 	
-	{
-		SubAction.registerFactory(getClassKey(), new Factory());
+	protected static void register() {
+		SubAction.registerFactory(ClassKey(), new Factory());
 	}
 
 	private ValueSpecifier damage;
@@ -52,7 +52,11 @@ public class SubDamage extends SubAction {
 
 	@Override
 	protected String getClassKey() {
+		return SubDamage.ClassKey();
+	}
+	
+	protected static String ClassKey() {
 		return "damage";
-	}	
+	}
 	
 }

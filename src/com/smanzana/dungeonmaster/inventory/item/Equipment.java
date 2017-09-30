@@ -238,7 +238,15 @@ public abstract class Equipment extends Item {
 	
 	@Override
 	protected String getClassKey() {
+		return ClassKey();
+	}
+	
+	protected static String ClassKey() {
 		return "equipment";
+	}
+	
+	protected static void register() {
+		Item.registerType(ClassKey(), new Factory());
 	}
 	
 	public static Equipment fromData(DataNode node) {

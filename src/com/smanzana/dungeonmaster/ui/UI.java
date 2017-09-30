@@ -70,6 +70,9 @@ public class UI implements Runnable {
 	public void run() {
 		UIRequest next;
 		
+		System.out.println("Starting UI Thread...");
+		running = true;
+		
 		while (true) {
 			
 			next = popRequest();
@@ -89,10 +92,13 @@ public class UI implements Runnable {
 				;
 			}
 		}
+		
+		System.out.println("UI Thread has Shutdown");
 	}
 	
 	public void halt() {
 		synchronized(running) {
+			System.out.println("UI Thread receieved halt");
 			running = false;
 		}
 	}
@@ -105,6 +111,9 @@ public class UI implements Runnable {
 	
 	private UIRequest popRequest() {
 		synchronized(requests) {
+			if (requests.size() == 0)
+				return null;
+			
 			UIRequest ret = requests.get(0);
 			requests.remove(0);
 			return ret;
