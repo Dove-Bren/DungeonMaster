@@ -4,6 +4,7 @@ import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.inventory.Inventory.InventoryHook;
 import com.smanzana.dungeonmaster.inventory.item.Item;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.ui.UI;
 
 public abstract class Entity extends Pawn {
 
@@ -14,6 +15,7 @@ public abstract class Entity extends Pawn {
 	public Entity() {
 		this.inventory = new Inventory();
 		
+		final Entity me = this;
 		this.inventory.setInventoryHook(new InventoryHook() {
 
 			@Override
@@ -27,7 +29,8 @@ public abstract class Entity extends Pawn {
 
 			@Override
 			public boolean steal(Item item, Pawn actor) {
-				return (askDM());
+				return (UI.instance().askDM(actor.getName() + " is attempting to steal from " + me.getName()
+						+ " (" + item.getName() + "). Allow it?"));
 			}
 			
 		});

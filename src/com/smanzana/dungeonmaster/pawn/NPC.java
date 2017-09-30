@@ -1,14 +1,16 @@
 package com.smanzana.dungeonmaster.pawn;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.smanzana.dungeonmaster.DungeonMaster;
-import com.smanzana.dungeonmaster.battle.effects.Effect;
-import com.smanzana.dungeonmaster.inventory.Inventory;
-import com.smanzana.dungeonmaster.inventory.Inventory.InventoryHook;
-import com.smanzana.dungeonmaster.inventory.item.Item;
+import com.smanzana.dungeonmaster.action.Action;
+import com.smanzana.dungeonmaster.action.Action.TargetType;
+import com.smanzana.dungeonmaster.action.subaction.SubInspectNPC;
 import com.smanzana.dungeonmaster.session.datums.NPCDatumData;
 import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
-import com.smanzana.dungeonmaster.utils.ValueCapsule;
 
 /**
  * Non-player character. 
@@ -194,6 +196,24 @@ public class NPC extends Entity {
 		npc.stats = data.getStats();
 		
 		return npc;
+	}
+
+	@Override
+	public Collection<Action> getActions(boolean isAdmin, Player player) {
+		List<Action> actions = new LinkedList<>();
+		Action action;
+		
+		action = new Action("Inspect", "View this NPC's stats and basic info", TargetType.TARGET);
+		action.addSubAction(new SubInspectNPC(this));
+		actions.add(action);
+		
+		if (isAdmin || this.willTrade()) {
+			action = new Action("Trade", "Trade with this NPC", TargetType.TARGET);
+			action.addSubAction(new SubShop(this));
+			actions.add(action);
+		}
+		
+		return actions;
 	}
 
 }

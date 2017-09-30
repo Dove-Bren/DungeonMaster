@@ -1,9 +1,11 @@
 package com.smanzana.dungeonmaster.pawn;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
+import com.smanzana.dungeonmaster.action.Action;
 import com.smanzana.dungeonmaster.battle.effects.Effect;
 import com.smanzana.dungeonmaster.session.datums.NPCDatumData;
 import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
@@ -261,6 +263,17 @@ public class Mob extends NPC {
 		mob.xp = data.getXp();
 		
 		return mob;
+	}
+	
+	@Override
+	public Collection<Action> getActions(boolean isAdmin, Player player) {
+		Collection<Action> actions = super.getActions(isAdmin, player);
+		
+		// Add player combat actions
+		if (player != null)
+			actions.addAll(player.getCombatActions());
+		
+		return actions;
 	}
 	
 }

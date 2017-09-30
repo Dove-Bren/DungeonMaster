@@ -1,15 +1,17 @@
 package com.smanzana.dungeonmaster.pawn;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
+import com.smanzana.dungeonmaster.action.Action;
+import com.smanzana.dungeonmaster.action.Action.TargetType;
+import com.smanzana.dungeonmaster.action.subaction.SubInspectPlayer;
 import com.smanzana.dungeonmaster.battle.effects.Effect;
-import com.smanzana.dungeonmaster.inventory.Inventory;
-import com.smanzana.dungeonmaster.inventory.Inventory.InventoryHook;
-import com.smanzana.dungeonmaster.inventory.item.Item;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
 import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
@@ -175,25 +177,6 @@ public class Player extends Entity {
 		this.playerClass = null;
 		this.xp = 0;
 		this.rawHitDice = 0;
-
-		final Inventory inv = this.getInventory();
-		inv.setInventoryHook(new InventoryHook() {
-
-			@Override
-			public boolean buy(Item item, Pawn actor) {
-				// This is a 'sell'
-				// Assume the player has triggered it
-				// or the DM is forcing it.
-				inv.addGold(item.getValue());
-				return true;
-			}
-
-			@Override
-			public boolean steal(Item item, Pawn actor) {
-				return (askDM());
-			}
-			
-		});
 	}
 
 	public Player(String name, String race, String background, int maxXP, int level) {
@@ -242,7 +225,10 @@ public class Player extends Entity {
 	}
 	
 	public List<String> getSpells() {
-		return spells;
+		List<String> names = new ArrayList<>(spells.size());
+		for (Spell s : spells)
+			names.add(s.getName());
+		return names;
 	}
 	
 	public void awardSpell(Spell spell) {
@@ -517,5 +503,21 @@ public class Player extends Entity {
 				this.spellSlots.put(level, data.spellSlots.get(level));
 			}
 		}
+	}
+
+	@Override
+	public Collection<Action> getActions(boolean isAdmin, Player player) {
+		List<Action> actions = new LinkedList<>();
+		Action action;
+		
+		action = new Action("Inspect", "View this Player's stats and basic info", TargetType.TARGET);
+		action.addSubAction(new SubInspectPlayer(this));
+		actions.add(action);
+		
+		return actions;
+	}
+	
+	public Collection<Action> getCombatActions() {
+		
 	}
 }

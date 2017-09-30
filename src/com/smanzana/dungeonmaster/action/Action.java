@@ -53,7 +53,7 @@ public class Action extends SubAction {
 		this.subActions = new LinkedList<>();
 	}
 	
-	protected Action(String name, String description, TargetType type) {
+	public Action(String name, String description, TargetType type) {
 		this.subActions = new LinkedList<>();
 		this.name = name;
 		this.description = description;
