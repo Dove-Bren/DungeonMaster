@@ -1,6 +1,7 @@
 package com.smanzana.dungeonmaster.ui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,7 @@ import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.ui.common.MessageBox;
 
-public class UI {
+public class UI implements Runnable {
 	
 	private static interface UIRequest extends UICallback, UIRequestRun {
 		
@@ -60,9 +61,40 @@ public class UI {
 	private List<UIRequest> requests;
 	private Comm DMComm;
 	private Map<Integer, Comm> PlayerComms; // PlayerID (from session) to comm
+	private Boolean running = false;
 	
 	private UI() {
 		requests = new LinkedList<>();
+	}
+	
+	public void run() {
+		UIRequest next;
+		
+		while (true) {
+			
+			next = popRequest();
+			if (next != null) {
+				next.run(next);
+			}
+					
+			
+			synchronized(running) {
+				if (!running)
+					break;
+			}
+			
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				;
+			}
+		}
+	}
+	
+	public void halt() {
+		synchronized(running) {
+			running = false;
+		}
 	}
 	
 	private void pushRequest(UIRequest req) {
@@ -186,6 +218,62 @@ public class UI {
 		return (decision != null && decision.equals("true"));
 	}
 	
+	public boolean askParty(String desc) {
+		// iterate over players.
+		// Dont' use blocking call, so that we can ask all at the same time
+		// Then check all returns for a false.
+		
+		if (this.PlayerComms.isEmpty()) 
+			return true; // No party to query
+		
+		final Map<Integer, Boolean> results = new HashMap<>();
+		List<String> opts = new ArrayList<>(3);
+		opts.add("Agree");
+		opts.add("Refute");
+		for (Integer key : PlayerComms.keySet()) {
+			final int myKey = key;
+			results.put(key, null); // to signal that we haven't got anything back
+									// but that we've asked
+			this.displayMessage(PlayerComms.get(key), desc, opts, new UICallback() {
+
+				@Override
+				public void callback(String serialResponse) {
+					results.put(myKey, serialResponse.equals(opts.get(0))); // 0 is "Agree"
+				}
+				
+			});
+		}
+		
+		while (true) {
+			// Sleep first since we're going to have to wait anyways
+			// Plus following a 'continue' we hit a sleep :)
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				;
+			}
+			
+			// Check for any outstanding queries
+			for (Integer key : results.keySet()) {
+				// if key maps to NULL, no response has come in
+				if (results.get(key) == null)
+					continue;
+			}
+			
+			// No comms had null, so we're good to eval
+			break;
+		}
+		
+		boolean hit = false;
+		for (Boolean bool : results.values()) {
+			if (!bool) {
+				hit = true;
+				break;
+			}
+		}
+		
+		return !hit;
+	}
 	
 	
 }
