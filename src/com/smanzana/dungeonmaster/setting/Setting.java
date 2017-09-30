@@ -8,6 +8,7 @@ import java.util.List;
 import com.smanzana.dungeonmaster.action.Action;
 import com.smanzana.dungeonmaster.action.ActionRegistry;
 import com.smanzana.dungeonmaster.action.Interactable;
+import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.Notable;
@@ -83,7 +84,7 @@ public class Setting implements Notable, DataCompatible, Interactable {
 	}
 	
 	@Override
-	public Collection<Action> getActions(boolean admin) {
+	public Collection<Action> getActions(boolean admin, Player player) {
 		if (!admin)
 			return fetchActions(this.playerActions);
 		

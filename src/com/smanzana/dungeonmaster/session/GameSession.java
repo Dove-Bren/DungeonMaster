@@ -465,7 +465,7 @@ public class GameSession extends SessionBase implements Notable {
 			actions.addAll(setting.getActions(admin));
 		
 		for (Pawn p : activePawns.values())
-			actions.addAll(p.getActions(admin));
+			actions.addAll(p.getActions(admin, null));
 		
 		return actions;
 	}

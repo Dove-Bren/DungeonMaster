@@ -510,7 +510,7 @@ public class Player extends Entity {
 		List<Action> actions = new LinkedList<>();
 		Action action;
 		
-		action = new Action("Inspect", "View this Player's stats and basic info", TargetType.TARGET);
+		action = new Action("Inspect", "View this Player's stats and basic info", true, Attributes.INTELLIGENCE, TargetType.TARGET);
 		action.addSubAction(new SubInspectPlayer(this));
 		actions.add(action);
 		

@@ -203,12 +203,12 @@ public class NPC extends Entity {
 		List<Action> actions = new LinkedList<>();
 		Action action;
 		
-		action = new Action("Inspect", "View this NPC's stats and basic info", TargetType.TARGET);
+		action = new Action("Inspect", "View this NPC's stats and basic info", true, Attributes.INTELLIGENCE, TargetType.TARGET);
 		action.addSubAction(new SubInspectNPC(this));
 		actions.add(action);
 		
 		if (isAdmin || this.willTrade()) {
-			action = new Action("Trade", "Trade with this NPC", TargetType.TARGET);
+			action = new Action("Trade", "Trade with this NPC", true, Attributes.CHARISMA, TargetType.TARGET);
 			action.addSubAction(new SubShop(this));
 			actions.add(action);
 		}
