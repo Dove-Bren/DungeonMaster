@@ -29,7 +29,7 @@ public class StartScreen extends JPanel {
 	public void init() {
 		
 		this.add(Box.createVerticalGlue());
-		this.add(new JLabel(AppFrame.createImageIcon("resources/title.png")));
+		this.add(new JLabel(AppFrame.createImageIcon("title.png")));
 		this.add(Box.createRigidArea(new Dimension(0, 50)));
 		this.add(Box.createVerticalGlue());
 		

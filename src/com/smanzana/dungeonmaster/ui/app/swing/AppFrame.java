@@ -15,7 +15,7 @@ import com.smanzana.dungeonmaster.ui.app.swing.screens.StartScreen;
 public class AppFrame extends JFrame {
 
 	public static ImageIcon createImageIcon(String path) {
-        URL imgURL = AppFrame.class.getResource(path);
+        URL imgURL = AppFrame.class.getResource("/resources/" + path);
         if (imgURL != null) {
             return new ImageIcon(imgURL, "ImageIcon");
         } else {
