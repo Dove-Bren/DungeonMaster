@@ -1,7 +1,5 @@
 package com.smanzana.dungeonmaster.ui.app.swing.screens;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -13,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 
 public class StartScreen extends JPanel {
@@ -89,7 +88,7 @@ public class StartScreen extends JPanel {
 		buttonQuit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Quit");
+				DungeonMaster.shutdown();
 			}
 		});
 		
@@ -127,6 +126,8 @@ public class StartScreen extends JPanel {
 		
 		onFresh = false;
 		
+		buttonStart.setVisible(false);
+		buttonStart.validate();
 		buttonPanel.removeAll();
 		
 		buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -139,7 +140,7 @@ public class StartScreen extends JPanel {
 		buttonPanel.add(buttonQuit);
 		buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 		
-		buttonStart.setVisible(false);
+		
 		buttonNew.setVisible(true);
 		buttonLoad.setVisible(true);
 		buttonTemplate.setVisible(true);
