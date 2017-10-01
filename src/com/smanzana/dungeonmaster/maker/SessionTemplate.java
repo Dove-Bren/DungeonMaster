@@ -1,8 +1,11 @@
 package com.smanzana.dungeonmaster.maker;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.smanzana.dungeonmaster.session.SessionBase;
+import com.smanzana.dungeonmaster.session.datums.Datum;
 
 /**
  * Holds a set of configurations to spawn sessions with
@@ -16,7 +19,7 @@ public class SessionTemplate extends SessionBase {
 	public SessionTemplate(File rootDir) {
 		super(rootDir, "");
 		
-		this.loadConfigs();
+		this.load();
 		dirty = false;
 	}
 	
@@ -43,5 +46,19 @@ public class SessionTemplate extends SessionBase {
 	public void save(File newRoot) {
 		this.root = newRoot;
 		this.saveConfigs();
+	}
+	
+	public List<Datum<?>> getDatums() {
+		List<Datum<?>> list = new LinkedList<>();
+		
+		list.add(this.actionDatum);
+		list.add(this.classDatum);
+		list.add(this.itemDatum);
+		list.add(this.npcDatum);
+		list.add(this.profileDatum);
+		list.add(this.settingDatum);
+		list.add(this.spellDatum);
+		
+		return list;
 	}
 }

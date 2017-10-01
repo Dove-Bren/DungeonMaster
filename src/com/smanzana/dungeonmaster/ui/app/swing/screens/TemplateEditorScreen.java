@@ -194,15 +194,19 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 			    super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 			    
 			    if (fetchedIcons == false) {
+			    	//final int scale = 24;
 			    	configIcon = AppFrame.createImageIcon("icon/config.png");
-			    	configIcon = new ImageIcon(configIcon.getImage().getScaledInstance(16, 16, 0));
+			    	//configIcon = new ImageIcon(configIcon.getImage().getScaledInstance(scale, scale, 0));
 			    	datumIcon = AppFrame.createImageIcon("icon/datum.png");
-			    	datumIcon = new ImageIcon(datumIcon.getImage().getScaledInstance(16, 16, 0));
+			    	//datumIcon = new ImageIcon(datumIcon.getImage().getScaledInstance(scale, scale, 0));
 			    	datumOpenIcon = AppFrame.createImageIcon("icon/datum_open.png");
-			    	datumOpenIcon = new ImageIcon(datumOpenIcon.getImage().getScaledInstance(16, 16, 0));
+			    	//datumOpenIcon = new ImageIcon(datumOpenIcon.getImage().getScaledInstance(scale, scale, 0));
 			    	dataIcon = AppFrame.createImageIcon("icon/data.png");
-			    	dataIcon = new ImageIcon(dataIcon.getImage().getScaledInstance(16, 16, 0));
+			    	//dataIcon = new ImageIcon(dataIcon.getImage().getScaledInstance(scale, scale, 0));
 			    	fetchedIcons = true;
+			    	
+			    	//this.setMinimumSize(new Dimension(scale, scale));
+			    	//this.setPreferredSize(new Dimension(scale, scale));
 			    }
 			    
 			    Object obj = null;
@@ -489,6 +493,9 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		addConfigToTree(root, MechanicsConfig.instance());
 		addConfigToTree(root, RollTableConfig.instance());
 		
+		for (Datum<?> datum : currentTemplate.getDatums())
+			addDatumToTree(root, datum);
+		
 		sourceModel.reload();
 		sourceTree.validate();
 		sourceTree.setVisible(true);
@@ -496,6 +503,15 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	
 	private void addConfigToTree(DefaultMutableTreeNode root, Config<?> config) {
 		root.add(new DefaultMutableTreeNode(config));
+	}
+	
+	private void addDatumToTree(DefaultMutableTreeNode root, Datum<?> datum) {
+		DefaultMutableTreeNode node = new DefaultMutableTreeNode(datum);
+		for (DatumData data : datum.getData()) {
+			node.add(new DefaultMutableTreeNode(data));
+		}
+		
+		root.add(node);
 	}
 	
 	public void shutdown() {
