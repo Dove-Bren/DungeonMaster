@@ -115,6 +115,8 @@ public class UI implements Runnable {
 			System.out.println("UI Thread receieved halt");
 			running = false;
 		}
+		
+		UI.instance = null;
 	}
 	
 	private void pushRequest(UIRequest req) {

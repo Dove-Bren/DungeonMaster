@@ -113,7 +113,7 @@ public class GameSession extends SessionBase implements Notable {
 				; // who cares?
 			}
 			
-			if (debug < 600) {
+			if (debug < 20) {
 				debug++;
 				if (debug % 10 == 0)
 					System.out.println(60 - (debug / 10) + "...");

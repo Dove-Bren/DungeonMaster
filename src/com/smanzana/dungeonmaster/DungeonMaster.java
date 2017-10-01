@@ -14,7 +14,9 @@ public class DungeonMaster {
 
 	private static GameSession activeSession = null;
 	private static Thread UIThread = null;
-	private static Boolean receivedShutdown = false; // Prevent multiple-processing
+	private static Boolean receivedShutdown = false; // Shut down the whole program
+	private static Boolean receivedClose = false; // Shut down running session & UI
+	private static Boolean sessionLock = false; // locked for access; true when session active
 	
 	// Program Client members
 	private static AppUI hostUI;
@@ -31,6 +33,37 @@ public class DungeonMaster {
 		
 		hostUI = new AppUI(); // Kicks off program GUI & client
 		
+		// Wait for a session to run (or shutdown)
+		while (true) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				;
+			}
+			
+			synchronized(receivedShutdown) {
+				if (receivedShutdown) {
+					shutdown();
+					return;
+				}
+			}
+			
+			GameSession next = null;
+			synchronized(sessionLock) {
+				if (activeSession != null) {
+					sessionLock = true;
+					next = activeSession;
+				}
+			}
+			
+			if (next != null) {
+				runSessionInternal(next);
+				synchronized(sessionLock) {
+					sessionLock = false;
+				}
+			}
+		}
+		
 //		activeSession = new GameSession(new File("testsession"));
 //		runSession(activeSession);
 	}
@@ -40,11 +73,20 @@ public class DungeonMaster {
 	}
 	
 	public static void runSession(GameSession session) {
-		if (activeSession != null) {
-			System.out.println("Error! Already have an active session!");
-			return;
+		synchronized(sessionLock) {
+			if (sessionLock || activeSession != null) {
+				System.out.println("Error! Already have an active session!");
+				return;
+			}
+			activeSession = session;
 		}
-		activeSession = session;
+		
+	}
+	
+	private static void runSessionInternal(GameSession session) {
+		synchronized(receivedClose) {
+			receivedClose = false;
+		}
 		launchSession(session);
 		
 		try {
@@ -54,7 +96,7 @@ public class DungeonMaster {
 			e.printStackTrace();
 		}
 		
-		shutdown();
+		closeSession();
 	}
 	
 	/**
@@ -76,18 +118,34 @@ public class DungeonMaster {
 			}
 			receivedShutdown = true;
 		}
+		closeSession();
+		hostUI.shutdown();
+		System.exit(0);
+		
+	}
+	
+	public static void closeSession() {
+		boolean dirty = false;
+		synchronized(receivedClose) {
+			if (receivedClose) {
+				System.out.println("Already received close. Ignoring repeated session shutdown");
+				return;
+			}
+			receivedClose = true;
+		}
 		
 		if (UIThread != null) {
-			System.out.println("Requesting UI Thread shutdown (waiting up to 10 seconds)...");
+			System.out.println("Requesting UI Thread shutdown...");
 			UI.instance().halt();
 			try {
-				UIThread.join(1000 * 10);
+				UIThread.join();
 			} catch (InterruptedException e) {
 				;
 			}
 			
 			if (UIThread.isAlive()) {
 				System.out.println("UI Thread failed to shut down properly.");
+				dirty = true;
 			} else {
 				System.out.println("UI Thread shutdown successfully");
 			}
@@ -100,7 +158,12 @@ public class DungeonMaster {
 			activeSession = null;
 		}
 		
-		System.exit(0);
+		if (dirty) {
+			System.out.println("Program shutdown incorrectly. Shutting down");
+			shutdown();
+		} else {
+			System.out.println("Session successfully closed.");
+		}
 		return;
 	}
 		
