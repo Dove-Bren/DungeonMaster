@@ -24,10 +24,11 @@ public class StatSet implements DataCompatible {
 	private int mana;
 	private int maxStamina;
 	private int stamina;
+	private int baseAC;
 	private Map<Attributes, Integer> abilityScores;
 	
 	public StatSet() {
-		health = maxHealth = mana = maxMana = stamina = maxStamina = 1;
+		health = maxHealth = mana = maxMana = stamina = maxStamina = baseAC = 1;
 		abilityScores = new EnumMap<>(Attributes.class);
 		
 		for (Attributes attrib : Attributes.values())
@@ -82,6 +83,14 @@ public class StatSet implements DataCompatible {
 		this.mana = mana;
 	}
 	
+	public int getBaseAC() {
+		return baseAC;
+	}
+
+	public void setBaseAC(int baseAC) {
+		this.baseAC = baseAC;
+	}
+
 	public int getAbilityScore(Attributes attribute) {
 		return this.abilityScores.get(attribute);
 	}
@@ -138,6 +147,9 @@ public class StatSet implements DataCompatible {
 		if (null != (node = root.getChild("maxstamina"))) {
 			this.maxStamina = DataNode.parseInt(node);
 		}
+		if (null != (node = root.getChild("ac"))) {
+			this.baseAC = DataNode.parseInt(node);
+		}
 		
 		for (Attributes attr : Attributes.values()) {
 			if (null != (node = root.getChild(attr.name()))) {
@@ -157,6 +169,7 @@ public class StatSet implements DataCompatible {
 		list.add(new DataNode("maxmana", "" + this.maxMana, null));
 		list.add(new DataNode("stamina", "" + this.stamina, null));
 		list.add(new DataNode("maxstamina", "" + this.maxStamina, null));
+		list.add(new DataNode("ac", "" + this.baseAC, null));
 		
 		for (Attributes attr : Attributes.values()) {
 			list.add(new DataNode(attr.name(), "" + this.abilityScores.get(attr), null));

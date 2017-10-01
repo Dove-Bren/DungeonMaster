@@ -279,4 +279,8 @@ public abstract class Pawn implements Notable, DataCompatible, Interactable {
 	}
 	
 	public abstract String getName();
+	
+	public int getAC() {
+		return this.stats.getBaseAC();
+	}
 }

@@ -6,21 +6,23 @@ import java.util.List;
 public enum MechanicsKey {
 	// Interaction
 	ALLOW_PC_CONTROL("Allows connected players to perform actions", "When disabled, connected players can only view data"),
+	AUTO_SAVINGTHROW("Turns on automatic saving throw checking", "Checks follow the rest of configuration.", "Specifically, respects USE_ABILITY_SCORES+rolltables.cfg", "If false, DM is given outline of roll and asked to perform it"),
+	SHOW_SAVINGTHROW("When AUTO_SAVINGTHROW is used, displays the 'roll'", "dialog to the player (if applicable) to be set off.", "No effect on roll; just cosmetic"),
 	
 	// Stats
 	USE_ABILITY_SCORES("Enables ability scores", "Ability Scores are strength, constitution, etc.","When turned off, roll, relevant requirement, and bonus mechanics are turned off."),
 	USE_HEALTH("Enables health tracking", "When disabled, all notion of 'health' and 'how dead' something is are maintained", "by the DM"),
 	USE_MANA("Enables mana use and tracking"),
 	USE_STAMINA("Enables stamina tracking"),
-	USE_OFFDEF("Enables offense and defense mechanics.", "This could mean AC or attack bonus and reduction", "on your combat settings"),
-	USE_AC("Offense and Defense follow traditional AC/HD rules", "In short, AC is how high someone must roll to land a hit. HD/Attack bonus", "is the bonus to their roll", "When off, attack/defense are bonus/penalty to damage dealt.", "Requires USE_OFFDEF"),
+	USE_OFFDEF("Enables offense and defense mechanics.", "This could mean AC or attack bonus and reduction", "on your combat settings", "See USE_AC and USE_CONTESTED_COMBAT"),
+	USE_AC("Offense and Defense follow traditional AC rules", "In short, AC is how high someone must roll to land a hit.", "Total AC = base AC + armor AC", "When both this and USE_CONTESTED_COMBAT are off, defense is penalty to damage dealt.", "Requires USE_OFFDEF"),
 	
 	// Progression
 	USE_LEVELS("Turns on level tracking", "When turned off, leveling'up (including adjusting stats) must be done", "entirely by the DM"),
 	USE_XP("Turns on XP tracking", "When disabled, DM is responsible for triggering 'level ups' (if enabled)", "Requires USE_LEVELS"),
-	LEVEL_ABILITY_SCORES("Does leveling automatically increase ability scores?", "Amounts are configured in rolltables.cfg", "Requires USE_LEVELS, USE_ABILITY_SCORES"),
+	LEVEL_ABILITY_SCORES("Does leveling automatically increase ability scores?", "Amounts are configured in class.dat", "Requires USE_LEVELS, USE_ABILITY_SCORES"),
 	LEVEL_ALLOCATE_POINTS("On level, do players get points to spend how they choose?", "Works along side LEVEL_ABILITY_SCORES", "Requires USE_LEVELS, USE_ABILITY_SCORES"),
-	LEVEL_ALLOCATE_POINTS_AMOUNT("How many points are players given to allocate?", "Requires LEVEL_aLLOCATE_POINTS"),
+	LEVEL_ALLOCATE_POINTS_AMOUNT("How many points are players given to allocate?", "Requires LEVEL_ALLOCATE_POINTS"),
 	LEVEL_ALLOCATE_POINTS_INTERVAL("How many levels between point allocation?", "Requires LEVEL_ALLOCATE_POINTS"),
 	HP_FROM_HITDICE("Is max health obtained by rolling hitdice?", "If so, each level a new HD is rolled and added to max health", "Requires USE_ABILITY_SCORES, USE_HEALTH,"),
 	HP_FROM_HITDICE_BONUS("Should constitution modifier be added to health?", "Requires HP_FROM_HITDICE"),
@@ -48,6 +50,7 @@ public enum MechanicsKey {
 	LOOT_SPLIT_RANDOM("When looting, random players are picked as recipients.", "When LOOT_SPLIT_ROLL is true, random players are picked to roll for the items", "Requires DROP_LOOT"),
 	LOOT_SPLIT_ROLL("When looting, players must roll to get loot", "Players roll against eachother. Highest roller gets the item", "Requires DROP_LOOT"),
 	USE_INITIATIVE("Automatically roll for turn order when combat starts", "Will prompt DM for order if false"),
+	USE_CONTESTED_COMBAT("Instead of using AC, use contested rolls to determine hit chance.", "What that means is the attacker and defender both roll.", "If the attacker rolls higher (with bonuses), they strike the defender.", "If USE_AC is on, this is ignored", "Requires USE_OFFDEF"),
 	
 	// Actions
 	USE_ACTIONS("Enables or disables all actions", "When false, DM is responsible for ALL modification of inventory, effects, etc."),

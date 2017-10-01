@@ -87,8 +87,21 @@ public abstract class Entity extends Pawn {
 		this.name = name;
 	}
 	
+	// If USE_AC, AC from equips. Else damage reduction
 	public int getDefenseScore() {
 		return this.getInventory().getEquipment().getTotalDefense();
+	}
+	
+	public int getAttackScore() {
+		return this.getInventory().getEquipment().getTotalAttack();
+	}
+	
+	// Gets total AC including from equipment.
+	// Doesn't check if USE_AC. You must do that.
+	public int getAC() {
+		int base = super.getAC();
+		base += getDefenseScore();
+		return base;
 	}
 	
 }

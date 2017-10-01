@@ -69,6 +69,24 @@ public class EquipmentSet implements DataCompatible, Cloneable {
 		return sum;
 	}
 	
+	public int getTotalAttack() {
+		// mainhand + offhand (if not shield)
+		int sum = 0;
+		Equipment equip;
+		
+		equip = getPiece(Equipment.Slot.MAIN_HAND); 
+		if (equip != null)
+			sum += ((Weapon) equip).getAttack().fetchValue();
+		
+		equip = getPiece(Equipment.Slot.OFF_HAND);
+		if (equip != null) {
+			if (!((Weapon) equip).isShield())
+				sum += ((Weapon) equip).getAttack().fetchValue();
+		}
+		
+		return sum;
+	}
+	
 	public EquipmentSet clone() {
 		DataNode serial = this.write("dummy");
 		EquipmentSet out = new EquipmentSet();
