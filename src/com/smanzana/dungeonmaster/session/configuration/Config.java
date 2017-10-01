@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,17 +18,17 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 	protected static final String OUT_COMMENT_PREFIX = "#";
 	protected static final String OUT_COMMENT_GUARD = "##########";
 	
+
+	public static enum ValueType
+	{
+		STRING,
+		BOOL,
+		INT,
+		DOUBLE,
+	}
 	
 	protected static class ConfigValue
 	{
-		public enum ValueType
-		{
-			STRING,
-			BOOL,
-			INT,
-			DOUBLE,
-		}
-		
 		private ValueType valueType;
 		private Object value;
 		
@@ -169,6 +170,14 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 		values.put(key, new ConfigValue(value));
 	}
 	
+	public void setValue(String key, Object value) {
+		T typeKey = getKey(key);
+		if (typeKey == null)
+			return;
+		
+		this.setValue(typeKey, value);
+	}
+	
 	public boolean getBool(T key)
 	{
 		return values.get(key).getBooleanValue();
@@ -217,7 +226,16 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 	 * This is a change to order them however they should be ordered.
 	 * @return
 	 */
-	protected abstract List<T> getKeyList();
+	public abstract List<T> getKeyList();
+	
+	public List<String> getKeyNames() {
+		List<T> l = getKeyList();
+		List<String> ret = new ArrayList<>(l.size());
+		for (T t : l)
+			ret.add(serializeKey(t));
+		
+		return ret;
+	}
 	
 	/**
 	 * Returns any comments related to provided key
@@ -225,6 +243,14 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 	 * @return comments as a string, or null
 	 */
 	protected abstract List<String> getComments(T key);
+	
+	public List<String> getComments(String keyName) {
+		T key = getKey(keyName);
+		if (key == null)
+			return null;
+		
+		return getComments(key);
+	}
 	
 	protected void readValue(String inputLine)
 	{
@@ -299,6 +325,21 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 		}
 		
 		reader.close();
+	}
+	
+	public ValueType getFieldType(String keyName) {
+		T key = getKey(keyName);
+		if (key == null)
+			return null;
+		
+		return getFieldType(key);
+	}
+	
+	public ValueType getFieldType(Object key) {
+		if (values.containsKey(key))
+			return values.get(key).getType();
+		
+		return null;
 	}
 	
 }
