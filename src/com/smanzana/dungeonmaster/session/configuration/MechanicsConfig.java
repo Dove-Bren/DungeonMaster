@@ -109,8 +109,13 @@ public class MechanicsConfig extends Config<MechanicsKey> {
 	}
 	
 	@Override
-	public String getName() {
+	public String getEditorName() {
 		return "Mechanics";
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		return "Collection of settings that dictate how the game is played";
 	}
 	
 }

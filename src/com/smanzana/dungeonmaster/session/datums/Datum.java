@@ -13,25 +13,30 @@ import java.util.List;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
+import com.smanzana.dungeonmaster.ui.EditorDisplayable;
 
 /**
  * Like a config, but instead of predefined "key: value" data, holds an arbitrary number of data templates.
  * @author Skyler
  */
-public class Datum<T extends DatumData> {
+public class Datum<T extends DatumData> implements EditorDisplayable {
 	
 	private DatumFactory<T> factory;
 	protected List<T> data; // List of all data 'objects'
 	protected String childKey;
+	protected String displayName;
+	protected String tooltip;
 	
 	private Datum() {
 		this.data = new LinkedList<>();
 	}
 	
-	public Datum(String childKey, DatumFactory<T> factory) {
+	public Datum(String childKey, DatumFactory<T> factory, String displayName, String tooltip) {
 		this();
 		this.factory = factory;
 		this.childKey = childKey;
+		this.displayName = displayName;
+		this.tooltip = tooltip;
 	}
 	
 	public List<T> getData() {
@@ -98,6 +103,16 @@ public class Datum<T extends DatumData> {
 		
 		this.saveToFile(outFile);
 		this.data = backup;
+	}
+
+	@Override
+	public String getEditorName() {
+		return displayName;
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		return tooltip;
 	}
 	
 }

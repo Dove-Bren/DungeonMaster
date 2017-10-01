@@ -108,8 +108,13 @@ public class RollTableConfig extends Config<RollTableKey> {
 	}
 	
 	@Override
-	public String getName() {
+	public String getEditorName() {
 		return "Roll Tables";
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		return "Definition of roll bonuses based on stats";
 	}
 	
 }

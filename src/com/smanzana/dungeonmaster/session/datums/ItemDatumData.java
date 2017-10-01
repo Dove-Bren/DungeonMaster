@@ -60,5 +60,19 @@ public class ItemDatumData implements DatumData {
 		Item item = new Junk("Gold Dust", "Small pile of gold dust", 10);
 		return new ItemDatumData(item); 
 	}
+
+	@Override
+	public String getEditorName() {
+		if (item == null)
+			return "";
+		return item.getName();
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		if (item == null)
+			return null;
+		return item.getDescription();
+	}
 	
 }

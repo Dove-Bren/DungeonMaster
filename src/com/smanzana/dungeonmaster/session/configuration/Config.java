@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Config<T extends Enum<T>> {
+import com.smanzana.dungeonmaster.ui.EditorDisplayable;
+
+public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 	
 	protected static final String OUT_COMMENT_PREFIX = "#";
 	protected static final String OUT_COMMENT_GUARD = "##########";
@@ -299,6 +301,4 @@ public abstract class Config<T extends Enum<T>> {
 		reader.close();
 	}
 	
-	// For display in editor
-	public abstract String getName();
 }

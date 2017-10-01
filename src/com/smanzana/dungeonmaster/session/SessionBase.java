@@ -55,13 +55,20 @@ public abstract class SessionBase {
 		this.root = root;
 		this.configDir = configDir;
 		
-		this.classDatum = new Datum<ClassDatumData>("class", new ClassDatumData.ClassDatumFactory());
-		this.profileDatum = new Datum<ProfileDatumData>("profile", new ProfileDatumData.ProfileDatumFactory());
-		this.actionDatum = new Datum<>("action", new ActionDatumData.ActionDatumFactory());
-		this.spellDatum = new Datum<>("spell", new SpellDatumData.SpellDatumFactory());
-		this.settingDatum = new Datum<>("setting", new SettingDatumData.SettingDatumFactory());
-		this.npcDatum = new Datum<>("npc", new NPCDatumData.NPCDatumFactory());
-		this.itemDatum = new Datum<>("item", new ItemDatumData.ItemDatumFactory());
+		this.classDatum = new Datum<ClassDatumData>("class", new ClassDatumData.ClassDatumFactory(),
+				prettyDatumName(PATH_CLASS), "Class definitions including progression and skills");
+		this.profileDatum = new Datum<ProfileDatumData>("profile", new ProfileDatumData.ProfileDatumFactory(),
+				prettyDatumName(PATH_PROFILE), "Generic profiles for npcs");
+		this.actionDatum = new Datum<>("action", new ActionDatumData.ActionDatumFactory(),
+				prettyDatumName(PATH_ACTIONS), "All defined actions performed by players or npcs");
+		this.spellDatum = new Datum<>("spell", new SpellDatumData.SpellDatumFactory(),
+				prettyDatumName(PATH_SPELLS), "Spell definitions");
+		this.settingDatum = new Datum<>("setting", new SettingDatumData.SettingDatumFactory(),
+				prettyDatumName(PATH_SETTING), "Premade settings for your adventures");
+		this.npcDatum = new Datum<>("npc", new NPCDatumData.NPCDatumFactory(),
+				prettyDatumName(PATH_NPC), "NPC templates for fast spawning");
+		this.itemDatum = new Datum<>("item", new ItemDatumData.ItemDatumFactory(),
+				prettyDatumName(PATH_ITEM), "All pre-defined items");
 	}
 	
 	public ClassDatumData lookupClass(String className) {
@@ -253,5 +260,13 @@ public abstract class SessionBase {
 		saveConfig(configDir, PATH_COMBONUS, CombatBonusConfig.instance());
 		saveConfig(configDir, PATH_ROLLTABLE, RollTableConfig.instance());
 		saveConfig(configDir, PATH_KEYWORDS, KeywordConfig.instance());
+	}
+	
+	private String prettyDatumName(String raw) {
+		String ret = raw.substring(0, raw.indexOf("."));
+		
+		ret = ret.substring(0, 1).toUpperCase() + ret.substring(1);
+		
+		return ret;
 	}
 }

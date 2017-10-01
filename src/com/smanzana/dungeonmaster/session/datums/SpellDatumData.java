@@ -63,5 +63,19 @@ public class SpellDatumData implements DatumData {
 		
 		return new SpellDatumData(spell);
 	}
+
+	@Override
+	public String getEditorName() {
+		if (spell == null)
+			return "";
+		return spell.getName();
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		if (spell == null)
+			return null;
+		return spell.getDescription();
+	}
 	
 }

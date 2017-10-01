@@ -108,8 +108,13 @@ public class CombatBonusConfig extends Config<CombatBonusKey> {
 	}
 	
 	@Override
-	public String getName() {
+	public String getEditorName() {
 		return "Combat Bonuses";
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		return "Bonuses given to attackers based on their weapons and stats";
 	}
 	
 }

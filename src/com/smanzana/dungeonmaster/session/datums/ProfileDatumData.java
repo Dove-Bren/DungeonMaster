@@ -142,5 +142,15 @@ public class ProfileDatumData implements DatumData {
 		
 		return data;
 	}
+
+	@Override
+	public String getEditorName() {
+		return getProfileName();
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		return "Profile for randomly-generated names";
+	}
 	
 }

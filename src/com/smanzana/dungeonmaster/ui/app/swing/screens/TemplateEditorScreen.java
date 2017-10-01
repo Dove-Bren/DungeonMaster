@@ -2,6 +2,7 @@ package com.smanzana.dungeonmaster.ui.app.swing.screens;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +13,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -21,8 +23,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.maker.SessionTemplate;
@@ -31,7 +36,10 @@ import com.smanzana.dungeonmaster.session.configuration.Config;
 import com.smanzana.dungeonmaster.session.configuration.KeywordConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
+import com.smanzana.dungeonmaster.session.datums.Datum;
+import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
+import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 
 public class TemplateEditorScreen extends JPanel implements ActionListener {
 	
@@ -167,6 +175,69 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		sourceModel = new DefaultTreeModel(new DefaultMutableTreeNode("template"));
 		sourceTree = new JTree(sourceModel);
 		sourceTree.setBackground(Color.WHITE);
+		sourceTree.setCellRenderer(new DefaultTreeCellRenderer() {
+			private static final long serialVersionUID = -205095548994473885L;
+			private ImageIcon configIcon;
+			private ImageIcon datumIcon;
+			private ImageIcon datumOpenIcon;
+			private ImageIcon dataIcon;
+			private boolean fetchedIcons;
+			
+			public Component getTreeCellRendererComponent(
+                    JTree tree,
+                    Object value,
+                    boolean sel,
+                    boolean expanded,
+                    boolean leaf,
+                    int row,
+                    boolean hasFocus) {
+			    super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+			    
+			    if (fetchedIcons == false) {
+			    	configIcon = AppFrame.createImageIcon("icon/config.png");
+			    	configIcon = new ImageIcon(configIcon.getImage().getScaledInstance(16, 16, 0));
+			    	datumIcon = AppFrame.createImageIcon("icon/datum.png");
+			    	datumIcon = new ImageIcon(datumIcon.getImage().getScaledInstance(16, 16, 0));
+			    	datumOpenIcon = AppFrame.createImageIcon("icon/datum_open.png");
+			    	datumOpenIcon = new ImageIcon(datumOpenIcon.getImage().getScaledInstance(16, 16, 0));
+			    	dataIcon = AppFrame.createImageIcon("icon/data.png");
+			    	dataIcon = new ImageIcon(dataIcon.getImage().getScaledInstance(16, 16, 0));
+			    	fetchedIcons = true;
+			    }
+			    
+			    Object obj = null;
+			    if (value != null && (value instanceof DefaultMutableTreeNode)) {
+			    	obj = ((DefaultMutableTreeNode) value).getUserObject();
+			    }
+			    
+			    if (obj instanceof Config) {
+			    	Config<?> conf = (Config<?>) obj;
+			        setText(conf.getEditorName());
+			        setToolTipText(conf.getEditorTooltip());
+			        
+			        if (configIcon != null)
+			    		setIcon(configIcon);
+			    } else if (obj instanceof Datum<?>) {
+			    	Datum<?> datum = (Datum<?>) obj;
+			    	setText(datum.getEditorName());
+			        setToolTipText(datum.getEditorTooltip());
+			        
+			        if (datumIcon != null && datumOpenIcon != null)
+			    		setIcon(sourceTree.isExpanded(new TreePath(((DefaultMutableTreeNode) value).getPath()))
+			    				? datumOpenIcon : datumIcon);
+			    } else if (obj instanceof DatumData) {
+			    	DatumData data = (DatumData) obj;
+			    	setText(data.getEditorName());
+			    	setToolTipText(data.getEditorTooltip());
+			    	
+			    	if (dataIcon != null)
+			    		setIcon(dataIcon);
+			    }
+			
+			    return this;
+			}
+		});
+		ToolTipManager.sharedInstance().registerComponent(sourceTree);
 		sourcePanel = new JScrollPane(sourceTree);
 		sourcePanel.setPreferredSize(new Dimension(250, 1000));
 		sourcePanel.setMaximumSize(new Dimension(250, 5000));
@@ -344,7 +415,6 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		if (!currentTemplate.isDirty()) {
 			currentTemplate = null;
 			clearEditorPanel();
-			updateTree();
 			return true;
 		}
 		
@@ -356,13 +426,13 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 			currentTemplate.save();
 		
 		clearEditorPanel();
-		updateTree();
 		
 		return true;
 	}
 	
+	// Also clears out source panel hehe
 	private void clearEditorPanel() {
-		// TODO
+		updateTree();
 	}
 	
 	// Doesn't care if exists or not; just opens. Commands should
@@ -391,7 +461,6 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		
 		this.currentTemplate = template;
 		
-		// TODO display that shizz bruh
 		updateTree();
 		
 		return true;
@@ -426,7 +495,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	}
 	
 	private void addConfigToTree(DefaultMutableTreeNode root, Config<?> config) {
-		root.add(new DefaultMutableTreeNode(config.getName()));
+		root.add(new DefaultMutableTreeNode(config));
 	}
 	
 	public void shutdown() {

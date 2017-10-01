@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.action.Action;
@@ -25,6 +27,12 @@ public class AppUI extends Comm {
 	private AppFrame guiFrame;
 	
 	public AppUI() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
 		guiFrame = new AppFrame(this);
 		guiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		guiFrame.addWindowListener(new WindowListener() {

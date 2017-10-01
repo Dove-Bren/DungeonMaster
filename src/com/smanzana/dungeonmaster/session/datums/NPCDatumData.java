@@ -165,5 +165,15 @@ public class NPCDatumData implements DatumData {
 		
 		return data;
 	}
+
+	@Override
+	public String getEditorName() {
+		return getTemplateName();
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		return "Template NPC";
+	}
 	
 }

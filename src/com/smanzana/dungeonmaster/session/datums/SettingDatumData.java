@@ -74,5 +74,19 @@ public class SettingDatumData implements DatumData {
 		
 		return data;
 	}
+
+	@Override
+	public String getEditorName() {
+		if (setting == null)
+			return "";
+		return setting.getTitle();
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		if (setting == null)
+			return null;
+		return setting.getDescription();
+	}
 	
 }

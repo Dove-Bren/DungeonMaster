@@ -299,5 +299,15 @@ public class ClassDatumData implements DatumData {
 		
 		return data;
 	}
+
+	@Override
+	public String getEditorName() {
+		return getName();
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		return getDescription();
+	}
 	
 }
