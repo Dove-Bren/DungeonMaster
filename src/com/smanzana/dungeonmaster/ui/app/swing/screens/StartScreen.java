@@ -13,6 +13,8 @@ import javax.swing.JPanel;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
+import com.smanzana.dungeonmaster.ui.app.swing.AppSound;
+import com.smanzana.dungeonmaster.ui.app.swing.AppSound.Sound;
 
 public class StartScreen extends JPanel {
 	
@@ -52,6 +54,7 @@ public class StartScreen extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				pressStart();
 				getRootPane().setDefaultButton(buttonLoad);
+				AppSound.playSound(Sound.CLICK_LIGHT);
 			}
 		});
 		
@@ -65,6 +68,7 @@ public class StartScreen extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("New");
+				AppSound.playSound(Sound.CLICK_LIGHT);
 			}
 		});
 		

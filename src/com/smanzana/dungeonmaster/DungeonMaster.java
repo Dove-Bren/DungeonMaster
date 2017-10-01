@@ -4,6 +4,8 @@ import java.io.File;
 
 import com.smanzana.dungeonmaster.session.GameSession;
 import com.smanzana.dungeonmaster.ui.UI;
+import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
+import com.smanzana.dungeonmaster.ui.app.swing.AppSound;
 
 /**
  * D&D Companion Program.
@@ -23,6 +25,8 @@ public class DungeonMaster {
 		
 		// Creation mode: Create templates
 		// DM mode: Spawn a session from a template OR load an existing session
+		
+		AppSound.preloadSounds();
 		
 		activeSession = new GameSession(new File("testsession"));
 		runSession(activeSession);
