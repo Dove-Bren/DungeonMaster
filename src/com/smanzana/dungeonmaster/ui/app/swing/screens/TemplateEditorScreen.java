@@ -8,8 +8,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.EnumMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -18,7 +21,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
-import javax.swing.border.EmptyBorder;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.maker.SessionTemplate;
@@ -68,10 +70,12 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	private JList sourceList;
 	private JScrollPane sourcePanel;
 	private JPanel editorPanel;
+	private Map<Command, JMenuItem> menuItems;
 	
 	public TemplateEditorScreen(AppUI UI) {
 		super(new BorderLayout());
 		currentTemplate = null;
+		menuItems = new EnumMap<>(Command.class);
 		this.ui = UI;
 	}
 	
@@ -92,6 +96,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		item.setActionCommand(Command.NEW.getCommand());
 		item.addActionListener(this);
 		menu.add(item);
+		menuItems.put(Command.NEW, item);
 		
 		item = new JMenuItem("Open");
 		item.setMnemonic(KeyEvent.VK_O);
@@ -101,6 +106,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		item.setActionCommand(Command.OPEN.getCommand());
 		item.addActionListener(this);
 		menu.add(item);
+		menuItems.put(Command.OPEN, item);
 		
 		item = new JMenuItem("Save");
 		item.setMnemonic(KeyEvent.VK_S);
@@ -110,6 +116,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		item.setActionCommand(Command.SAVE.getCommand());
 		item.addActionListener(this);
 		menu.add(item);
+		menuItems.put(Command.SAVE, item);
 		
 		item = new JMenuItem("Save As");
 		item.setMnemonic(KeyEvent.VK_A);
@@ -119,6 +126,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		item.setActionCommand(Command.SAVEAS.getCommand());
 		item.addActionListener(this);
 		menu.add(item);
+		menuItems.put(Command.SAVEAS, item);
 		
 		item = new JMenuItem("Close");
 		item.setMnemonic(KeyEvent.VK_C);
@@ -128,18 +136,21 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		item.setActionCommand(Command.CLOSE.getCommand());
 		item.addActionListener(this);
 		menu.add(item);
+		menuItems.put(Command.CLOSE, item);
 		
 		item = new JMenuItem("Main Menu");
 		item.setMnemonic(KeyEvent.VK_M);
 		item.setActionCommand(Command.MAINMENU.getCommand());
 		item.addActionListener(this);
 		menu.add(item);
+		menuItems.put(Command.MAINMENU, item);
 		
 		item = new JMenuItem("Quit");
 		item.setMnemonic(KeyEvent.VK_Q);
 		item.setActionCommand(Command.QUIT.getCommand());
 		item.addActionListener(this);
 		menu.add(item);
+		menuItems.put(Command.QUIT, item);
 		
 		menubar.add(menu);
 		
@@ -157,6 +168,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		editorPanel = new JPanel();
 		this.add(editorPanel, BorderLayout.CENTER);
 		
+		updateMenu();
 		this.validate();
 		this.setVisible(true);
 	}
@@ -200,6 +212,21 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 			if (!clearEditor()) {
 				break;
 			}
+			
+			JFileChooser fc = new JFileChooser(new File(DungeonMaster.PATH_TEMPLATES));
+			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			fc.showOpenDialog(getParent());
+			
+			File sel = fc.getSelectedFile();
+			if (!sel.exists())
+				JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That folder does not exist", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+			else if (!sel.isDirectory())
+				JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That is not a directory", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+			else {
+				// oh well just make one wherever it is
+				openTemplate(sel);
+			}
+			
 			break;
 		case MAINMENU:
 			if (!clearEditor()) {
@@ -244,6 +271,8 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 			}
 			break;
 		}
+		
+		updateMenu();
 	}
 	
 	private boolean isValidTemplateName(String name) {
@@ -341,14 +370,18 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 			templateDir.mkdirs();
 		
 		File target = new File(templateDir, name);
+		return openTemplate(target);
+	}
+	
+	private boolean openTemplate(File target) {
 		SessionTemplate template;
 		try {
 			template = new SessionTemplate(target);
 		} catch (Exception e) {
-			System.out.println("Failed to open template: " + name);
+			System.out.println("Failed to open template: " + target.getPath());
 			e.printStackTrace();
 			
-			JOptionPane.showMessageDialog(getParent(), "Failed to open template \"" + name + "\": "
+			JOptionPane.showMessageDialog(getParent(), "Failed to open template \"" + target.getPath() + "\": "
 					+ e.getMessage() + ". Error details can be found in the console.");
 			return false;
 		}
@@ -358,6 +391,13 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		// TODO display that shizz bruh
 		
 		return true;
+	}
+	
+	// Updates menu items given the current state of our template
+	private void updateMenu() {
+		// Save & Save as need a template
+		menuItems.get(Command.SAVE).setEnabled(currentTemplate != null);
+		menuItems.get(Command.SAVEAS).setEnabled(currentTemplate != null);
 	}
 	
 	public void shutdown() {
