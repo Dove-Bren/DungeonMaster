@@ -53,7 +53,6 @@ public class AppUI {
 			}
 		});
 		
-		guiFrame.pack();
 		guiFrame.setVisible(true);
 	}
 	

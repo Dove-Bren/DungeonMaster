@@ -1,5 +1,6 @@
 package com.smanzana.dungeonmaster.ui.app.swing;
 
+import java.awt.Dimension;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -31,5 +32,8 @@ public class AppFrame extends JFrame {
 		this.add(startScreen);
 		startScreen.init();
 		
+		this.setPreferredSize(new Dimension(1280, 720));
+		this.setMinimumSize(new Dimension(500, 400));
+		pack();
 	}
 }

@@ -1,5 +1,8 @@
 package com.smanzana.dungeonmaster.ui.app.swing.screens;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +18,9 @@ import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 public class StartScreen extends JPanel {
 	
 	private boolean onFresh;
+	
+	// GUI members
+	private JPanel buttonPanel;
 	private JButton buttonStart;
 	private JButton buttonNew;
 	private JButton buttonLoad;
@@ -28,10 +34,18 @@ public class StartScreen extends JPanel {
 	
 	public void init() {
 		
+		JLabel title = new JLabel(AppFrame.createImageIcon("title.png"));
+		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS));
+		title.setAlignmentX(CENTER_ALIGNMENT);
+		buttonPanel.setAlignmentX(CENTER_ALIGNMENT);
+		
 		this.add(Box.createVerticalGlue());
-		this.add(new JLabel(AppFrame.createImageIcon("title.png")));
+		this.add(Box.createRigidArea(new Dimension(0, 100)));
+		this.add(title);
 		this.add(Box.createRigidArea(new Dimension(0, 50)));
 		this.add(Box.createVerticalGlue());
+		this.add(buttonPanel);
 		
 		buttonStart = new JButton("Start");
 		buttonStart.addActionListener(new ActionListener() {
@@ -41,7 +55,10 @@ public class StartScreen extends JPanel {
 				getRootPane().setDefaultButton(buttonLoad);
 			}
 		});
-		this.add(buttonStart);
+		
+		buttonPanel.add(Box.createRigidArea(new Dimension(0, 70)));
+		buttonPanel.add(buttonStart);
+		buttonPanel.add(Box.createRigidArea(new Dimension(0, 70)));
 		getRootPane().setDefaultButton(buttonStart);
 		
 		buttonNew = new JButton("New Session");
@@ -76,16 +93,30 @@ public class StartScreen extends JPanel {
 			}
 		});
 		
-		this.add(buttonNew);
-		this.add(buttonLoad);
-		this.add(buttonTemplate);
-		this.add(buttonQuit);
+		buttonStart.setAlignmentX(Component.CENTER_ALIGNMENT);
+		buttonLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
+		buttonNew.setAlignmentX(Component.CENTER_ALIGNMENT);
+		buttonTemplate.setAlignmentX(Component.CENTER_ALIGNMENT);
+		buttonQuit.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		this.add(Box.createRigidArea(new Dimension(0,50)));
+		this.add(Box.createVerticalGlue());
 
 		buttonNew.setVisible(false);
 		buttonLoad.setVisible(false);
 		buttonTemplate.setVisible(false);
 		buttonQuit.setVisible(false);
 		
+		buttonStart.setPreferredSize(new Dimension(76, 25));
+		buttonNew.setPreferredSize(new Dimension(76, 25));
+		buttonLoad.setPreferredSize(new Dimension(76, 25));
+		buttonTemplate.setPreferredSize(new Dimension(76, 25));
+		buttonQuit.setPreferredSize(new Dimension(76, 25));
+
+		buttonPanel.setPreferredSize(new Dimension(76, 165));
+		buttonPanel.setMaximumSize(new Dimension(76, 165));
+		buttonPanel.validate();
+		buttonPanel.setVisible(true);
 		this.validate();
 		this.setVisible(true);
 	}
@@ -95,6 +126,19 @@ public class StartScreen extends JPanel {
 			return;
 		
 		onFresh = false;
+		
+		buttonPanel.removeAll();
+		
+		buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		buttonPanel.add(buttonNew);
+		buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		buttonPanel.add(buttonLoad);
+		buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		buttonPanel.add(buttonTemplate);
+		buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		buttonPanel.add(buttonQuit);
+		buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		
 		buttonStart.setVisible(false);
 		buttonNew.setVisible(true);
 		buttonLoad.setVisible(true);
