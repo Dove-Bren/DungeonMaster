@@ -145,7 +145,13 @@ public final class Mechanics {
 	 * @return The modified damage.
 	 */
 	public static int AdjustDamage(Pawn target, int damage) {
+		// if !USE_AC, subtract defense value from damage
+		// else just return it
+		if (!MechanicsConfig.instance().getBool(MechanicsKey.USE_AC)) {
+			return damage - (target instanceof Entity ? ((Entity) target).getDefenseScore() : 0);
+		}
 		
+		return damage;
 	}
 	
 }
