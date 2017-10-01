@@ -12,6 +12,7 @@ import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.pawn.NPC;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
+import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.common.InventoryView;
 import com.smanzana.dungeonmaster.ui.common.MessageBox;
 import com.smanzana.dungeonmaster.ui.common.NPCView;
@@ -81,6 +82,10 @@ public class UI implements Runnable {
 		System.out.println("Starting UI Thread...");
 		running = true;
 		
+		// testing
+		AppUI dm = new AppUI();
+		// testing
+		
 		while (true) {
 			
 			next = popRequest();
@@ -100,6 +105,9 @@ public class UI implements Runnable {
 				;
 			}
 		}
+		
+		System.out.println("Killing DM ui");
+		dm.shutdown();
 		
 		System.out.println("UI Thread has Shutdown");
 	}

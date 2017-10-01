@@ -55,6 +55,8 @@ public class GameSession extends SessionBase implements Notable {
 	 * Key is unique ID passed out on registration and used to indicate target from clients
 	 */
 	private Map<Integer, Pawn> activePawns;
+	
+	private Boolean receivedShutdown;
 		
 	public GameSession(File root) {
 		super(root, PATH_CONFIG);
@@ -63,11 +65,8 @@ public class GameSession extends SessionBase implements Notable {
 		requestQueue = new LinkedList<>();
 		playerSessionKeys = new HashMap<>();
 		activePawns = new HashMap<>();
-		
-		// just for testing
-		load();
-		// just for testing
-		
+		receivedShutdown = false;
+				
 		// Nothing special; Session does not begin until 'run' is called
 	}
 	
@@ -100,24 +99,48 @@ public class GameSession extends SessionBase implements Notable {
 		}
 		
 		int debug = 0;
-		System.out.println("5...");
+		System.out.println("60...");
 		while (runLoop()) {
+			if (isShuttingDown()) {
+				// perform shutdown stuff
+				System.out.println("Game Thread processing shutdown");
+				break;
+			}
+			
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				; // who cares?
 			}
 			
-			if (debug < 50) {
+			if (debug < 600) {
 				debug++;
 				if (debug % 10 == 0)
-					System.out.println(5 - (debug / 10) + "...");
+					System.out.println(60 - (debug / 10) + "...");
 			}
 			else
 				break;
 		}
 		
+		shutdown();
+		
 		save();
+		System.out.println("Game Thread has finished shutting down");
+	}
+	
+	public void shutdown() {
+		synchronized(receivedShutdown) {
+			if (receivedShutdown)
+				return;
+			
+			receivedShutdown = true;
+		}
+	}
+	
+	public boolean isShuttingDown() {
+		synchronized(receivedShutdown) {
+			return receivedShutdown;
+		}
 	}
 	
 	private void init() {

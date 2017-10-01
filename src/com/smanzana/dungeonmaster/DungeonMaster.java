@@ -14,7 +14,7 @@ public class DungeonMaster {
 
 	private static GameSession activeSession = null;
 	private static Thread UIThread = null;
-	private static boolean receivedShutdown = false; // Prevent multiple-processing
+	private static Boolean receivedShutdown = false; // Prevent multiple-processing
 	
 	public static void main(String[] args) {
 		// Two modes:
@@ -56,9 +56,12 @@ public class DungeonMaster {
 	}
 	
 	public static void shutdown() {
-		if (receivedShutdown) {
-			System.out.println("Already received shutdown. Ignoring repeated shutdown");
-			return;
+		synchronized(receivedShutdown) {
+			if (receivedShutdown) {
+				System.out.println("Already received shutdown. Ignoring repeated shutdown");
+				return;
+			}
+			receivedShutdown = true;
 		}
 		
 		System.out.println("Requesting UI Thread shutdown (waiting up to 10 seconds)...");
@@ -74,6 +77,11 @@ public class DungeonMaster {
 		} else {
 			System.out.println("UI Thread shutdown successfully");
 		}
+		
+		System.out.println("Shutting down Game Thread...");
+		activeSession.shutdown();
+		
+		activeSession = null;
 		
 		return;
 	}

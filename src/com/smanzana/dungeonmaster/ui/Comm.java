@@ -27,6 +27,13 @@ public abstract class Comm {
 	public abstract void processInput();
 	
 	/**
+	 * Shut down the comm.
+	 * This usually means send 'Sorry! We're closed!' to the client.
+	 * For APP client, also involves shutting down application
+	 */
+	public abstract void shutdown();
+	
+	/**
 	 * Show a message box.
 	 * Call callback with the option that was selected, as per messagebox
 	 * @param msg
