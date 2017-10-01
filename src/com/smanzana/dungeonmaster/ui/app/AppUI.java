@@ -25,7 +25,7 @@ public class AppUI extends Comm {
 	private AppFrame guiFrame;
 	
 	public AppUI() {
-		guiFrame = new AppFrame();
+		guiFrame = new AppFrame(this);
 		guiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		guiFrame.addWindowListener(new WindowListener() {
 
@@ -141,29 +141,29 @@ public class AppUI extends Comm {
     //          UI Control Methods           //
     ///////////////////////////////////////////
 	public void goTemplateEditor() {
-		
+		System.out.println("Going to Template Editor");
 	}
 	
 	public void goLoadSession() {
-		
+		System.out.println("Going to LoadSession Screen");
 	}
 	
 	public void goNewSession() {
-		
+		System.out.println("Going to NewSession Screen");
 	}
 	
 	public void goGameScreen() {
-		
+		System.out.println("Going to Game Screen");
 	}
 	
 	// Screen before actual play
 	// Where players can join and PCs get made
 	public void goSessionScreen(GameSession session) {
-		
+		System.out.println("Going to Session Screen");
 	}
 	
 	public void goCharacterCreation(GameSession returnSession) {
-		
+		System.out.println("Going to CharacterCreation Screen");
 	}
 	
 	

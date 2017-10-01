@@ -12,6 +12,9 @@ import com.smanzana.dungeonmaster.ui.app.swing.AppSound;
  */
 public class DungeonMaster {
 
+	public static final String PATH_TEMPLATES = "templates";
+	public static final String PATH_SESSIONS = "session";
+	
 	private static GameSession activeSession = null;
 	private static Thread UIThread = null;
 	private static Boolean receivedShutdown = false; // Shut down the whole program

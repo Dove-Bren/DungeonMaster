@@ -10,7 +10,9 @@ import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
+import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.swing.screens.StartScreen;
+import com.smanzana.dungeonmaster.ui.app.swing.screens.TemplateEditorScreen;
 
 /**
  * Main JFrame
@@ -61,11 +63,19 @@ public class AppFrame extends JFrame {
 	}
 	
 	private StartScreen startScreen;
+	private TemplateEditorScreen templateScreen;
 	
-	public AppFrame() {
-		startScreen = new StartScreen();
-		this.add(startScreen);
-		startScreen.init();
+	private AppUI ui;
+	
+	public AppFrame(AppUI ui) {
+		this.ui = ui;
+		startScreen = new StartScreen(ui);
+//		this.add(startScreen);
+//		startScreen.init();
+		
+		templateScreen = new TemplateEditorScreen(ui);
+		this.add(templateScreen);
+		templateScreen.init();
 		
 		this.setPreferredSize(new Dimension(1280, 720));
 		this.setMinimumSize(new Dimension(500, 400));
