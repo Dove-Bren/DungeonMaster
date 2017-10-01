@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.action.Action;
 import com.smanzana.dungeonmaster.pawn.Attributes;
+import com.smanzana.dungeonmaster.session.GameSession;
 import com.smanzana.dungeonmaster.ui.Comm;
 import com.smanzana.dungeonmaster.ui.UICallback;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
@@ -135,4 +136,35 @@ public class AppUI extends Comm {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	///////////////////////////////////////////  
+    //          UI Control Methods           //
+    ///////////////////////////////////////////
+	public void goTemplateEditor() {
+		
+	}
+	
+	public void goLoadSession() {
+		
+	}
+	
+	public void goNewSession() {
+		
+	}
+	
+	public void goGameScreen() {
+		
+	}
+	
+	// Screen before actual play
+	// Where players can join and PCs get made
+	public void goSessionScreen(GameSession session) {
+		
+	}
+	
+	public void goCharacterCreation(GameSession returnSession) {
+		
+	}
+	
+	
 }
