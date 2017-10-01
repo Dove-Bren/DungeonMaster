@@ -166,5 +166,8 @@ public class AppUI extends Comm {
 		System.out.println("Going to CharacterCreation Screen");
 	}
 	
+	public void goMainScreen() {
+		System.out.println("Going to main screen");
+	}
 	
 }

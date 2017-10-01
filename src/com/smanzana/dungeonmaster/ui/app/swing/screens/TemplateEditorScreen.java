@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JList;
@@ -32,7 +33,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		SAVEAS("saveas"),
 		CLOSE("close"),
 		QUIT("quit"),
-				
+		MAINMENU("mainmenu"),
 		;
 		
 		private String command;
@@ -128,8 +129,14 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		item.addActionListener(this);
 		menu.add(item);
 		
+		item = new JMenuItem("Main Menu");
+		item.setMnemonic(KeyEvent.VK_M);
+		item.setActionCommand(Command.MAINMENU.getCommand());
+		item.addActionListener(this);
+		menu.add(item);
+		
 		item = new JMenuItem("Quit");
-		item.setMnemonic(KeyEvent.VK_N);
+		item.setMnemonic(KeyEvent.VK_Q);
 		item.setActionCommand(Command.QUIT.getCommand());
 		item.addActionListener(this);
 		menu.add(item);
@@ -165,42 +172,76 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		
 		switch (cmd) {
 		case NEW:
-			if (!clearEditor()) {
-				break;
-			}
-			String name = JOptionPane.showInputDialog(getParent(), "Enter the name of the new template", "New Template", JOptionPane.PLAIN_MESSAGE);
-			while (name != null) {
-				if (!isValidTemplateName(name))
-					name = JOptionPane.showInputDialog(getParent(), "Please enter a valid template name", "New Template", JOptionPane.PLAIN_MESSAGE);
-				else if (isValidTemplateDir(name))
-					name = JOptionPane.showInputDialog(getParent(), "A template already exists with that name. Enter a different name for the new template", "New Template", JOptionPane.PLAIN_MESSAGE);
-				else
+			{
+				if (!clearEditor()) {
 					break;
+				}
+				String name = JOptionPane.showInputDialog(getParent(), "Enter the name of the new template", "New Template", JOptionPane.PLAIN_MESSAGE);
+				while (name != null) {
+					if (!isValidTemplateName(name))
+						name = JOptionPane.showInputDialog(getParent(), "Please enter a valid template name", "New Template", JOptionPane.PLAIN_MESSAGE);
+					else if (isValidTemplateDir(name))
+						name = JOptionPane.showInputDialog(getParent(), "A template already exists with that name. Enter a different name for the new template", "New Template", JOptionPane.PLAIN_MESSAGE);
+					else
+						break;
+				}
+				if (name == null) {
+					System.out.println("New template cancelled");
+					break;
+				}
+				
+				openTemplate(name);
 			}
-			if (name == null) {
-				System.out.println("New template cancelled");
-			}
-			
-			openTemplate(name);
 			break;
 		case CLOSE:
-			if (!clearEditor()) {
-				break;
-			}
+			clearEditor();
 			break;
 		case OPEN:
 			if (!clearEditor()) {
 				break;
 			}
 			break;
+		case MAINMENU:
+			if (!clearEditor()) {
+				break;
+			}
+			ui.goMainScreen();
+			break;
 		case QUIT:
 			if (!clearEditor()) {
 				break;
 			}
+			DungeonMaster.shutdown();
 			break;
 		case SAVE:
+			currentTemplate.save();
 			break;
 		case SAVEAS:
+			{
+				String name = JOptionPane.showInputDialog(getParent(), "Enter the name of the new template", "Save As Template", JOptionPane.PLAIN_MESSAGE);
+				while (name != null) {
+					if (!isValidTemplateName(name))
+						name = JOptionPane.showInputDialog(getParent(), "Please enter a valid template name", "Save As Template", JOptionPane.PLAIN_MESSAGE);
+					else if (isValidTemplateDir(name)) {
+						int choice = JOptionPane.showConfirmDialog(getParent(), "A template already exists with that name. Are you sure you wish to overwrite it?", "Save As Template", JOptionPane.YES_NO_OPTION);
+						if (choice != JOptionPane.YES_OPTION) {
+							name = null;
+							break;
+						}
+						
+						break;
+					}
+					else
+						break;
+				}
+				if (name == null) {
+					System.out.println("Save-As template cancelled");
+					break;
+				}
+				
+				File newRoot = new File(DungeonMaster.PATH_TEMPLATES, name);
+				currentTemplate.save(newRoot);
+			}
 			break;
 		}
 	}
@@ -239,10 +280,57 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	// Returns true if editor was successfully cleared.
 	// False means something's still open so don't close or open anything new
 	private boolean clearEditor() {
+		return clearEditor(false);
+	}
+	
+	private boolean clearEditor(boolean force) {
+	
 		if (currentTemplate == null)
 			return true;
 		
-		return true; // TODO
+		if (force) {
+			// Write out a force temp file to let them know next time
+			File tmp = new File(DungeonMaster.PATH_TEMPLATES, ".badclose");
+			if (!tmp.exists())
+				try {
+					tmp.createNewFile();
+				} catch (IOException e) {
+					System.out.println("Could not create .badclose file");
+				}
+			
+			String backupName = currentTemplate.getRoot().getName();
+			backupName += ".backup";
+			String root = backupName;
+			int suffix = 0;
+			while (isValidTemplateDir(backupName)) {
+				suffix++;
+				backupName = root + suffix;
+			}
+			
+			this.currentTemplate.save(new File(DungeonMaster.PATH_TEMPLATES, backupName));
+			return true;
+		}
+		
+		if (!currentTemplate.isDirty()) {
+			currentTemplate = null;
+			clearEditorPanel();
+			return true;
+		}
+		
+		// No rush. Ask if they want to save, discard, or cancel
+		int selection = JOptionPane.showConfirmDialog(getParent(), "Save changes before closing?", "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
+		if (selection == JOptionPane.CANCEL_OPTION)
+			return false;
+		if (selection == JOptionPane.YES_OPTION)
+			currentTemplate.save();
+		
+		clearEditorPanel();
+		
+		return true;
+	}
+	
+	private void clearEditorPanel() {
+		// TODO
 	}
 	
 	// Doesn't care if exists or not; just opens. Commands should
@@ -270,6 +358,10 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		// TODO display that shizz bruh
 		
 		return true;
+	}
+	
+	public void shutdown() {
+		clearEditor(true);
 	}
 	
 }

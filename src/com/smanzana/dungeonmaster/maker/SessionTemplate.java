@@ -11,10 +11,21 @@ import com.smanzana.dungeonmaster.session.SessionBase;
  */
 public class SessionTemplate extends SessionBase {
 	
+	private boolean dirty;
+	
 	public SessionTemplate(File rootDir) {
 		super(rootDir, "");
 		
 		this.loadConfigs();
+		dirty = false;
+	}
+	
+	public void dirty() {
+		this.dirty = true;
+	}
+	
+	public boolean isDirty() {
+		return this.dirty;
 	}
 	
 	/**
