@@ -298,4 +298,7 @@ public abstract class Config<T extends Enum<T>> {
 		
 		reader.close();
 	}
+	
+	// For display in editor
+	public abstract String getName();
 }

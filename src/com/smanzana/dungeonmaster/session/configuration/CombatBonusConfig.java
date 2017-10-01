@@ -107,4 +107,9 @@ public class CombatBonusConfig extends Config<CombatBonusKey> {
 		return list.getValue(score);
 	}
 	
+	@Override
+	public String getName() {
+		return "Combat Bonuses";
+	}
+	
 }

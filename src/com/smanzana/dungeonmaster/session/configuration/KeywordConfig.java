@@ -86,4 +86,9 @@ public class KeywordConfig extends Config<KeywordKey> {
 		return this.getString(key);
 	}
 	
+	@Override
+	public String getName() {
+		return "Keywords";
+	}
+	
 }

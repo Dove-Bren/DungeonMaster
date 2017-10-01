@@ -108,4 +108,9 @@ public class MechanicsConfig extends Config<MechanicsKey> {
 		return commentMap.get(key);
 	}
 	
+	@Override
+	public String getName() {
+		return "Mechanics";
+	}
+	
 }

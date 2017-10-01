@@ -107,4 +107,9 @@ public class RollTableConfig extends Config<RollTableKey> {
 		return list.getValue(score);
 	}
 	
+	@Override
+	public String getName() {
+		return "Roll Tables";
+	}
+	
 }

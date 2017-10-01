@@ -13,17 +13,24 @@ import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.maker.SessionTemplate;
+import com.smanzana.dungeonmaster.session.configuration.CombatBonusConfig;
+import com.smanzana.dungeonmaster.session.configuration.Config;
+import com.smanzana.dungeonmaster.session.configuration.KeywordConfig;
+import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
+import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
 
 public class TemplateEditorScreen extends JPanel implements ActionListener {
@@ -67,7 +74,8 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	
 	// GUI members
 	private JMenuBar menubar;
-	private JList sourceList;
+	private JTree sourceTree;
+	private DefaultTreeModel sourceModel;
 	private JScrollPane sourcePanel;
 	private JPanel editorPanel;
 	private Map<Command, JMenuItem> menuItems;
@@ -156,9 +164,10 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		
 		this.getRootPane().setJMenuBar(menubar);
 		
-		sourceList = new JList<String>();
-		sourceList.setBackground(Color.WHITE);
-		sourcePanel = new JScrollPane(sourceList);
+		sourceModel = new DefaultTreeModel(new DefaultMutableTreeNode("template"));
+		sourceTree = new JTree(sourceModel);
+		sourceTree.setBackground(Color.WHITE);
+		sourcePanel = new JScrollPane(sourceTree);
 		sourcePanel.setPreferredSize(new Dimension(250, 1000));
 		sourcePanel.setMaximumSize(new Dimension(250, 5000));
 		sourcePanel.setBorder(BorderFactory.createEtchedBorder());
@@ -168,6 +177,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		editorPanel = new JPanel();
 		this.add(editorPanel, BorderLayout.CENTER);
 		
+		updateTree();
 		updateMenu();
 		this.validate();
 		this.setVisible(true);
@@ -209,25 +219,26 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 			clearEditor();
 			break;
 		case OPEN:
-			if (!clearEditor()) {
-				break;
+			{
+				if (!clearEditor()) {
+					break;
+				}
+				
+				JFileChooser fc = new JFileChooser(new File(DungeonMaster.PATH_TEMPLATES));
+				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				fc.showOpenDialog(getParent());
+				
+				File sel = fc.getSelectedFile();
+				if (!sel.exists())
+					JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That folder does not exist", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+				else if (!sel.isDirectory())
+					JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That is not a directory", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+				else {
+					// oh well just make one wherever it is
+					openTemplate(sel);
+				}
 			}
-			
-			JFileChooser fc = new JFileChooser(new File(DungeonMaster.PATH_TEMPLATES));
-			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			fc.showOpenDialog(getParent());
-			
-			File sel = fc.getSelectedFile();
-			if (!sel.exists())
-				JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That folder does not exist", "Error opening template", JOptionPane.PLAIN_MESSAGE);
-			else if (!sel.isDirectory())
-				JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That is not a directory", "Error opening template", JOptionPane.PLAIN_MESSAGE);
-			else {
-				// oh well just make one wherever it is
-				openTemplate(sel);
-			}
-			
-			break;
+			break;	
 		case MAINMENU:
 			if (!clearEditor()) {
 				break;
@@ -245,29 +256,19 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 			break;
 		case SAVEAS:
 			{
-				String name = JOptionPane.showInputDialog(getParent(), "Enter the name of the new template", "Save As Template", JOptionPane.PLAIN_MESSAGE);
-				while (name != null) {
-					if (!isValidTemplateName(name))
-						name = JOptionPane.showInputDialog(getParent(), "Please enter a valid template name", "Save As Template", JOptionPane.PLAIN_MESSAGE);
-					else if (isValidTemplateDir(name)) {
-						int choice = JOptionPane.showConfirmDialog(getParent(), "A template already exists with that name. Are you sure you wish to overwrite it?", "Save As Template", JOptionPane.YES_NO_OPTION);
-						if (choice != JOptionPane.YES_OPTION) {
-							name = null;
-							break;
-						}
-						
-						break;
-					}
-					else
-						break;
-				}
-				if (name == null) {
+				JFileChooser fc = new JFileChooser(new File(DungeonMaster.PATH_TEMPLATES));
+				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				
+				fc.showSaveDialog(getParent());
+				File loc = fc.getSelectedFile();
+				
+				if (loc == null) {
 					System.out.println("Save-As template cancelled");
 					break;
 				}
 				
-				File newRoot = new File(DungeonMaster.PATH_TEMPLATES, name);
-				currentTemplate.save(newRoot);
+				currentTemplate.save(loc);
+				updateTree();
 			}
 			break;
 		}
@@ -343,6 +344,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		if (!currentTemplate.isDirty()) {
 			currentTemplate = null;
 			clearEditorPanel();
+			updateTree();
 			return true;
 		}
 		
@@ -354,6 +356,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 			currentTemplate.save();
 		
 		clearEditorPanel();
+		updateTree();
 		
 		return true;
 	}
@@ -389,6 +392,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		this.currentTemplate = template;
 		
 		// TODO display that shizz bruh
+		updateTree();
 		
 		return true;
 	}
@@ -398,6 +402,31 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		// Save & Save as need a template
 		menuItems.get(Command.SAVE).setEnabled(currentTemplate != null);
 		menuItems.get(Command.SAVEAS).setEnabled(currentTemplate != null);
+	}
+	
+	private void updateTree() {
+		
+		if (currentTemplate == null) {
+			sourceTree.setVisible(false);
+			return;
+		}
+		
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) sourceModel.getRoot(); 
+		root.setUserObject(currentTemplate.getRoot().getName());
+		root.removeAllChildren();
+		
+		addConfigToTree(root, CombatBonusConfig.instance());
+		addConfigToTree(root, KeywordConfig.instance());
+		addConfigToTree(root, MechanicsConfig.instance());
+		addConfigToTree(root, RollTableConfig.instance());
+		
+		sourceModel.reload();
+		sourceTree.validate();
+		sourceTree.setVisible(true);
+	}
+	
+	private void addConfigToTree(DefaultMutableTreeNode root, Config<?> config) {
+		root.add(new DefaultMutableTreeNode(config.getName()));
 	}
 	
 	public void shutdown() {
