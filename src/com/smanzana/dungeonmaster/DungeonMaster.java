@@ -1,10 +1,8 @@
 package com.smanzana.dungeonmaster;
 
-import java.io.File;
-
 import com.smanzana.dungeonmaster.session.GameSession;
 import com.smanzana.dungeonmaster.ui.UI;
-import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
+import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.swing.AppSound;
 
 /**
@@ -18,6 +16,9 @@ public class DungeonMaster {
 	private static Thread UIThread = null;
 	private static Boolean receivedShutdown = false; // Prevent multiple-processing
 	
+	// Program Client members
+	private static AppUI hostUI;
+	
 	public static void main(String[] args) {
 		// Two modes:
 		// Creation mode (set up configs)
@@ -28,15 +29,22 @@ public class DungeonMaster {
 		
 		AppSound.preloadSounds();
 		
-		activeSession = new GameSession(new File("testsession"));
-		runSession(activeSession);
+		hostUI = new AppUI(); // Kicks off program GUI & client
+		
+//		activeSession = new GameSession(new File("testsession"));
+//		runSession(activeSession);
 	}
 	
 	public static GameSession getActiveSession() {
 		return activeSession;
 	}
 	
-	private static void runSession(GameSession session) {
+	public static void runSession(GameSession session) {
+		if (activeSession != null) {
+			System.out.println("Error! Already have an active session!");
+			return;
+		}
+		activeSession = session;
 		launchSession(session);
 		
 		try {
@@ -56,6 +64,7 @@ public class DungeonMaster {
 	 */
 	private static void launchSession(GameSession session) {
 		UIThread = new Thread(UI.instance(), "UI Thread");
+		UI.instance().setDMComm(hostUI);
 		UIThread.start();
 	}
 	
@@ -68,25 +77,30 @@ public class DungeonMaster {
 			receivedShutdown = true;
 		}
 		
-		System.out.println("Requesting UI Thread shutdown (waiting up to 10 seconds)...");
-		UI.instance().halt();
-		try {
-			UIThread.join(1000 * 10);
-		} catch (InterruptedException e) {
-			;
+		if (UIThread != null) {
+			System.out.println("Requesting UI Thread shutdown (waiting up to 10 seconds)...");
+			UI.instance().halt();
+			try {
+				UIThread.join(1000 * 10);
+			} catch (InterruptedException e) {
+				;
+			}
+			
+			if (UIThread.isAlive()) {
+				System.out.println("UI Thread failed to shut down properly.");
+			} else {
+				System.out.println("UI Thread shutdown successfully");
+			}
 		}
 		
-		if (UIThread.isAlive()) {
-			System.out.println("UI Thread failed to shut down properly.");
-		} else {
-			System.out.println("UI Thread shutdown successfully");
+		if (activeSession != null) {
+			System.out.println("Shutting down Game Thread...");
+			activeSession.shutdown();
+			
+			activeSession = null;
 		}
 		
-		System.out.println("Shutting down Game Thread...");
-		activeSession.shutdown();
-		
-		activeSession = null;
-		
+		System.exit(0);
 		return;
 	}
 		
