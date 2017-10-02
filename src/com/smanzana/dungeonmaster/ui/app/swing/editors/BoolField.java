@@ -22,7 +22,6 @@ public class BoolField implements ActionListener, EditorField {
 	private JRadioButton falsefield;
 	private JPanel wrapper;
 	private BoolFieldCallback hook;
-	private String title;
 	
 	public BoolField(String title, BoolFieldCallback hook) {
 		this(title, hook, false);
@@ -30,7 +29,6 @@ public class BoolField implements ActionListener, EditorField {
 	
 	public BoolField(String title, BoolFieldCallback hook, boolean startTrue) {
 		this.hook = hook;
-		this.title = title;
 		
 		wrapper = new JPanel();
 		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.LINE_AXIS));
@@ -41,11 +39,13 @@ public class BoolField implements ActionListener, EditorField {
 		wrapper.add(label);
 		wrapper.add(Box.createRigidArea(new Dimension(20, 0)));
 		
-		falsefield = new JRadioButton("True");
+		falsefield = new JRadioButton("False");
+		falsefield.addActionListener(this);
 		wrapper.add(falsefield);
 		wrapper.add(Box.createRigidArea(new Dimension(30, 0)));
 		
-		truefield = new JRadioButton("False");
+		truefield = new JRadioButton("True");
+		truefield.addActionListener(this);
 		wrapper.add(truefield);
 		wrapper.add(Box.createHorizontalGlue());
 		
@@ -57,6 +57,8 @@ public class BoolField implements ActionListener, EditorField {
 		ButtonGroup group = new ButtonGroup();
 		group.add(falsefield);
 		group.add(truefield);
+		
+		
 		
 		wrapper.validate();
 	}

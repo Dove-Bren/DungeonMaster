@@ -12,21 +12,21 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class IntField implements ActionListener, EditorField {
+public class DoubleField implements ActionListener, EditorField {
 
-	public static interface IntFieldCallback {
-		public void setField(int value);
+	public static interface DoubleFieldCallback {
+		public void setField(double value);
 	}
 	
 	private JPanel wrapper;
 	private JFormattedTextField textfield;
-	private IntFieldCallback hook;
+	private DoubleFieldCallback hook;
 	
-	public IntField(String title, IntFieldCallback hook) {
+	public DoubleField(String title, DoubleFieldCallback hook) {
 		this(title, hook, "");
 	}
 	
-	public IntField(String title, IntFieldCallback hook, String startingText) {
+	public DoubleField(String title, DoubleFieldCallback hook, String startingText) {
 		this.hook = hook;
 		
 		wrapper = new JPanel();
@@ -38,7 +38,7 @@ public class IntField implements ActionListener, EditorField {
 		wrapper.add(label);
 		wrapper.add(Box.createRigidArea(new Dimension(20, 0)));
 		
-		this.textfield = new JFormattedTextField(NumberFormat.getIntegerInstance());
+		this.textfield = new JFormattedTextField(NumberFormat.getNumberInstance());
 		textfield.addActionListener(this);
 		wrapper.add(textfield);
 		wrapper.add(Box.createHorizontalGlue());
@@ -53,7 +53,7 @@ public class IntField implements ActionListener, EditorField {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if (hook != null)
-			hook.setField(Integer.parseInt(textfield.getText()));
+			hook.setField(Double.parseDouble(textfield.getText()));
 	}
 	
 	

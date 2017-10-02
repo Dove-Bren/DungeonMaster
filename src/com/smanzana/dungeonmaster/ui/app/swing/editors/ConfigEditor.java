@@ -44,31 +44,31 @@ public class ConfigEditor extends JScrollPane implements DMEditor {
 				}, (Boolean) config.getValue(keyName));
 				break;
 			case DOUBLE:
-				comp = new DoubleField(new DoubleFieldCallback() {
+				comp = new DoubleField(keyName, new DoubleFieldCallback() {
 					@Override
 					public void setField(double value) {
 						config.setValue(keyName, value);
 						template.dirty();
 					}
-				});
+				}, config.getValue(keyName).toString());
 				break;
 			case INT:
-				comp = new IntField(new IntFieldCallback() {
+				comp = new IntField(keyName, new IntFieldCallback() {
 					@Override
 					public void setField(int value) {
 						config.setValue(keyName, value);
 						template.dirty();
 					}
-				});
+				}, config.getValue(keyName).toString());
 				break;
 			case STRING:
-				comp = new TextField(new TextFieldCallback() {
+				comp = new TextField(keyName, new TextFieldCallback() {
 					@Override
 					public void setField(String value) {
 						config.setValue(keyName, value);
 						template.dirty();
 					}
-				});
+				}, (String) config.getValue(keyName));
 				break;
 			}
 			
@@ -84,7 +84,6 @@ public class ConfigEditor extends JScrollPane implements DMEditor {
 				}
 				comp.getComponent().setToolTipText(buf);
 			}
-			System.out.println("Adding text box");
 			comp.getComponent().setBackground(Color.GREEN);
 			comp.getComponent().setPreferredSize(new Dimension(100, 25));
 			editor.add(comp.getComponent());

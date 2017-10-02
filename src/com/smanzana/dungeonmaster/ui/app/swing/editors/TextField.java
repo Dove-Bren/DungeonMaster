@@ -1,8 +1,14 @@
 package com.smanzana.dungeonmaster.ui.app.swing.editors;
 
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class TextField implements ActionListener, EditorField {
@@ -13,18 +19,34 @@ public class TextField implements ActionListener, EditorField {
 	
 	private JTextField textfield;
 	private TextFieldCallback hook;
+	private JPanel wrapper;
 	
-	public TextField(TextFieldCallback hook) {
-		this(hook, "");
+	public TextField(String title, TextFieldCallback hook) {
+		this(title, hook, "");
 	}
 	
-	public TextField(TextFieldCallback hook, String startingText) {
+	public TextField(String title, TextFieldCallback hook, String startingText) {
 		this.hook = hook;
+		
+		wrapper = new JPanel();
+		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.LINE_AXIS));
+		wrapper.add(Box.createRigidArea(new Dimension(10, 0)));
+		wrapper.add(Box.createHorizontalGlue());
+		JLabel label = new JLabel(title);
+		label.setFont(label.getFont().deriveFont(Font.BOLD));
+		wrapper.add(label);
+		wrapper.add(Box.createRigidArea(new Dimension(20, 0)));
+		
 		this.textfield = new JTextField(startingText, 20);
+		textfield.addActionListener(this);
+		wrapper.add(textfield);
+		wrapper.add(Box.createHorizontalGlue());
+
+		wrapper.validate();
 	}
 	
-	public JTextField getComponent() {
-		return textfield;
+	public JPanel getComponent() {
+		return wrapper;
 	}
 
 	@Override

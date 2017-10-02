@@ -24,6 +24,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -43,7 +45,7 @@ import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.ConfigEditor;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.DMEditor;
 
-public class TemplateEditorScreen extends JPanel implements ActionListener {
+public class TemplateEditorScreen extends JPanel implements ActionListener, TreeSelectionListener {
 	
 	private static enum Command {
 		NEW("new"),
@@ -90,11 +92,13 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	private JPanel editorPanel;
 	private DMEditor currentEditor;
 	private Map<Command, JMenuItem> menuItems;
+	private Object lastEditorObject;
 	
 	public TemplateEditorScreen(AppUI UI) {
 		super(new BorderLayout());
 		currentTemplate = null;
 		currentEditor = null;
+		lastEditorObject = null;
 		menuItems = new EnumMap<>(Command.class);
 		this.ui = UI;
 	}
@@ -178,6 +182,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		
 		sourceModel = new DefaultTreeModel(new DefaultMutableTreeNode("template"));
 		sourceTree = new JTree(sourceModel);
+		sourceTree.addTreeSelectionListener(this);
 		sourceTree.setBackground(Color.WHITE);
 		sourceTree.setCellRenderer(new DefaultTreeCellRenderer() {
 			private static final long serialVersionUID = -205095548994473885L;
@@ -477,7 +482,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		updateTree();
 		
 		// testing
-		openEditor(new ConfigEditor(MechanicsConfig.instance()));
+		openEditor(new ConfigEditor(currentTemplate, MechanicsConfig.instance()));
 		//testing
 		
 		return true;
@@ -535,8 +540,10 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	}
 	
 	private void openEditor(DMEditor editor) {
-		if (currentEditor == null) {
+		if (currentEditor != null) {
 			// UH OH //TODO
+			currentEditor.getComponent().setVisible(false);
+			currentEditor = null;
 		}
 		
 		currentEditor = editor;
@@ -549,6 +556,30 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	
 	public void shutdown() {
 		clearEditor(true);
+	}
+
+	@Override
+	public void valueChanged(TreeSelectionEvent arg0) {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) arg0.getPath().getLastPathComponent();
+		
+		if (currentTemplate == null)
+			return;
+		
+		if (node == null)
+			return;
+		
+		if (node.getUserObject() == lastEditorObject)
+			return;
+		
+		lastEditorObject = node.getUserObject();
+		DMEditor editor = null;
+		if (lastEditorObject instanceof Config<?>) {
+			editor = new ConfigEditor(currentTemplate, (Config<?>) lastEditorObject);
+		}
+		
+		if (editor != null)
+			openEditor(editor);
+		
 	}
 	
 }
