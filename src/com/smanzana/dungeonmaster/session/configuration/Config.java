@@ -19,27 +19,23 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 	protected static final String OUT_COMMENT_GUARD = "##########";
 	
 
-	public static enum ValueType
-	{
+	public static enum ValueType {
 		STRING,
 		BOOL,
 		INT,
 		DOUBLE,
 	}
 	
-	protected static class ConfigValue
-	{
+	protected static class ConfigValue {
 		private ValueType valueType;
 		private Object value;
 		
-		public ConfigValue(ValueType type, Object value)
-		{
+		public ConfigValue(ValueType type, Object value) {
 			this.valueType = type;
 			this.value = value;
 		}
 		
-		public ConfigValue(Object value)
-		{
+		public ConfigValue(Object value) {
 			this.value = value;
 			if (value instanceof String)
 				this.valueType = ValueType.STRING;
@@ -51,13 +47,11 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 				this.valueType = ValueType.BOOL;
 		}
 		
-		public ValueType getType()
-		{
+		public ValueType getType() {
 			return valueType;
 		}
 		
-		public boolean matchesType(Object o)
-		{
+		public boolean matchesType(Object o) {
 			switch (valueType)
 			{
 			case STRING:
@@ -73,41 +67,36 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 			return false;
 		}
 		
-		public String getStringValue()
-		{
+		public String getStringValue() {
 			if (valueType == ValueType.STRING)
 				return (String) value;
 			
 			return null;
 		}
 		
-		public Integer getIntValue()
-		{
+		public Integer getIntValue() {
 			if (valueType == ValueType.INT)
 				return (Integer) value;
 			
 			return null;
 		}
 		
-		public Double getDoubleValue()
-		{
+		public Double getDoubleValue() {
 			if (valueType == ValueType.STRING)
 				return (Double) value;
 			
 			return null;
 		}
 		
-		public Boolean getBooleanValue()
-		{
-			if (valueType == ValueType.STRING)
+		public Boolean getBooleanValue() {
+			if (valueType == ValueType.BOOL)
 				return (Boolean) value;
 			
 			return null;
 		}
 		
 		@Override
-		public String toString()
-		{
+		public String toString() {
 			return this.value.toString();
 		}
 		
@@ -115,8 +104,7 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 		 * Sets value if types match. Otherwise does nothing
 		 * @param newValue
 		 */
-		public void setValue(Object newValue)
-		{
+		public void setValue(Object newValue) {
 			if (this.matchesType(newValue))
 				this.value = newValue;
 		}
@@ -127,10 +115,8 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 		 * nothing happens.
 		 * @param serial
 		 */
-		public void setValueFromString(String serial)
-		{
-			switch (valueType)
-			{
+		public void setValueFromString(String serial) {
+			switch (valueType) {
 			case STRING:
 				this.value = serial;
 				break;
@@ -159,14 +145,12 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 	}
 	
 	protected Map<T, ConfigValue> values;
-	protected Config()
-	{
+	protected Config() {
 		values = new HashMap<T, ConfigValue>();
 		setupDefaults();
 	}
 	
-	protected void setValue(T key, Object value)
-	{
+	protected void setValue(T key, Object value) {
 		values.put(key, new ConfigValue(value));
 	}
 	
@@ -178,30 +162,54 @@ public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
 		this.setValue(typeKey, value);
 	}
 	
-	public boolean getBool(T key)
-	{
-		return values.get(key).getBooleanValue();
+	public boolean getBool(T key) {
+		try {
+			return values.get(key).getBooleanValue();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			System.out.println("Caught null on key: " + key.name());
+			return false;
+		}
 	}
 	
-	public String getString(T key)
-	{
+	public String getString(T key) {
 		return values.get(key).getStringValue();
 	}
 	
-	public int getInt(T key)
-	{
+	public int getInt(T key) {
 		return values.get(key).getIntValue();
 	}
 	
-	public double getDouble(T key)
-	{
+	public double getDouble(T key) {
 		return values.get(key).getDoubleValue();
+	}
+	
+	public Object getValue(String keyName) {
+		T key = getKey(keyName);
+		ValueType type = null;
+		if (key != null)
+			type = getFieldType(key);
+		
+		if (type == null)
+			return null;
+		
+		switch (type) {
+		case BOOL:
+			return getBool(key);
+		case DOUBLE:
+			return getDouble(key);
+		case INT:
+			return getInt(key);
+		case STRING:
+			return getString(key);
+		}
+		
+		return null;
 	}
 	
 	protected abstract void setupDefaults();
 	
-	public void resetAllValues()
-	{
+	public void resetAllValues() {
 		setupDefaults();
 	}
 	

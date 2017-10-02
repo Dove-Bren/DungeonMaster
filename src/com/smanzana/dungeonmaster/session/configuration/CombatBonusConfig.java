@@ -75,7 +75,7 @@ public class CombatBonusConfig extends Config<CombatBonusKey> {
 	}
 
 	@Override
-	protected List<CombatBonusKey> getKeyList() {
+	public List<CombatBonusKey> getKeyList() {
 		CombatBonusKey[] vals = CombatBonusKey.values();
 		List<CombatBonusKey> list = new ArrayList<>(vals.length);
 		for (CombatBonusKey key : vals)

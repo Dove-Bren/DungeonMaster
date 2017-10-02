@@ -75,7 +75,7 @@ public class RollTableConfig extends Config<RollTableKey> {
 	}
 
 	@Override
-	protected List<RollTableKey> getKeyList() {
+	public List<RollTableKey> getKeyList() {
 		RollTableKey[] vals = RollTableKey.values();
 		List<RollTableKey> list = new ArrayList<>(vals.length);
 		for (RollTableKey key : vals)

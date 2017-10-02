@@ -40,6 +40,8 @@ import com.smanzana.dungeonmaster.session.datums.Datum;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.ConfigEditor;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.DMEditor;
 
 public class TemplateEditorScreen extends JPanel implements ActionListener {
 	
@@ -86,11 +88,13 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	private DefaultTreeModel sourceModel;
 	private JScrollPane sourcePanel;
 	private JPanel editorPanel;
+	private DMEditor currentEditor;
 	private Map<Command, JMenuItem> menuItems;
 	
 	public TemplateEditorScreen(AppUI UI) {
 		super(new BorderLayout());
 		currentTemplate = null;
+		currentEditor = null;
 		menuItems = new EnumMap<>(Command.class);
 		this.ui = UI;
 	}
@@ -249,7 +253,8 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		sourcePanel.setBackground(Color.WHITE);
 		this.add(sourcePanel, BorderLayout.LINE_START);		
 		
-		editorPanel = new JPanel();
+		editorPanel = new JPanel(new BorderLayout());
+		editorPanel.setBackground(Color.CYAN); //// donotcheckin
 		this.add(editorPanel, BorderLayout.CENTER);
 		
 		updateTree();
@@ -304,13 +309,15 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 				fc.showOpenDialog(getParent());
 				
 				File sel = fc.getSelectedFile();
-				if (!sel.exists())
-					JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That folder does not exist", "Error opening template", JOptionPane.PLAIN_MESSAGE);
-				else if (!sel.isDirectory())
-					JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That is not a directory", "Error opening template", JOptionPane.PLAIN_MESSAGE);
-				else {
-					// oh well just make one wherever it is
-					openTemplate(sel);
+				if (sel != null) {
+					if (!sel.exists())
+						JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That folder does not exist", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+					else if (!sel.isDirectory())
+						JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That is not a directory", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+					else {
+						// oh well just make one wherever it is
+						openTemplate(sel);
+					}
 				}
 			}
 			break;	
@@ -436,6 +443,8 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	
 	// Also clears out source panel hehe
 	private void clearEditorPanel() {
+		currentEditor = null;
+		updateEditor();
 		updateTree();
 	}
 	
@@ -466,6 +475,10 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		this.currentTemplate = template;
 		
 		updateTree();
+		
+		// testing
+		openEditor(new ConfigEditor(MechanicsConfig.instance()));
+		//testing
 		
 		return true;
 	}
@@ -512,6 +525,26 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		}
 		
 		root.add(node);
+	}
+	
+	private void updateEditor() {
+		if (currentEditor == null) {
+			editorPanel.removeAll();
+			return;
+		}
+	}
+	
+	private void openEditor(DMEditor editor) {
+		if (currentEditor == null) {
+			// UH OH //TODO
+		}
+		
+		currentEditor = editor;
+		editorPanel.add(editor.getComponent(), BorderLayout.CENTER);
+		editor.getComponent().setVisible(true);
+		
+		editorPanel.validate();
+		
 	}
 	
 	public void shutdown() {

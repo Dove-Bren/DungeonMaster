@@ -28,7 +28,6 @@ public class MechanicsConfig extends Config<MechanicsKey> {
 	private MechanicsConfig()
 	{
 		super();
-		//setupDefaults();
 		commentMap = new EnumMap<>(MechanicsKey.class);
 		deployComments();
 	}
@@ -94,7 +93,7 @@ public class MechanicsConfig extends Config<MechanicsKey> {
 	}
 
 	@Override
-	protected List<MechanicsKey> getKeyList() {
+	public List<MechanicsKey> getKeyList() {
 		MechanicsKey[] vals = MechanicsKey.values();
 		List<MechanicsKey> list = new ArrayList<>(vals.length);
 		for (MechanicsKey key : vals)

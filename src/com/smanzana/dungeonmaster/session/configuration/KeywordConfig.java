@@ -68,7 +68,7 @@ public class KeywordConfig extends Config<KeywordKey> {
 	}
 
 	@Override
-	protected List<KeywordKey> getKeyList() {
+	public List<KeywordKey> getKeyList() {
 		KeywordKey[] vals = KeywordKey.values();
 		List<KeywordKey> list = new ArrayList<>(vals.length);
 		for (KeywordKey key : vals)
