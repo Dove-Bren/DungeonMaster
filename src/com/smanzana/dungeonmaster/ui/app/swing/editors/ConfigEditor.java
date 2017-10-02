@@ -12,6 +12,7 @@ import javax.swing.border.EmptyBorder;
 import com.smanzana.dungeonmaster.maker.SessionTemplate;
 import com.smanzana.dungeonmaster.session.configuration.Config;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.BoolField.BoolFieldCallback;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.DoubleField.DoubleFieldCallback;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.IntField.IntFieldCallback;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.TextField.TextFieldCallback;
 
@@ -43,6 +44,13 @@ public class ConfigEditor extends JScrollPane implements DMEditor {
 				}, (Boolean) config.getValue(keyName));
 				break;
 			case DOUBLE:
+				comp = new DoubleField(new DoubleFieldCallback() {
+					@Override
+					public void setField(double value) {
+						config.setValue(keyName, value);
+						template.dirty();
+					}
+				});
 				break;
 			case INT:
 				comp = new IntField(new IntFieldCallback() {
