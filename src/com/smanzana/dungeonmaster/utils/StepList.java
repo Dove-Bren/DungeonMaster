@@ -78,6 +78,14 @@ public class StepList implements DataCompatible {
 		this.large = max;
 	}
 	
+	/**
+	 * Value given when input is higher than current maximum
+	 * @return
+	 */
+	public int getHigh() {
+		return this.large;
+	}
+	
 	public int getValue(int input) {
 		if (map.isEmpty())
 			return 0;
@@ -156,9 +164,7 @@ public class StepList implements DataCompatible {
 	public DataNode write(String key) {
 		String serial = "";
 		
-		if (this.map.isEmpty()) {
-			serial = this.max + ":" + (large - 1);
-		} else {
+		if (!this.map.isEmpty()) {
 			List<Integer> keys = new ArrayList<>(map.keySet());
 			Collections.sort(keys); // so that we write it out better-looking
 			for (Integer k : keys) {
@@ -166,6 +172,7 @@ public class StepList implements DataCompatible {
 				// cleanup trailing comma in deserialization. Who cares?
 			}
 		}
+		serial += this.max + ":" + (large - 1);
 		
 		return new DataNode(key, serial, null);
 	}

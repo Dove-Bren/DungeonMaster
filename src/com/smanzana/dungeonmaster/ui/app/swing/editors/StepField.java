@@ -23,11 +23,12 @@ import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 import com.smanzana.dungeonmaster.utils.StepList;
 
-public class StepField implements ActionListener, EditorField {
+public class StepField implements ActionListener, EditorField, PropertyChangeListener {
 
 	public static interface StepFieldCallback {
 		public void setField(String value);
@@ -127,27 +128,15 @@ public class StepField implements ActionListener, EditorField {
 		public int getMax() {
 			return Integer.parseInt(maxField.getText());
 		}
-		
-		public void setMax(int max) {
-			maxField.setText(max + "");
-		}
 
 		public int getValue() {
 			return Integer.parseInt(valueField.getText());
-		}
-		
-		public int getMin() {
-			return Integer.parseInt(min.getText());
-		}
-		
-		public void setMin(int min) {
-			this.min.setText(min + "");
 		}
 
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
 			if (arg0.getNewValue() == null || arg0.getNewValue().toString().trim().isEmpty()) {
-				((JFormattedTextField) arg0.getSource()).setText("0");
+				((JFormattedTextField) arg0.getSource()).setValue((Long) 0L);
 			}
 
 			parent.actionPerformed(null);
@@ -161,6 +150,7 @@ public class StepField implements ActionListener, EditorField {
 	private RangeSegment segments[];
 	private int segmentCount = 0;
 	private JButton segmentButton;
+	private JFormattedTextField largeField; // holds high value
 	
 	public StepField(String title, StepFieldCallback hook) {
 		this(title, hook, null);
@@ -181,6 +171,7 @@ public class StepField implements ActionListener, EditorField {
 		
 		segmentWrapper = new JPanel();
 		segmentWrapper.setLayout(new BoxLayout(segmentWrapper, BoxLayout.LINE_AXIS));
+		segmentWrapper.setOpaque(false);
 		segmentWrapper.add(Box.createHorizontalGlue());
 		wrapper.add(segmentWrapper);
 		
@@ -199,7 +190,33 @@ public class StepField implements ActionListener, EditorField {
 		segmentButton.addActionListener((arg0) -> {
 			addColumn();
 		});
-		wrapper.add(segmentButton);
+		
+		JPanel buttonHighPanel = new JPanel();
+		buttonHighPanel.setLayout(new BoxLayout(buttonHighPanel, BoxLayout.PAGE_AXIS));
+		buttonHighPanel.setOpaque(false);
+		
+		buttonHighPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		buttonHighPanel.add(Box.createVerticalGlue());
+		
+		largeField = new JFormattedTextField(NumberFormat.getIntegerInstance());
+		largeField.setMinimumSize(new Dimension(20, 20));
+		largeField.setPreferredSize(largeField.getMinimumSize());
+		largeField.setMaximumSize(largeField.getPreferredSize());
+		largeField.setValue((Long) (long) startingList.getHigh());
+		largeField.setColumns(2);
+		largeField.addPropertyChangeListener("value", this);
+		largeField.setAlignmentX(0.5f);
+		largeField.setHorizontalAlignment(JTextField.CENTER);
+		buttonHighPanel.add(largeField);
+		
+		buttonHighPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		buttonHighPanel.add(Box.createVerticalGlue());
+		segmentButton.setAlignmentX(0.5f);
+		buttonHighPanel.add(segmentButton);
+		buttonHighPanel.add(Box.createVerticalGlue());
+		buttonHighPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		
+		wrapper.add(buttonHighPanel);
 		wrapper.add(Box.createRigidArea(new Dimension(10, 0)));
 
 		wrapper.validate();
@@ -263,6 +280,8 @@ public class StepField implements ActionListener, EditorField {
 				out.addStep(seg.getMax(), seg.getValue());
 		}
 		
+		out.setHigh(((Long) largeField.getValue()).intValue());
+		
 		return out;
 	}
 	
@@ -300,5 +319,15 @@ public class StepField implements ActionListener, EditorField {
 		
 		segmentCount = i;
 		wrapper.validate();
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent arg0) {
+		// 'largeField' changed.
+		if (arg0.getNewValue() == null || arg0.getNewValue().toString().trim().isEmpty()) {
+			largeField.setValue((Long) 0L);
+		}
+
+		update();
 	}
 }
