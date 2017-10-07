@@ -1,7 +1,10 @@
 package com.smanzana.dungeonmaster.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
@@ -152,10 +155,13 @@ public class StepList implements DataCompatible {
 	@Override
 	public DataNode write(String key) {
 		String serial = "";
+		
 		if (this.map.isEmpty()) {
 			serial = this.max + ":" + (large - 1);
 		} else {
-			for (Integer k : map.keySet()) {
+			List<Integer> keys = new ArrayList<>(map.keySet());
+			Collections.sort(keys); // so that we write it out better-looking
+			for (Integer k : keys) {
 				serial += k + ":" + map.get(k) + ",";
 				// cleanup trailing comma in deserialization. Who cares?
 			}

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -170,6 +171,7 @@ public class StepField implements ActionListener, EditorField {
 		
 		wrapper = new JPanel();
 		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.LINE_AXIS));
+		wrapper.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		wrapper.add(Box.createRigidArea(new Dimension(10, 0)));
 		JLabel label = new JLabel(title);
 		label.setFont(label.getFont().deriveFont(Font.BOLD));
@@ -217,10 +219,13 @@ public class StepField implements ActionListener, EditorField {
 	}
 	
 	private void update() {
-		fromStepList(toStepList());
+		StepList steps = toStepList();
+		fromStepList(steps);
 		
-		segmentButton.setEnabled(segmentCount < 15);
+		if (this.hook != null)
+			this.hook.setField(steps.serialize());
 		
+		segmentButton.setEnabled(segmentCount < 15);		
 		wrapper.validate();
 	}
 	
