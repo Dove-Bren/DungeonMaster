@@ -1,11 +1,14 @@
 package com.smanzana.dungeonmaster.ui.app.swing.editors;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
@@ -31,14 +34,22 @@ public class StepField implements ActionListener, EditorField {
 	
 	private static class RangeSegment extends JPanel implements PropertyChangeListener {
 		
+		private static final long serialVersionUID = -6013376481894020315L;
+		private static final Color COLOR_DEFAULT = new Color(186, 186, 186);
+		private static final Color COLOR_PRESSED = new Color(186, 73, 73);
+		private static final Color COLOR_HOVER = new Color(186, 203, 203);
+		
 		private JLabel min;
 		private JFormattedTextField maxField;
 		private JFormattedTextField valueField;
 		private StepField parent;
+		private boolean criticalClick = false;
 		
 		public RangeSegment(StepField parent, int min, int max, int value) {
 			super(new GridBagLayout());
-			setOpaque(false);
+			this.setPreferredSize(new Dimension(80, 80));
+			this.setMaximumSize(new Dimension(80, 80));
+			this.setBackground(COLOR_DEFAULT);
 			this.parent = parent;
 			
 			this.min = new JLabel(min + "");
@@ -76,6 +87,37 @@ public class StepField implements ActionListener, EditorField {
 			cons.gridx = 1;
 			cons.gridy = 2; // might need to be -1 + 1 y
 			add(valueField, cons);
+			final RangeSegment me = this;
+			this.addMouseListener(new MouseAdapter() {
+				public void mousePressed(MouseEvent e) {
+					if (e.getButton() == MouseEvent.BUTTON3) {
+						setBackground(COLOR_PRESSED);
+						criticalClick = true;
+					}
+					else {
+						criticalClick = false;
+					}
+					repaint();
+				}
+				
+				public void mouseEntered(MouseEvent e) {
+					setBackground(COLOR_HOVER);
+				}
+				
+				public void mouseExited(MouseEvent e) {
+					setBackground(COLOR_DEFAULT);
+				}
+				
+				public void mouseReleased(MouseEvent e) {
+					if (criticalClick)
+					if (e.getX() >= 0 && e.getX() <= getWidth()
+					&&  e.getY() >= 0 && e.getY() <= getHeight()) {
+						parent.deleteSegment(me);
+					}
+					
+					criticalClick = false;
+				}
+			});
 			
 			//this.setBorder(BorderFactory.createLineBorder(Color.black));
 			validate();
@@ -103,6 +145,10 @@ public class StepField implements ActionListener, EditorField {
 
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
+			if (arg0.getNewValue() == null || arg0.getNewValue().toString().trim().isEmpty()) {
+				((JFormattedTextField) arg0.getSource()).setText("0");
+			}
+
 			parent.actionPerformed(null);
 		}
 		
@@ -125,14 +171,15 @@ public class StepField implements ActionListener, EditorField {
 		wrapper = new JPanel();
 		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.LINE_AXIS));
 		wrapper.add(Box.createRigidArea(new Dimension(10, 0)));
-		wrapper.add(Box.createHorizontalGlue());
 		JLabel label = new JLabel(title);
 		label.setFont(label.getFont().deriveFont(Font.BOLD));
 		wrapper.add(label);
 		wrapper.add(Box.createRigidArea(new Dimension(20, 0)));
+		wrapper.add(Box.createHorizontalGlue());
 		
 		segmentWrapper = new JPanel();
 		segmentWrapper.setLayout(new BoxLayout(segmentWrapper, BoxLayout.LINE_AXIS));
+		segmentWrapper.add(Box.createHorizontalGlue());
 		wrapper.add(segmentWrapper);
 		
 		if (startingList == null) {
@@ -151,6 +198,7 @@ public class StepField implements ActionListener, EditorField {
 			addColumn();
 		});
 		wrapper.add(segmentButton);
+		wrapper.add(Box.createRigidArea(new Dimension(10, 0)));
 
 		wrapper.validate();
 	}
@@ -163,12 +211,29 @@ public class StepField implements ActionListener, EditorField {
 		RangeSegment last = segments[segmentCount - 1];
 		segments[segmentCount] = new RangeSegment(this, last.getMax() + 1, last.getMax() + 2, last.getValue() + 1);
 		segmentWrapper.add(segments[segmentCount++]);//, wrapper.getComponentCount() -3);
+		segmentWrapper.add(Box.createHorizontalGlue());
 		
-		if (segmentCount >= 15) {
-			segmentButton.setEnabled(false);
-		}
+		update();
+	}
+	
+	private void update() {
+		fromStepList(toStepList());
+		
+		segmentButton.setEnabled(segmentCount < 15);
 		
 		wrapper.validate();
+	}
+	
+	protected void deleteSegment(RangeSegment segment) {
+		if (segmentCount != 1) {
+			for (int index = 0; index < segments.length; index++) {
+				if (segments[index] == segment) {
+					segments[index] = null;
+					break;
+				}
+			}
+		}
+		actionPerformed(null);
 	}
 	
 	public JPanel getComponent() {
@@ -180,7 +245,7 @@ public class StepField implements ActionListener, EditorField {
 		if (hook != null) {
 			; //FIXME TODO
 			System.out.println("performed!");
-			fromStepList(toStepList());
+			update();
 		}
 	}
 	
@@ -212,6 +277,7 @@ public class StepField implements ActionListener, EditorField {
 		segments = new RangeSegment[Math.max(15, maxs.size())];
 		segmentWrapper.removeAll();
 		Collections.sort(maxs);
+		segmentWrapper.add(Box.createHorizontalGlue());
 		
 		int lastMax = -100;
 		int i = 0;
@@ -222,6 +288,7 @@ public class StepField implements ActionListener, EditorField {
 			RangeSegment seg = new RangeSegment(this, lastMax + 1, max, value);
 			segments[i++] = seg;
 			segmentWrapper.add(seg);
+			segmentWrapper.add(Box.createHorizontalGlue());
 			
 			lastMax = max;
 		}
