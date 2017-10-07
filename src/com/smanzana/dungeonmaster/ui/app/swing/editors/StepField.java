@@ -134,11 +134,14 @@ public class StepField implements ActionListener, EditorField {
 		segmentWrapper = new JPanel();
 		segmentWrapper.setLayout(new BoxLayout(segmentWrapper, BoxLayout.LINE_AXIS));
 		wrapper.add(segmentWrapper);
-		// testing. Should deserialize statset and go from there
-		segments = new RangeSegment[15];
-		segments[0] = new RangeSegment(this, -99, 0, 1);
-		segmentWrapper.add(segments[0]);
-		segmentCount = 1;
+		
+		if (startingList == null) {
+			startingList = new StepList();
+			startingList.addStep(5, 1);
+			startingList.addStep(10, 2);
+		}
+		
+		fromStepList(startingList);
 
 		wrapper.add(Box.createHorizontalGlue());
 		
@@ -184,6 +187,7 @@ public class StepField implements ActionListener, EditorField {
 	private StepList toStepList() {
 		StepList out = new StepList();
 		
+		if (segments != null)
 		for (RangeSegment seg : segments) {
 			if (seg != null)
 				out.addStep(seg.getMax(), seg.getValue());
@@ -198,6 +202,8 @@ public class StepField implements ActionListener, EditorField {
 	 */
 	private void fromStepList(StepList in) {
 		List<Integer> maxs = new ArrayList<>(in.getMaxs());
+		
+		if (segments != null)
 		for (RangeSegment seg : segments) {
 			if (seg != null)
 				seg.setVisible(false);

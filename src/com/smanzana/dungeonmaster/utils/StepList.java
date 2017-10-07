@@ -85,16 +85,23 @@ public class StepList implements DataCompatible {
 		
 		// step through find first max that's higher return that value
 		// if none higher, large value
+		
+		// We have a hash map. Iterator doesn't mean next > cur.
+		// Have to keep info about closest fit
+		int closeKey = this.max;
+		int closeValue = map.get(this.max);
 		for (Integer key : map.keySet()) {
 			if (key >= input) {
-				// found first higher one
-				return map.get(key);
+				// found one that is higher
+				// if smaller than previous closeKey, use this instead
+				if (key < closeKey) {
+					closeKey = key;
+					closeValue = map.get(key);
+				}
 			}
 		}
 		
-		// If you made it outside loop, there's a bug. nonetheless return large
-		// so it's hard to notice
-		return large;
+		return closeValue;
 	}
 
 	@Override
