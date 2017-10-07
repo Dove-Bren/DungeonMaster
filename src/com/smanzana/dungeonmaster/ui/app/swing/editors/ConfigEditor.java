@@ -10,11 +10,15 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import com.smanzana.dungeonmaster.maker.SessionTemplate;
+import com.smanzana.dungeonmaster.session.configuration.CombatBonusConfig;
 import com.smanzana.dungeonmaster.session.configuration.Config;
+import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.BoolField.BoolFieldCallback;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.DoubleField.DoubleFieldCallback;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.IntField.IntFieldCallback;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.StepField.StepFieldCallback;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.TextField.TextFieldCallback;
+import com.smanzana.dungeonmaster.utils.StepList;
 
 public class ConfigEditor extends JScrollPane implements DMEditor {
 
@@ -62,13 +66,24 @@ public class ConfigEditor extends JScrollPane implements DMEditor {
 				}, config.getValue(keyName).toString());
 				break;
 			case STRING:
-				comp = new TextField(keyName, new TextFieldCallback() {
-					@Override
-					public void setField(String value) {
-						config.setValue(keyName, value);
-						template.dirty();
-					}
-				}, (String) config.getValue(keyName));
+				// See note about crappiness below.
+				if (isStepList(config)) {
+					comp = new StepField(keyName, new StepFieldCallback() {
+						@Override
+						public void setField(String value) {
+							config.setValue(keyName, value);
+							template.dirty();
+						}
+					}, StepList.deserialize((String) config.getValue(keyName)));
+				} else {
+					comp = new TextField(keyName, new TextFieldCallback() {
+						@Override
+						public void setField(String value) {
+							config.setValue(keyName, value);
+							template.dirty();
+						}
+					}, (String) config.getValue(keyName));
+				}
 				break;
 			}
 			
@@ -91,6 +106,12 @@ public class ConfigEditor extends JScrollPane implements DMEditor {
 		
 		this.setViewportView(editor);
 		this.validate();
+	}
+	
+	private boolean isStepList(Config<?> config) {
+		// Crappy. Oh well. Just doing what works :)
+		return (config instanceof CombatBonusConfig ||
+			    config instanceof RollTableConfig);
 	}
 
 	@Override

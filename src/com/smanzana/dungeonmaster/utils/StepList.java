@@ -1,5 +1,6 @@
 package com.smanzana.dungeonmaster.utils;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -174,5 +175,13 @@ public class StepList implements DataCompatible {
 		list.load(dummy);
 		
 		return list;
+	}
+	
+	public Collection<Integer> getMaxs() {
+		return map.keySet();
+	}
+	
+	public Collection<Integer> getValues() {
+		return map.values();
 	}
 }
