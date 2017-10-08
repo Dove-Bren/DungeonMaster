@@ -21,6 +21,8 @@ import com.smanzana.dungeonmaster.ui.app.swing.screens.TemplateEditorScreen;
  */
 public class AppFrame extends JFrame {
 	
+	private static final long serialVersionUID = 3875735928809652043L;
+
 	public static enum Screen {
 		START,
 		TEMPLATE;

@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.EnumMap;
@@ -24,8 +26,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -46,7 +46,7 @@ import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.ConfigEditor;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.DMEditor;
 
-public class TemplateEditorScreen extends JPanel implements ActionListener, TreeSelectionListener {
+public class TemplateEditorScreen extends JPanel implements ActionListener {
 	
 	private static enum Command {
 		// FILE
@@ -201,7 +201,13 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, Tree
 		
 		sourceModel = new DefaultTreeModel(new DefaultMutableTreeNode("template"));
 		sourceTree = new JTree(sourceModel);
-		sourceTree.addTreeSelectionListener(this);
+		//sourceTree.addTreeSelectionListener(this);
+		sourceTree.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				doMousePressed(e);
+			}
+		});
 		//sourceTree.setBackground(Color.WHITE);
 		UIColor.setColors(sourceTree, UIColor.Key.EDITOR_LIST_FOREGROUND, UIColor.Key.EDITOR_LIST_BACKGROUND);
 		sourceTree.setCellRenderer(new DefaultTreeCellRenderer() {
@@ -591,9 +597,14 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, Tree
 		clearEditor(true);
 	}
 
-	@Override
-	public void valueChanged(TreeSelectionEvent arg0) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) arg0.getPath().getLastPathComponent();
+	public void doMousePressed(MouseEvent e) {
+		if (e.getClickCount() != 2)
+			return;
+		TreePath selPath = sourceTree.getPathForLocation(e.getX(), e.getY());
+        if (selPath == null)
+        	return;
+        
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
 		
 		if (currentTemplate == null)
 			return;
