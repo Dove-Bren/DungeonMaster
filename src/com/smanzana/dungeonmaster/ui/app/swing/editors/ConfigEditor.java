@@ -13,6 +13,7 @@ import com.smanzana.dungeonmaster.maker.SessionTemplate;
 import com.smanzana.dungeonmaster.session.configuration.CombatBonusConfig;
 import com.smanzana.dungeonmaster.session.configuration.Config;
 import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
+import com.smanzana.dungeonmaster.ui.app.UIColor;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.BoolField.BoolFieldCallback;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.DoubleField.DoubleFieldCallback;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.IntField.IntFieldCallback;
@@ -31,7 +32,8 @@ public class ConfigEditor extends JScrollPane implements DMEditor {
 		
 		editor = new JPanel();
 		editor.setLayout(new BoxLayout(editor, BoxLayout.PAGE_AXIS));
-		editor.setBackground(Color.YELLOW);
+		//editor.setBackground(Color.YELLOW);
+		UIColor.setColors(editor, UIColor.Key.EDITOR_MAIN_FOREGROUND, UIColor.Key.EDITOR_MAIN_BACKGROUND);
 		editor.setBorder(new EmptyBorder(20, 20, 20, 20));
 		
 		EditorField comp;
@@ -99,7 +101,7 @@ public class ConfigEditor extends JScrollPane implements DMEditor {
 				}
 				comp.getComponent().setToolTipText(buf);
 			}
-			comp.getComponent().setBackground(Color.GREEN);
+			UIColor.setColors(comp.getComponent(), UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
 			comp.getComponent().setPreferredSize(new Dimension(100, 25));
 			editor.add(comp.getComponent());
 		}
@@ -116,7 +118,7 @@ public class ConfigEditor extends JScrollPane implements DMEditor {
 
 	@Override
 	public JComponent getComponent() {
-		this.setBackground(Color.RED);
+		//this.setBackground(Color.RED);
 		return this;
 	}
 	

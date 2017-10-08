@@ -202,7 +202,8 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, Tree
 		sourceModel = new DefaultTreeModel(new DefaultMutableTreeNode("template"));
 		sourceTree = new JTree(sourceModel);
 		sourceTree.addTreeSelectionListener(this);
-		sourceTree.setBackground(Color.WHITE);
+		//sourceTree.setBackground(Color.WHITE);
+		UIColor.setColors(sourceTree, UIColor.Key.EDITOR_LIST_FOREGROUND, UIColor.Key.EDITOR_LIST_BACKGROUND);
 		sourceTree.setCellRenderer(new DefaultTreeCellRenderer() {
 			private static final long serialVersionUID = -205095548994473885L;
 			private ImageIcon configIcon;
@@ -210,6 +211,11 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, Tree
 			private ImageIcon datumOpenIcon;
 			private ImageIcon dataIcon;
 			private boolean fetchedIcons;
+			
+			@Override
+			public Color getBackgroundNonSelectionColor() {
+				return null;
+			}
 			
 			public Component getTreeCellRendererComponent(
                     JTree tree,
@@ -275,12 +281,12 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, Tree
 		sourcePanel.setMaximumSize(new Dimension(250, 5000));
 		sourcePanel.setBorder(BorderFactory.createEtchedBorder());
 		//sourcePanel.setBackground(Color.WHITE);
-		UIColor.setColor(sourcePanel, UIColor.Key.BASE_BACKGROUND);
+		UIColor.setColors(sourcePanel, UIColor.Key.EDITOR_LIST_FOREGROUND, UIColor.Key.EDITOR_LIST_BACKGROUND);
 		this.add(sourcePanel, BorderLayout.LINE_START);		
 		
 		editorPanel = new JPanel(new BorderLayout());
 		//editorPanel.setBackground(Color.CYAN); //// donotcheckin
-		UIColor.setColor(editorPanel, UIColor.Key.BASE_NESTED_BACKGROUND);
+		UIColor.setColors(editorPanel, UIColor.Key.EDITOR_MAIN_FOREGROUND, UIColor.Key.EDITOR_MAIN_BACKGROUND);
 		this.add(editorPanel, BorderLayout.CENTER);
 		
 		updateTree();
