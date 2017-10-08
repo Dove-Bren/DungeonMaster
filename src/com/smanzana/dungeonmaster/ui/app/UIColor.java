@@ -6,6 +6,12 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +23,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -266,26 +273,75 @@ public class UIColor {
 			
 			
 			JPanel mainPanel = new JPanel(new BorderLayout());
+			JPanel bottomPanel = new JPanel();
 			JPanel topPanel = new JPanel();
 			JButton button;
+			
 			topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.LINE_AXIS));
+			topPanel.add(Box.createRigidArea(new Dimension(20, 0)));
+			button = new JButton("Load Scheme");
+			button.addActionListener((ActionEvent event) -> {
+				JFileChooser fc = new JFileChooser(new File("."));
+				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fc.showOpenDialog(null);
+				
+				File sel = fc.getSelectedFile();
+				if (sel != null) {
+					if (!sel.exists())
+						JOptionPane.showMessageDialog(null, "Could not find the selected file", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+					else {
+						try {
+							loadFromFile(sel);
+						} catch (Exception e) {
+							e.printStackTrace();
+							System.out.println("Encountered FileIO errors reading scheme file");
+						}
+					}
+				}
+			});		
+			topPanel.add(button);
+			topPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+			
+			button = new JButton("Save Scheme");
+			button.addActionListener((ActionEvent event) -> {
+				JFileChooser fc = new JFileChooser(new File("."));
+				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fc.showSaveDialog(null);
+				
+				File sel = fc.getSelectedFile();
+				if (sel != null) {
+					try {
+						saveToFile(sel);
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.out.println("Encountered FileIO errors reading scheme file");
+					}
+				}
+			});		
+			topPanel.add(button);
+			
+			topPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 			topPanel.add(Box.createHorizontalGlue());
+			mainPanel.add(topPanel, BorderLayout.NORTH);
+			
+			bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.LINE_AXIS));
+			bottomPanel.add(Box.createHorizontalGlue());
 			
 			button = new JButton("Default");
 			button.addActionListener((ActionEvent event) -> {
 				for (Key k : Key.values())
 					instance().colors.get(k).updateColor(k, k.getDefault());
 			});
-			topPanel.add(button);
-			topPanel.add(Box.createRigidArea(new Dimension(20, 0)));
+			bottomPanel.add(button);
+			bottomPanel.add(Box.createRigidArea(new Dimension(20, 0)));
 			
 			button = new JButton("OK");
 			button.addActionListener((ActionEvent event) -> {
 				// close. Nothing to do
 				dialog.setVisible(false);
 			});
-			topPanel.add(button);
-			topPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+			bottomPanel.add(button);
+			bottomPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 			
 			button = new JButton("Cancel");
 			button.addActionListener((ActionEvent event) -> {
@@ -295,10 +351,10 @@ public class UIColor {
 				
 				dialog.setVisible(false);
 			});
-			topPanel.add(button);
-			topPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+			bottomPanel.add(button);
+			bottomPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 			
-			mainPanel.add(topPanel, BorderLayout.NORTH);
+			mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 			JPanel contentPanel = new JPanel();
 			contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.PAGE_AXIS));
 			contentPanel.setBorder(new EmptyBorder(10,10,10,10));
@@ -350,5 +406,50 @@ public class UIColor {
 			
 		
 		return item;
+	}
+	
+	public static void saveToFile(File outFile) throws FileNotFoundException {
+		String buf = "";
+		
+		for (Key k : Key.values()) {
+			Color c = instance().colors.get(k).color;
+			buf += k.name() + ":" + c.getRGB() + ",";
+		}
+		
+		PrintWriter writer = new PrintWriter(outFile);
+		writer.println(buf);
+		writer.close();
+	}
+	
+	public static void loadFromFile(File inFile) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(inFile));
+		String raw = reader.readLine();
+		reader.close();
+		
+		for (String sub : raw.split(",")) {
+			int pos = sub.indexOf(':');
+			if (pos == -1)
+				continue;
+			
+			String key = sub.substring(0, pos);
+			Key real;
+			try {
+				real = Key.valueOf(key);
+			} catch (Exception e) {
+				System.err.println("Failed to find key for read value: " + key);
+				continue;
+			}
+			
+			int rgb;
+			try {
+				rgb = Integer.parseInt(sub.substring(pos+1));
+			} catch (NumberFormatException e) {
+				System.err.println("Found invalid RGB value: " + sub.substring(pos+1));
+				continue;
+			}
+			
+			instance().colors.get(real).updateColor(real, new Color(rgb));
+		}
+		
 	}
 }
