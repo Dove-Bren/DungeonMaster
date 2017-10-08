@@ -166,7 +166,7 @@ public class AppUI extends Comm {
     //          UI Control Methods           //
     ///////////////////////////////////////////
 	public void goTemplateEditor() {
-		System.out.println("Going to Template Editor");
+		guiFrame.setScreen(AppFrame.Screen.TEMPLATE);
 	}
 	
 	public void goLoadSession() {
@@ -192,7 +192,7 @@ public class AppUI extends Comm {
 	}
 	
 	public void goMainScreen() {
-		System.out.println("Going to main screen");
+		guiFrame.setScreen(AppFrame.Screen.START);
 	}
 	
 }

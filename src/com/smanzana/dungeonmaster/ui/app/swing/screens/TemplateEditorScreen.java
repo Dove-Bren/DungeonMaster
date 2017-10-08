@@ -385,6 +385,9 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, Tree
 				updateTree();
 			}
 			break;
+		case COLORS:
+			; // Nothing to do; Shouldn't be handled by templateEditor
+			break;
 		}
 		
 		updateMenu();
@@ -475,6 +478,8 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, Tree
 	
 	// Also clears out source panel hehe
 	private void clearEditorPanel() {
+		if (currentEditor != null)
+			currentEditor.getComponent().setVisible(false);
 		currentEditor = null;
 		updateEditor();
 		updateTree();
@@ -562,6 +567,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, Tree
 	private void updateEditor() {
 		if (currentEditor == null) {
 			editorPanel.removeAll();
+			editorPanel.validate();
 			return;
 		}
 	}

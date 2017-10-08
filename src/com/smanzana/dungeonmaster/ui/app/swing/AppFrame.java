@@ -20,6 +20,11 @@ import com.smanzana.dungeonmaster.ui.app.swing.screens.TemplateEditorScreen;
  *
  */
 public class AppFrame extends JFrame {
+	
+	public static enum Screen {
+		START,
+		TEMPLATE;
+	}
 
 	// Path relative to resources/GUI/ directory
 	public static ImageIcon createImageIcon(String path) {
@@ -69,16 +74,42 @@ public class AppFrame extends JFrame {
 	
 	public AppFrame(AppUI ui) {
 		this.ui = ui;
-		startScreen = new StartScreen(ui);
-//		this.add(startScreen);
-//		startScreen.init();
 		
-		templateScreen = new TemplateEditorScreen(ui);
-		this.add(templateScreen);
-		templateScreen.init();
-		
+		setScreen(Screen.START);
+
 		this.setPreferredSize(new Dimension(1280, 720));
 		this.setMinimumSize(new Dimension(500, 400));
 		pack();
+	}
+	
+	private void clear() {
+		if (startScreen != null)
+			startScreen.setVisible(false);
+		if (templateScreen != null)
+			templateScreen.setVisible(false);
+		
+		
+		startScreen = null;
+		templateScreen = null;
+		this.getContentPane().removeAll();
+		this.setJMenuBar(null);
+	}
+	
+	public void setScreen(Screen screen) {
+		clear();
+		switch (screen) {
+		case START:
+			startScreen = new StartScreen(ui);
+			this.add(startScreen);
+			startScreen.init();
+			break;
+		case TEMPLATE:
+			templateScreen = new TemplateEditorScreen(ui);
+			this.add(templateScreen);
+			templateScreen.init();
+			break;
+		}
+		
+		this.validate();
 	}
 }

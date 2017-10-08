@@ -159,7 +159,7 @@ public class StartScreen extends JPanel {
 		buttonTemplate.setVisible(true);
 		buttonQuit.setVisible(true);
 		
-		this.validate();		
+		this.validate();
 	}
 	
 }

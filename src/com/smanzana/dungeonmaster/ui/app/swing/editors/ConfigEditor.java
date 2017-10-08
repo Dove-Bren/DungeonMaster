@@ -1,6 +1,5 @@
 package com.smanzana.dungeonmaster.ui.app.swing.editors;
 
-import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.BoxLayout;
@@ -118,7 +117,6 @@ public class ConfigEditor extends JScrollPane implements DMEditor {
 
 	@Override
 	public JComponent getComponent() {
-		//this.setBackground(Color.RED);
 		return this;
 	}
 	
