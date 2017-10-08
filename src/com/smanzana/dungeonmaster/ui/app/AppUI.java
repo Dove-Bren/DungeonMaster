@@ -2,6 +2,9 @@ package com.smanzana.dungeonmaster.ui.app;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,6 +27,8 @@ import com.smanzana.dungeonmaster.ui.common.TargetView;
 
 public class AppUI extends Comm {
 	
+	private static File FILE_COLOR = new File(DungeonMaster.PATH_COLORS);
+	
 	private AppFrame guiFrame;
 	
 	public AppUI() {
@@ -33,6 +38,14 @@ public class AppUI extends Comm {
 				| UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
+		
+		if (FILE_COLOR != null && FILE_COLOR.exists())
+		try {
+			UIColor.loadFromFile(FILE_COLOR);
+		} catch (IOException e) {
+			System.out.println("Failed to load DM Scheme file.");
+		}
+		
 		guiFrame = new AppFrame(this);
 		guiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		guiFrame.addWindowListener(new WindowListener() {
@@ -83,6 +96,10 @@ public class AppUI extends Comm {
 		guiFrame.setVisible(false);
 		//guiFrame.dispose();
 		guiFrame = null;
+		try {
+			UIColor.saveToFile(FILE_COLOR);
+		} catch (FileNotFoundException e) {
+		}
 	}
 
 	@Override

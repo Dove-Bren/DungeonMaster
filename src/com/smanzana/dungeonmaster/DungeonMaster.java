@@ -14,6 +14,7 @@ public class DungeonMaster {
 
 	public static final String PATH_TEMPLATES = "templates";
 	public static final String PATH_SESSIONS = "session";
+	public static final String PATH_COLORS = "Colors.sch";
 	
 	private static GameSession activeSession = null;
 	private static Thread UIThread = null;

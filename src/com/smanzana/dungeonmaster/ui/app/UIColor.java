@@ -30,6 +30,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
 
 /**
  * Holds together all colors for different UI components
@@ -283,6 +284,20 @@ public class UIColor {
 			button.addActionListener((ActionEvent event) -> {
 				JFileChooser fc = new JFileChooser(new File("."));
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fc.setFileFilter(new FileFilter() {
+
+					@Override
+					public boolean accept(File arg0) {
+						return arg0.isDirectory() || (arg0.getName().contains(".") &&
+							arg0.getName().substring(arg0.getName().lastIndexOf('.') + 1).equals("sch"));
+					}
+
+					@Override
+					public String getDescription() {
+						return "Application Scheme Files (*.sch)";
+					}
+					
+				});
 				fc.showOpenDialog(null);
 				
 				File sel = fc.getSelectedFile();
@@ -306,6 +321,20 @@ public class UIColor {
 			button.addActionListener((ActionEvent event) -> {
 				JFileChooser fc = new JFileChooser(new File("."));
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fc.setFileFilter(new FileFilter() {
+
+					@Override
+					public boolean accept(File arg0) {
+						return arg0.isDirectory() || (arg0.getName().contains(".") &&
+							arg0.getName().substring(arg0.getName().lastIndexOf('.') + 1).equals(".sch"));
+					}
+
+					@Override
+					public String getDescription() {
+						return "Application Scheme Files (*.sch)";
+					}
+					
+				});
 				fc.showSaveDialog(null);
 				
 				File sel = fc.getSelectedFile();
