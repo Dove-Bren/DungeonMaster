@@ -41,6 +41,7 @@ import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
 import com.smanzana.dungeonmaster.session.datums.Datum;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
+import com.smanzana.dungeonmaster.ui.app.UIColor;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.ConfigEditor;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.DMEditor;
@@ -48,6 +49,7 @@ import com.smanzana.dungeonmaster.ui.app.swing.editors.DMEditor;
 public class TemplateEditorScreen extends JPanel implements ActionListener, TreeSelectionListener {
 	
 	private static enum Command {
+		// FILE
 		NEW("new"),
 		OPEN("open"),
 		SAVE("save"),
@@ -55,6 +57,11 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, Tree
 		CLOSE("close"),
 		QUIT("quit"),
 		MAINMENU("mainmenu"),
+		
+		// EDIT
+		COLORS("colors"),
+		
+		//
 		;
 		
 		private String command;
@@ -178,6 +185,18 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, Tree
 		
 		menubar.add(menu);
 		
+		menu = new JMenu("Edit");
+		menu.setMnemonic(KeyEvent.VK_E);
+		item = UIColor.createMenuItem("Colors");
+		item.setMnemonic(KeyEvent.VK_R);
+		item.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_C, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK
+				));
+		menuItems.put(Command.COLORS, item);
+		
+		menu.add(item);
+		menubar.add(menu);
+		
 		this.getRootPane().setJMenuBar(menubar);
 		
 		sourceModel = new DefaultTreeModel(new DefaultMutableTreeNode("template"));
@@ -255,11 +274,13 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, Tree
 		sourcePanel.setPreferredSize(new Dimension(250, 1000));
 		sourcePanel.setMaximumSize(new Dimension(250, 5000));
 		sourcePanel.setBorder(BorderFactory.createEtchedBorder());
-		sourcePanel.setBackground(Color.WHITE);
+		//sourcePanel.setBackground(Color.WHITE);
+		UIColor.setColor(sourcePanel, UIColor.Key.BASE_BACKGROUND);
 		this.add(sourcePanel, BorderLayout.LINE_START);		
 		
 		editorPanel = new JPanel(new BorderLayout());
-		editorPanel.setBackground(Color.CYAN); //// donotcheckin
+		//editorPanel.setBackground(Color.CYAN); //// donotcheckin
+		UIColor.setColor(editorPanel, UIColor.Key.BASE_NESTED_BACKGROUND);
 		this.add(editorPanel, BorderLayout.CENTER);
 		
 		updateTree();
