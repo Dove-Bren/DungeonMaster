@@ -22,6 +22,7 @@ public class EnumField<T extends Enum<T>> implements ActionListener, EditorField
 	private JPanel wrapper;
 	private EnumFieldCallback hook;
 	
+	@SuppressWarnings("unchecked")
 	public EnumField(String title, EnumFieldCallback hook, T startSelection) {
 		this.hook = hook;
 		

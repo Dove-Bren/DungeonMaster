@@ -517,6 +517,7 @@ public class GrabListField<T extends EditorDisplayable> implements ActionListene
 		return wrapper;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if (hook != null)
