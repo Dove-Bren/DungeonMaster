@@ -56,5 +56,15 @@ public class SubDamage extends SubAction {
 	protected static String ClassKey() {
 		return "damage";
 	}
+
+	@Override
+	public String getEditorName() {
+		return "Damage";
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		return "Deal raw damage";
+	}
 	
 }

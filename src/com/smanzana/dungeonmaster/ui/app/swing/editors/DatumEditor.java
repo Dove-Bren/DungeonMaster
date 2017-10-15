@@ -1,6 +1,5 @@
 package com.smanzana.dungeonmaster.ui.app.swing.editors;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +14,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.smanzana.dungeonmaster.action.Action.TargetType;
 import com.smanzana.dungeonmaster.action.subaction.SubAction;
+import com.smanzana.dungeonmaster.action.subaction.SubDamage;
 import com.smanzana.dungeonmaster.maker.SessionTemplate;
 import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
@@ -26,6 +26,9 @@ import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.BoolField.BoolFiel
 import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.DoubleField;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.DoubleField.DoubleFieldCallback;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EditorField;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EditorListField;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EditorListField.EditorListCallback;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EditorListField.EditorListFactory;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EnumField;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EnumField.EnumFieldCallback;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.GrabListField;
@@ -35,6 +38,7 @@ import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.IntField.IntFieldC
 import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.TextField;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.TextField.TextFieldCallback;
 import com.smanzana.dungeonmaster.utils.StatSet;
+import com.smanzana.dungeonmaster.utils.ValueConstant;
 
 /**
  * Editor for DatumData
@@ -233,17 +237,25 @@ public class DatumEditor extends JScrollPane implements DMEditor {
 			
 		}, tempList, exList)).getComponent());
 		
-		editor.add((new GrabListField<Temp>("ListTest2222222222222222", new GrabFieldCallback() {
-
-			@Override
-			public void setField(List<Object> valueName) {
-				System.out.println("Got list: ");
-				for (Object o : valueName) {
-					System.out.println("\t" + ((Temp) o).getEditorName());
-				}
-			}
-			
-		}, tempList, exList)).getComponent());
+		editor.add((new EditorListField<SubAction>("EditorTest",
+				new SubActionEditor(),
+				new EditorListCallback() {
+					@Override
+					public void setField(List<Object> valueName) {
+						for (Object o : valueName) {
+							System.out.println("\t" + ((Temp) o).getEditorName());
+						}
+					}
+				},
+				new EditorListFactory() {
+					@Override
+					public Object construct() {
+						return new SubDamage(new ValueConstant(1));
+					}
+				},
+				new LinkedList<>(),
+				true
+				)).getComponent());
 		
 		editor.add(Box.createVerticalGlue());
 		this.setViewportView(editor);

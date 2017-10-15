@@ -10,6 +10,7 @@ import com.smanzana.dungeonmaster.action.PartyAction;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.ui.EditorDisplayable;
 
 /**
  * An actual piece of "DO SOMETHING".
@@ -18,7 +19,7 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
  * @author Skyler
  *
  */
-public abstract class SubAction implements DataCompatible {
+public abstract class SubAction implements DataCompatible, EditorDisplayable {
 	
 	public abstract void apply(Pawn source, Pawn target);
 	
