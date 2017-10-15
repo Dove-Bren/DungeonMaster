@@ -1,6 +1,5 @@
 package com.smanzana.dungeonmaster.ui.app.swing.editors.fields;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
@@ -28,17 +27,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
-import com.smanzana.dungeonmaster.session.configuration.Config;
-import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
 import com.smanzana.dungeonmaster.ui.EditorDisplayable;
 import com.smanzana.dungeonmaster.ui.app.UIColor;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.ConfigEditor;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.DMEditor;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.DatumEditor;
 
 /**
  * List of elements that are selected from another set.
@@ -144,6 +136,7 @@ public class GrabListField<T extends EditorDisplayable> implements ActionListene
 		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.LINE_AXIS));
 		wrapper.add(Box.createRigidArea(new Dimension(10, 0)));
 		wrapper.add(Box.createHorizontalGlue());
+		UIColor.setColors(wrapper, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
 		JLabel label = new JLabel(title);
 		label.setFont(label.getFont().deriveFont(Font.BOLD));
 		wrapper.add(label);
@@ -153,18 +146,14 @@ public class GrabListField<T extends EditorDisplayable> implements ActionListene
 		fromList = new JList<T>(from);
 		fromList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		fromList.setLayoutOrientation(JList.VERTICAL);
-		fromList.setVisibleRowCount(10);
-		fromList.setMaximumSize(fromList.getPreferredScrollableViewportSize());
 		fromList.setDragEnabled(GrabListField.DD_ENABLED);
 		fromList.setDropMode(DropMode.ON_OR_INSERT);
-		UIColor.setColors(fromList, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
+		UIColor.setColors(fromList, UIColor.Key.EDITOR_MAIN_FOREGROUND, UIColor.Key.EDITOR_MAIN_BACKGROUND);
 		fromList.setCellRenderer((list, e, index, isSelected, focus) -> {
 			JLabel comp;
 			
-			comp = new JLabel(e.getEditorName());
-			
-			Color background;
-	        Color foreground;
+			comp = new JLabel("  " + e.getEditorName());
+			comp.setOpaque(true);
 
 	        // check if this cell represents the current DnD drop location
 	        JList.DropLocation dropLocation = list.getDropLocation();
@@ -172,22 +161,15 @@ public class GrabListField<T extends EditorDisplayable> implements ActionListene
 	                && !dropLocation.isInsert()
 	                && dropLocation.getIndex() == index) {
 
-	        	background = Color.BLUE;
-	            foreground = Color.WHITE;
+	        	UIColor.setColors(comp, UIColor.Key.EDITOR_MAIN_BACKGROUND, UIColor.Key.EDITOR_MAIN_FOREGROUND);
 
 	        // check if this cell is selected
 	        } else if (isSelected) {
-	            background = Color.RED;
-	            foreground = Color.WHITE;
-
+	            UIColor.setColors(comp, UIColor.Key.EDITOR_MAIN_BACKGROUND, UIColor.Key.EDITOR_MAIN_FOREGROUND);
 	        // unselected, and not the DnD drop location
 	        } else {
-	            background = Color.WHITE;
-	            foreground = Color.BLACK;
+	        	UIColor.setColors(comp, UIColor.Key.EDITOR_MAIN_FOREGROUND, UIColor.Key.EDITOR_MAIN_BACKGROUND);
 	        };
-
-	        comp.setBackground(background);
-	        comp.setForeground(foreground);
 			
 			return comp;
 		});
@@ -313,18 +295,14 @@ public class GrabListField<T extends EditorDisplayable> implements ActionListene
 		toList = new JList<>(to);
 		toList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		toList.setLayoutOrientation(JList.VERTICAL);
-		toList.setVisibleRowCount(10);
-		toList.setMaximumSize(toList.getPreferredScrollableViewportSize());
 		toList.setDragEnabled(GrabListField.DD_ENABLED);
 		toList.setDropMode(DropMode.INSERT);
-		UIColor.setColors(toList, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
+		UIColor.setColors(toList, UIColor.Key.EDITOR_MAIN_FOREGROUND, UIColor.Key.EDITOR_MAIN_BACKGROUND);
 		toList.setCellRenderer((list, e, index, isSelected, focus) -> {
 			JLabel comp;
 			
-			comp = new JLabel(e.getEditorName());
-			
-			Color background;
-	        Color foreground;
+			comp = new JLabel("  " + e.getEditorName());
+			comp.setOpaque(true);
 
 	        // check if this cell represents the current DnD drop location
 	        JList.DropLocation dropLocation = list.getDropLocation();
@@ -332,22 +310,15 @@ public class GrabListField<T extends EditorDisplayable> implements ActionListene
 	                && !dropLocation.isInsert()
 	                && dropLocation.getIndex() == index) {
 
-	        	background = Color.BLUE;
-	            foreground = Color.WHITE;
+	        	UIColor.setColors(comp, UIColor.Key.EDITOR_MAIN_BACKGROUND, UIColor.Key.EDITOR_MAIN_FOREGROUND);
 
 	        // check if this cell is selected
 	        } else if (isSelected) {
-	            background = Color.RED;
-	            foreground = Color.WHITE;
-
+	            UIColor.setColors(comp, UIColor.Key.EDITOR_MAIN_BACKGROUND, UIColor.Key.EDITOR_MAIN_FOREGROUND);
 	        // unselected, and not the DnD drop location
 	        } else {
-	            background = Color.WHITE;
-	            foreground = Color.BLACK;
+	        	UIColor.setColors(comp, UIColor.Key.EDITOR_MAIN_FOREGROUND, UIColor.Key.EDITOR_MAIN_BACKGROUND);
 	        };
-
-	        comp.setBackground(background);
-	        comp.setForeground(foreground);
 			
 			return comp;
 		});
@@ -505,13 +476,38 @@ public class GrabListField<T extends EditorDisplayable> implements ActionListene
 			from.addElement(t);
 		}
 		
-		wrapper.add(new JScrollPane(fromList));
+
+		fromList.setVisibleRowCount(20);
+		fromList.setMaximumSize(fromList.getPreferredScrollableViewportSize());
+		toList.setVisibleRowCount(20);
+		toList.setMaximumSize(toList.getPreferredScrollableViewportSize());
+		
+		Dimension med;
+		if (from.isEmpty()) {
+			// must construct from to
+			med = new Dimension(300, toList.getPreferredScrollableViewportSize().height + 30);
+		} else {
+			// construct from from, even if to has data
+			med = new Dimension(300, fromList.getPreferredScrollableViewportSize().height + 30);
+		}
+		Dimension small = new Dimension(med.width - 30, med.height - 30);
+		fromList.setPreferredSize(small);
+		toList.setPreferredSize(small);
+		JScrollPane pane = new JScrollPane(fromList);
+		pane.setMaximumSize(med);
+		pane.setMinimumSize(pane.getMaximumSize());
+		wrapper.add(pane);
 		wrapper.add(Box.createRigidArea(new Dimension(10, 0)));
 		wrapper.add(new JLabel(AppFrame.createImageIcon("icon/r_arrow.png")));
 		wrapper.add(Box.createRigidArea(new Dimension(10, 0)));
-		wrapper.add(new JScrollPane(toList));
+		pane = new JScrollPane(toList);
+		pane.setMaximumSize(med);
+		pane.setMinimumSize(pane.getMaximumSize());
+		UIColor.setColor(pane, UIColor.Key.BASE_SYSTEM);
+		wrapper.add(pane);
 		
-		wrapper.add(Box.createRigidArea(new Dimension(20, 0)));
+		wrapper.add(Box.createRigidArea(new Dimension(label.getPreferredSize().width, 0)));
+		wrapper.add(Box.createRigidArea(new Dimension(10, 0)));
 		wrapper.add(Box.createHorizontalGlue());
 		
 		wrapper.validate();

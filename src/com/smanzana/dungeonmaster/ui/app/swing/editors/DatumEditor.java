@@ -213,12 +213,13 @@ public class DatumEditor extends JScrollPane implements DMEditor {
 		}, Attributes.STRENGTH).getComponent());
 		
 		List<Temp> tempList = new LinkedList<>();
+		List<Temp> exList = new LinkedList<>();
 		tempList.add(new Temp("Fire"));
 		tempList.add(new Temp("Water"));
 		tempList.add(new Temp("Earth"));
 		tempList.add(new Temp("Wind"));
-		tempList.add(new Temp("Light"));
-		tempList.add(new Temp("Dark"));
+		exList.add(new Temp("Light"));
+		exList.add(new Temp("Dark"));
 		
 		editor.add((new GrabListField<Temp>("ListTest", new GrabFieldCallback() {
 
@@ -230,7 +231,19 @@ public class DatumEditor extends JScrollPane implements DMEditor {
 				}
 			}
 			
-		}, tempList)).getComponent());
+		}, tempList, exList)).getComponent());
+		
+		editor.add((new GrabListField<Temp>("ListTest2222222222222222", new GrabFieldCallback() {
+
+			@Override
+			public void setField(List<Object> valueName) {
+				System.out.println("Got list: ");
+				for (Object o : valueName) {
+					System.out.println("\t" + ((Temp) o).getEditorName());
+				}
+			}
+			
+		}, tempList, exList)).getComponent());
 		
 		editor.add(Box.createVerticalGlue());
 		this.setViewportView(editor);
