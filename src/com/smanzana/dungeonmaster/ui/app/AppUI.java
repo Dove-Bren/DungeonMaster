@@ -28,6 +28,7 @@ import com.smanzana.dungeonmaster.ui.common.TargetView;
 public class AppUI extends Comm {
 	
 	private static File FILE_COLOR = new File(DungeonMaster.PATH_COLORS);
+	private static File FILE_UISTATE = new File(DungeonMaster.PATH_UISTATE);
 	
 	private AppFrame guiFrame;
 	
@@ -45,6 +46,14 @@ public class AppUI extends Comm {
 		} catch (IOException e) {
 			System.out.println("Failed to load DM Scheme file.");
 		}
+		
+		if (FILE_UISTATE != null && FILE_UISTATE.exists())
+		try {
+			UIConfState.loadFromFile(FILE_UISTATE);
+		} catch (IOException e) {
+			System.out.println("Failed to load DM State file.");
+		}
+		
 		
 		guiFrame = new AppFrame(this);
 		guiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -99,6 +108,12 @@ public class AppUI extends Comm {
 		try {
 			UIColor.saveToFile(FILE_COLOR);
 		} catch (FileNotFoundException e) {
+			;
+		}
+		try {
+			UIConfState.saveToFile(FILE_UISTATE);
+		} catch (FileNotFoundException e) {
+			;
 		}
 	}
 
