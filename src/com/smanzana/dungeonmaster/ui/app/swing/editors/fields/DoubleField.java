@@ -1,31 +1,32 @@
-package com.smanzana.dungeonmaster.ui.app.swing.editors;
+package com.smanzana.dungeonmaster.ui.app.swing.editors.fields;
 
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
-public class TextField implements ActionListener, EditorField {
+public class DoubleField implements ActionListener, EditorField {
 
-	public static interface TextFieldCallback {
-		public void setField(String text);
+	public static interface DoubleFieldCallback {
+		public void setField(double value);
 	}
 	
-	private JTextField textfield;
-	private TextFieldCallback hook;
 	private JPanel wrapper;
+	private JFormattedTextField textfield;
+	private DoubleFieldCallback hook;
 	
-	public TextField(String title, TextFieldCallback hook) {
+	public DoubleField(String title, DoubleFieldCallback hook) {
 		this(title, hook, "");
 	}
 	
-	public TextField(String title, TextFieldCallback hook, String startingText) {
+	public DoubleField(String title, DoubleFieldCallback hook, String startingText) {
 		this.hook = hook;
 		
 		wrapper = new JPanel();
@@ -37,7 +38,7 @@ public class TextField implements ActionListener, EditorField {
 		wrapper.add(label);
 		wrapper.add(Box.createRigidArea(new Dimension(20, 0)));
 		
-		this.textfield = new JTextField(startingText, 20);
+		this.textfield = new JFormattedTextField(NumberFormat.getNumberInstance());
 		textfield.addActionListener(this);
 		wrapper.add(textfield);
 		wrapper.add(Box.createHorizontalGlue());
@@ -52,7 +53,7 @@ public class TextField implements ActionListener, EditorField {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if (hook != null)
-			hook.setField(textfield.getText());
+			hook.setField(Double.parseDouble(textfield.getText()));
 	}
 	
 	

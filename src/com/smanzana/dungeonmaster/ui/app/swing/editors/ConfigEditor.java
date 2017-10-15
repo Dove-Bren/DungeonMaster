@@ -13,11 +13,17 @@ import com.smanzana.dungeonmaster.session.configuration.CombatBonusConfig;
 import com.smanzana.dungeonmaster.session.configuration.Config;
 import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
 import com.smanzana.dungeonmaster.ui.app.UIColor;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.BoolField.BoolFieldCallback;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.DoubleField.DoubleFieldCallback;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.IntField.IntFieldCallback;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.StepField.StepFieldCallback;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.TextField.TextFieldCallback;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.BoolField;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.DoubleField;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EditorField;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.IntField;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.StepField;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.TextField;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.BoolField.BoolFieldCallback;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.DoubleField.DoubleFieldCallback;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.IntField.IntFieldCallback;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.StepField.StepFieldCallback;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.TextField.TextFieldCallback;
 import com.smanzana.dungeonmaster.utils.StepList;
 
 public class ConfigEditor extends JScrollPane implements DMEditor {
@@ -95,7 +101,7 @@ public class ConfigEditor extends JScrollPane implements DMEditor {
 				String buf = "";
 				for (String line : config.getComments(keyName)) {
 					if (!buf.isEmpty())
-						buf += "\n";
+						buf += System.getProperty("line.separator");
 					buf += line;
 				}
 				comp.getComponent().setToolTipText(buf);

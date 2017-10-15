@@ -38,13 +38,16 @@ import com.smanzana.dungeonmaster.session.configuration.Config;
 import com.smanzana.dungeonmaster.session.configuration.KeywordConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
+import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.UIColor;
+import com.smanzana.dungeonmaster.ui.app.UIConfState;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.ConfigEditor;
 import com.smanzana.dungeonmaster.ui.app.swing.editors.DMEditor;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.DatumEditor;
 
 public class TemplateEditorScreen extends JPanel implements ActionListener {
 	
@@ -52,6 +55,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		// FILE
 		NEW("new"),
 		OPEN("open"),
+		OPENLAST("open last"),
 		SAVE("save"),
 		SAVEAS("saveas"),
 		CLOSE("close"),
@@ -138,6 +142,16 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		item.addActionListener(this);
 		menu.add(item);
 		menuItems.put(Command.OPEN, item);
+		
+		item = new JMenuItem("Open Last");
+		//item.setMnemonic(KeyEvent.VK_L);
+		item.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_O, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK
+				));
+		item.setActionCommand(Command.OPENLAST.getCommand());
+		item.addActionListener(this);
+		menu.add(item);
+		menuItems.put(Command.OPENLAST, item);
 		
 		item = new JMenuItem("Save");
 		item.setMnemonic(KeyEvent.VK_S);
@@ -358,7 +372,11 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 					}
 				}
 			}
-			break;	
+			break;
+		case OPENLAST:
+			File sel = new File(UIConfState.instance().get(UIConfState.Key.LASTTEMPLATE));
+			openTemplate(sel);
+			break;
 		case MAINMENU:
 			if (!clearEditor()) {
 				break;
@@ -523,6 +541,8 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		openEditor(new ConfigEditor(currentTemplate, MechanicsConfig.instance()));
 		//testing
 		
+		UIConfState.instance().set(UIConfState.Key.LASTTEMPLATE, target.getPath());
+		
 		return true;
 	}
 	
@@ -531,6 +551,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		// Save & Save as need a template
 		menuItems.get(Command.SAVE).setEnabled(currentTemplate != null);
 		menuItems.get(Command.SAVEAS).setEnabled(currentTemplate != null);
+		menuItems.get(Command.OPENLAST).setEnabled(UIConfState.instance().get(UIConfState.Key.LASTTEMPLATE) != null);
 	}
 	
 	private void updateTree() {
@@ -619,6 +640,8 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		DMEditor editor = null;
 		if (lastEditorObject instanceof Config<?>) {
 			editor = new ConfigEditor(currentTemplate, (Config<?>) lastEditorObject);
+		} else if (lastEditorObject instanceof ActionDatumData) {
+			editor = new DatumEditor(currentTemplate, (ActionDatumData) lastEditorObject);
 		}
 		
 		if (editor != null)

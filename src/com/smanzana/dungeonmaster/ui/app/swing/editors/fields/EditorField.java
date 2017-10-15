@@ -1,4 +1,4 @@
-package com.smanzana.dungeonmaster.ui.app.swing.editors;
+package com.smanzana.dungeonmaster.ui.app.swing.editors.fields;
 
 import javax.swing.JComponent;
 
