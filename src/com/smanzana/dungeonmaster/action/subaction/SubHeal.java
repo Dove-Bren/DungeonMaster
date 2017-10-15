@@ -23,7 +23,7 @@ public class SubHeal extends SubAction {
 	}
 	
 	protected static void register() {
-		SubAction.registerFactory(ClassKey(), new Factory());
+		SubAction.registerFactory(ClassKey(), new Factory(), false);
 	}
 
 	private ValueSpecifier hp;
@@ -36,6 +36,30 @@ public class SubHeal extends SubAction {
 		this.stamina = stamina;
 	}
 	
+	public ValueSpecifier getHp() {
+		return hp;
+	}
+
+	public void setHp(ValueSpecifier hp) {
+		this.hp = hp;
+	}
+
+	public ValueSpecifier getMp() {
+		return mp;
+	}
+
+	public void setMp(ValueSpecifier mp) {
+		this.mp = mp;
+	}
+
+	public ValueSpecifier getStamina() {
+		return stamina;
+	}
+
+	public void setStamina(ValueSpecifier stamina) {
+		this.stamina = stamina;
+	}
+
 	@Override
 	public void apply(Pawn source, Pawn target) {
 		if (hp != null && MechanicsConfig.instance().getBool(MechanicsKey.USE_HEALTH))
@@ -83,6 +107,16 @@ public class SubHeal extends SubAction {
 	
 	protected static String ClassKey() {
 		return "heal";
+	}
+
+	@Override
+	public String getEditorName() {
+		return "Heal";
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		return "Restore health, stamina, and/or mana";
 	}
 	
 }

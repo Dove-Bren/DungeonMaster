@@ -21,7 +21,7 @@ public class SubDamage extends SubAction {
 	}
 	
 	protected static void register() {
-		SubAction.registerFactory(ClassKey(), new Factory());
+		SubAction.registerFactory(ClassKey(), new Factory(), false);
 	}
 
 	private ValueSpecifier damage;
@@ -30,6 +30,14 @@ public class SubDamage extends SubAction {
 		this.damage = amount;
 	}
 	
+	public ValueSpecifier getDamage() {
+		return damage;
+	}
+
+	public void setDamage(ValueSpecifier damage) {
+		this.damage = damage;
+	}
+
 	@Override
 	public void apply(Pawn source, Pawn target) {
 		target.damage(source, damage.fetchValue());

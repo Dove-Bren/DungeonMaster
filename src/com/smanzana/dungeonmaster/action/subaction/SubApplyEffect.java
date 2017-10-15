@@ -24,13 +24,21 @@ public class SubApplyEffect extends SubAction {
 	}
 	
 	protected static void register() {
-		SubAction.registerFactory(ClassKey(), new Factory());
+		SubAction.registerFactory(ClassKey(), new Factory(), false);
 	}
 	
 	private Effect effect;
 	
 	public SubApplyEffect(Effect effect) {
 		this.effect = effect;
+	}
+	
+	public Effect getEffect() {
+		return effect;
+	}
+	
+	public void setEffect(Effect ef) {
+		effect = ef;
 	}
 	
 	@Override
@@ -63,6 +71,16 @@ public class SubApplyEffect extends SubAction {
 	
 	protected static String ClassKey() {
 		return "applyeffect";
+	}
+
+	@Override
+	public String getEditorName() {
+		return "Apply Effect";
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		return "Applies a status effect";
 	}
 	
 }

@@ -2,6 +2,7 @@ package com.smanzana.dungeonmaster.action.subaction;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import com.smanzana.dungeonmaster.action.Action;
@@ -35,9 +36,11 @@ public abstract class SubAction implements DataCompatible, EditorDisplayable {
 	}
 	
 	private static Map<String, SubActionFactory<?>> factories = null;
+	private static List<String> editorSubactions = null;
 	
 	private static void init() {
 		 factories = new HashMap<>();
+		 editorSubactions = new LinkedList<>();
 		 
 		 // compile-time enumeration :(
 		 // Could make cooler with class annotations, but then have to iterate over all
@@ -70,8 +73,21 @@ public abstract class SubAction implements DataCompatible, EditorDisplayable {
 	
 	protected abstract String getClassKey();
 	
-	protected static void registerFactory(String classKey, SubActionFactory<?> factory) {
+	protected static void registerFactory(String classKey, SubActionFactory<?> factory, boolean sysonly) {
 		factories.put(classKey, factory);
+		if (!sysonly)
+			editorSubactions.add(classKey);
+	}
+	
+	public static List<String> getRegisteredTypes() {
+		return editorSubactions;
+	}
+	
+	public static SubAction constructFromType(String type) {
+		if (factories.containsKey(type))
+			return factories.get(type).construct(new DataNode("dummy", "", null));
+		
+		return null;
 	}
 
 	@Override

@@ -5,12 +5,16 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import com.smanzana.dungeonmaster.utils.NoteUtil;
 
 public class EnumField<T extends Enum<T>> implements ActionListener, EditorField {
 
@@ -21,10 +25,12 @@ public class EnumField<T extends Enum<T>> implements ActionListener, EditorField
 	private JComboBox<String> combo;
 	private JPanel wrapper;
 	private EnumFieldCallback hook;
+	private Map<T, String> prettyMap;
 	
 	@SuppressWarnings("unchecked")
 	public EnumField(String title, EnumFieldCallback hook, T startSelection) {
 		this.hook = hook;
+		this.prettyMap = new HashMap<>();
 		
 		wrapper = new JPanel();
 		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.LINE_AXIS));
@@ -40,7 +46,9 @@ public class EnumField<T extends Enum<T>> implements ActionListener, EditorField
 		combo.setMaximumSize(new Dimension(300, 20));
 		combo.setPreferredSize(new Dimension(100, 20));
 		EnumSet.allOf((Class<T>) startSelection.getClass()).forEach((e) -> {
-			combo.addItem(pretty(e.name()));
+			String pretty = NoteUtil.pretty(e.name());
+			prettyMap.put(e, pretty);
+			combo.addItem(pretty);
 			if (e == startSelection)
 				combo.setSelectedIndex(combo.getItemCount() - 1);
 		});
@@ -56,34 +64,20 @@ public class EnumField<T extends Enum<T>> implements ActionListener, EditorField
 	public JPanel getComponent() {
 		return wrapper;
 	}
-	
-	private String pretty(String raw) {
-		String buf = "";
-			
-		buf += raw.substring(0, 1);
-		raw = raw.substring(1);
-		raw = raw.toLowerCase();
-		
-		int pos;
-		while (-1 != (pos = raw.indexOf('_'))) {
-			// pos is position of first underscore.
-			// copy up to pos into buf. Then copy char after pos as uppercase.
-			// then set raw past capital char
-			buf += raw.substring(0, pos);
-			buf += raw.substring(pos + 1, pos + 2).toUpperCase();
-			raw = raw.substring(pos + 2);
-		}
-		buf += raw;
-		
-		return buf;
-	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if (hook != null)
-			hook.setField(combo.getSelectedItem().toString().toUpperCase());
+			hook.setField(lookup(combo.getSelectedItem().toString()).name()); // nullptr if lookup fails.
+			// but it shouldn't fail.
 	}
 	
-	
+	private T lookup(String pretty) {
+		for (T t : prettyMap.keySet())
+			if (prettyMap.get(t).equals(pretty))
+				return t;
+		
+		return null;
+	}
 	
 }

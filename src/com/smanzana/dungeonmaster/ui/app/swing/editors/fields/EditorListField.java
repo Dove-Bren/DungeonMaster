@@ -9,7 +9,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.Box;
@@ -43,6 +44,7 @@ public class EditorListField<T extends EditorDisplayable> implements ActionListe
 		
 		/**
 		 * Set the current object we're editting.
+		 * Type: DataWrapper of T
 		 * @param obj
 		 */
 		public void setEdittingObject(Object obj);
@@ -53,6 +55,13 @@ public class EditorListField<T extends EditorDisplayable> implements ActionListe
 		 * @return
 		 */
 		public boolean isEditorValid();
+		
+		/**
+		 * Handy method for commit  changes made in the editor to the data wrapper.
+		 * Called just before dialog is closed and editor should stop interacting
+		 * with the object.
+		 */
+		public void commit();
 		
 		/**
 		 * Reset the object to the state it was when setEdittingObject was last called.
@@ -76,8 +85,24 @@ public class EditorListField<T extends EditorDisplayable> implements ActionListe
 		public Object construct();
 	}
 	
-	private DefaultListModel<T> data;
-	private JList<T> dataList;
+	public static class DataWrapper<T> {
+		private T data;
+		
+		public DataWrapper(T data) {
+			this.data = data;
+		}
+
+		public T getData() {
+			return data;
+		}
+
+		public void setData(T data) {
+			this.data = data;
+		}
+	}
+	
+	private DefaultListModel<DataWrapper<T>> data;
+	private JList<DataWrapper<T>> dataList;
 	private JPanel wrapper;
 	private EditorListCallback hook;
 	private EditorListFactory factory;
@@ -100,14 +125,14 @@ public class EditorListField<T extends EditorDisplayable> implements ActionListe
 		wrapper.add(Box.createRigidArea(new Dimension(20, 0)));
 		
 		data = new DefaultListModel<>();
-		dataList = new JList<T>(data);
+		dataList = new JList<DataWrapper<T>>(data);
 		dataList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		dataList.setLayoutOrientation(JList.VERTICAL);
 		UIColor.setColors(dataList, UIColor.Key.EDITOR_MAIN_FOREGROUND, UIColor.Key.EDITOR_MAIN_BACKGROUND);
 		dataList.setCellRenderer((list, e, index, isSelected, focus) -> {
 			JLabel comp;
 			
-			comp = new JLabel("  " + e.getEditorName());
+			comp = new JLabel("  " + e.getData().getEditorName());
 			comp.setOpaque(true);
 
 	        // check if this cell represents the current DnD drop location
@@ -137,7 +162,7 @@ public class EditorListField<T extends EditorDisplayable> implements ActionListe
 		});
 		
 		for (T t : options) {
-			data.addElement(t);
+			data.addElement(new DataWrapper<T>(t));
 		}
 
 		dataList.setVisibleRowCount(20);
@@ -191,11 +216,15 @@ public class EditorListField<T extends EditorDisplayable> implements ActionListe
 		return wrapper;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		if (hook != null)
-			hook.setField((List<Object>) Collections.list(data.elements()));
+		if (hook != null) {
+			List<Object> list = new LinkedList<>();
+			Enumeration<DataWrapper<T>> it = data.elements();
+			while (it.hasMoreElements())
+				list.add(it.nextElement().getData());
+			hook.setField(list);
+		}
 	}
 	
 	public void doMousePressed(MouseEvent e) {
@@ -205,7 +234,7 @@ public class EditorListField<T extends EditorDisplayable> implements ActionListe
 		if (dataList.isSelectionEmpty())
 			return;
 		
-		T val = data.get(dataList.getSelectedIndex());
+		DataWrapper<T> val = data.get(dataList.getSelectedIndex());
 		
 		edit(val);
 	}
@@ -215,7 +244,7 @@ public class EditorListField<T extends EditorDisplayable> implements ActionListe
 	 * @param value
 	 * @return
 	 */
-	private boolean edit(T value) {
+	private boolean edit(DataWrapper<T> value) {
 		popupEditor.setEdittingObject(value);
 		final StringBuffer cancelled = new StringBuffer();
 		
@@ -240,6 +269,7 @@ public class EditorListField<T extends EditorDisplayable> implements ActionListe
 					return;
 				}
 				
+				popupEditor.commit();
 				dialog.setVisible(false);	
 			}
 		});
@@ -294,7 +324,7 @@ public class EditorListField<T extends EditorDisplayable> implements ActionListe
 	
 	private void add() {
 		@SuppressWarnings("unchecked")
-		T val = (T) factory.construct();
+		DataWrapper<T> val = new DataWrapper<T>((T) factory.construct());
 		
 		
 		if (edit(val))

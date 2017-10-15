@@ -25,7 +25,7 @@ public class SubMeleeAttack extends SubAction {
 	}
 	
 	protected static void register() {
-		SubAction.registerFactory(ClassKey(), new Factory());
+		SubAction.registerFactory(ClassKey(), new Factory(), true);
 	}
 
 	public SubMeleeAttack() {
@@ -87,6 +87,16 @@ public class SubMeleeAttack extends SubAction {
 	
 	protected static String ClassKey() {
 		return "melee";
+	}
+
+	@Override
+	public String getEditorName() {
+		return "Melee Strike";
+	}
+
+	@Override
+	public String getEditorTooltip() {
+		return "Perform a Melee Strike with currently-equipped equipment";
 	}
 	
 }
