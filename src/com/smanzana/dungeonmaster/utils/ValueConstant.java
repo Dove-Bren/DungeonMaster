@@ -14,6 +14,10 @@ public class ValueConstant implements ValueSpecifier {
 	public int fetchValue() {
 		return this.value;
 	}
+	
+	public void setValue(int value) {
+		this.value = value;
+	}
 
 	@Override
 	public void load(DataNode root) {
