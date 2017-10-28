@@ -87,12 +87,12 @@ public class KeywordConfig extends Config<KeywordKey> {
 	}
 	
 	@Override
-	public String getEditorName() {
+	public String getDisplayName() {
 		return "Keywords";
 	}
 
 	@Override
-	public String getEditorTooltip() {
+	public String getDisplayTooltip() {
 		return "Aliases for keywords used throughout the game.";
 	}
 	

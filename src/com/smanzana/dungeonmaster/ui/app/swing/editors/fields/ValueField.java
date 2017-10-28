@@ -13,12 +13,14 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.IntField.IntFieldCallback;
 import com.smanzana.dungeonmaster.utils.Dice;
 import com.smanzana.dungeonmaster.utils.DiceSet;
 import com.smanzana.dungeonmaster.utils.ValueConstant;
 import com.smanzana.dungeonmaster.utils.ValueRange;
 import com.smanzana.dungeonmaster.utils.ValueSpecifier;
+import com.smanzana.templateeditor.editor.fields.EditorField;
+import com.smanzana.templateeditor.editor.fields.IntField;
+import com.smanzana.templateeditor.editor.fields.IntField.IntFieldCallback;
 
 /**
  * Construct a {@link ValueSpecifier}.<br />

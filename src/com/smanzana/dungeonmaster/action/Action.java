@@ -273,5 +273,15 @@ public class Action extends SubAction {
 	protected static String ClassKey() {
 		return "action";
 	}
+
+	@Override
+	public String getDisplayName() {
+		return this.name;
+	}
+
+	@Override
+	public String getDisplayTooltip() {
+		return this.description;
+	}
 	
 }

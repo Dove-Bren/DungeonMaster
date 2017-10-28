@@ -167,12 +167,12 @@ public class NPCDatumData implements DatumData {
 	}
 
 	@Override
-	public String getEditorName() {
+	public String getDisplayName() {
 		return getTemplateName();
 	}
 
 	@Override
-	public String getEditorTooltip() {
+	public String getDisplayTooltip() {
 		return "Template NPC";
 	}
 	

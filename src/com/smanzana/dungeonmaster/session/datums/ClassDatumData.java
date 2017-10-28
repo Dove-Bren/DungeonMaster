@@ -301,12 +301,12 @@ public class ClassDatumData implements DatumData {
 	}
 
 	@Override
-	public String getEditorName() {
+	public String getDisplayName() {
 		return getName();
 	}
 
 	@Override
-	public String getEditorTooltip() {
+	public String getDisplayTooltip() {
 		return getDescription();
 	}
 	

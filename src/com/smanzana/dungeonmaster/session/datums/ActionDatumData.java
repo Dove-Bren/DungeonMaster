@@ -237,15 +237,14 @@ public class ActionDatumData implements DatumData {
 		
 		return action;
 	}
-
+	
 	@Override
-	public String getEditorName() {
+	public String getDisplayName() {
 		return getName();
 	}
-
+	
 	@Override
-	public String getEditorTooltip() {
+	public String getDisplayTooltip() {
 		return getDescription();
 	}
-	
 }

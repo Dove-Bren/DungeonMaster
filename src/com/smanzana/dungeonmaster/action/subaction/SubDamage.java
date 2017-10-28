@@ -66,12 +66,12 @@ public class SubDamage extends SubAction {
 	}
 
 	@Override
-	public String getEditorName() {
+	public String getDisplayName() {
 		return "Damage";
 	}
 
 	@Override
-	public String getEditorTooltip() {
+	public String getDisplayTooltip() {
 		return "Deal raw damage";
 	}
 	

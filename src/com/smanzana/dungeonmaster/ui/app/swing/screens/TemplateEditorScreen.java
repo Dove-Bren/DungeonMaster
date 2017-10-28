@@ -42,12 +42,10 @@ import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
-import com.smanzana.dungeonmaster.ui.app.UIColor;
 import com.smanzana.dungeonmaster.ui.app.UIConfState;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.ConfigEditor;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.DMEditor;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.DatumEditor;
+import com.smanzana.templateeditor.editor.IEditor;
+import com.smanzana.templateeditor.uiutils.UIColor;
 
 public class TemplateEditorScreen extends JPanel implements ActionListener {
 	
@@ -101,7 +99,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	private DefaultTreeModel sourceModel;
 	private JScrollPane sourcePanel;
 	private JPanel editorPanel;
-	private DMEditor currentEditor;
+	private IEditor<?> currentEditor;
 	private Map<Command, JMenuItem> menuItems;
 	private Object lastEditorObject;
 	

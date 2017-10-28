@@ -110,12 +110,12 @@ public class SubHeal extends SubAction {
 	}
 
 	@Override
-	public String getEditorName() {
+	public String getDisplayName() {
 		return "Heal";
 	}
 
 	@Override
-	public String getEditorTooltip() {
+	public String getDisplayTooltip() {
 		return "Restore health, stamina, and/or mana";
 	}
 	

@@ -1,4 +1,4 @@
-package com.smanzana.dungeonmaster.ui.app.swing.editors;
+package com.smanzana.dungeonmaster.ui.app.swing.editor;
 
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
@@ -22,13 +22,13 @@ import com.smanzana.dungeonmaster.action.subaction.SubHeal;
 import com.smanzana.dungeonmaster.battle.effects.Effect;
 import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.ui.app.UIColor;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EditorListField;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EditorListField.EditorListEditor;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EnumField;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EnumField.EnumFieldCallback;
-import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.IntField.IntFieldCallback;
 import com.smanzana.dungeonmaster.utils.NoteUtil;
 import com.smanzana.dungeonmaster.utils.ValueSpecifier;
+import com.smanzana.templateeditor.editor.fields.NestedEditorListField;
+import com.smanzana.templateeditor.editor.fields.EnumField;
+import com.smanzana.templateeditor.editor.fields.NestedEditorListField.EditorListEditor;
+import com.smanzana.templateeditor.editor.fields.EnumField.EnumFieldCallback;
+import com.smanzana.templateeditor.editor.fields.IntField.IntFieldCallback;
 
 public class SubActionEditor extends JScrollPane implements EditorListEditor {
 
@@ -42,7 +42,7 @@ public class SubActionEditor extends JScrollPane implements EditorListEditor {
 	}
 	
 	private JPanel editor;
-	private EditorListField.DataWrapper<SubAction> currentObject;
+	private NestedEditorListField.DataWrapper<SubAction> currentObject;
 	private SubAction backup;
 	private Map<String, String> prettyMap;
 	private JComboBox<String> combo;
@@ -237,7 +237,7 @@ public class SubActionEditor extends JScrollPane implements EditorListEditor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void setEdittingObject(Object obj) {
-		currentObject = (EditorListField.DataWrapper<SubAction>) obj;
+		currentObject = (NestedEditorListField.DataWrapper<SubAction>) obj;
 		backup = SubAction.fromData(currentObject.getData().write("dummy"));
 	}
 

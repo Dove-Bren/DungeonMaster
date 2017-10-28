@@ -65,14 +65,14 @@ public class SpellDatumData implements DatumData {
 	}
 
 	@Override
-	public String getEditorName() {
+	public String getDisplayName() {
 		if (spell == null)
 			return "";
 		return spell.getName();
 	}
 
 	@Override
-	public String getEditorTooltip() {
+	public String getDisplayTooltip() {
 		if (spell == null)
 			return null;
 		return spell.getDescription();

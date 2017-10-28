@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.smanzana.dungeonmaster.ui.EditorDisplayable;
+import com.smanzana.dungeonmaster.utils.Displayable;
 
-public abstract class Config<T extends Enum<T>> implements EditorDisplayable {
+public abstract class Config<T extends Enum<T>> implements Displayable {
 	
 	protected static final String OUT_COMMENT_PREFIX = "#";
 	protected static final String OUT_COMMENT_GUARD = "##########";

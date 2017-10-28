@@ -74,12 +74,12 @@ public class SubApplyEffect extends SubAction {
 	}
 
 	@Override
-	public String getEditorName() {
+	public String getDisplayName() {
 		return "Apply Effect";
 	}
 
 	@Override
-	public String getEditorTooltip() {
+	public String getDisplayTooltip() {
 		return "Applies a status effect";
 	}
 	

@@ -27,6 +27,7 @@ import javax.swing.JTextField;
 
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 import com.smanzana.dungeonmaster.utils.StepList;
+import com.smanzana.templateeditor.editor.fields.EditorField;
 
 public class StepField implements ActionListener, EditorField, PropertyChangeListener {
 

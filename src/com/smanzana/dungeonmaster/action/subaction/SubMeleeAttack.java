@@ -90,12 +90,12 @@ public class SubMeleeAttack extends SubAction {
 	}
 
 	@Override
-	public String getEditorName() {
+	public String getDisplayName() {
 		return "Melee Strike";
 	}
 
 	@Override
-	public String getEditorTooltip() {
+	public String getDisplayTooltip() {
 		return "Perform a Melee Strike with currently-equipped equipment";
 	}
 	

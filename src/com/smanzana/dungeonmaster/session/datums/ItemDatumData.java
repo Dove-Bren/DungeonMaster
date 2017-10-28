@@ -62,14 +62,14 @@ public class ItemDatumData implements DatumData {
 	}
 
 	@Override
-	public String getEditorName() {
+	public String getDisplayName() {
 		if (item == null)
 			return "";
 		return item.getName();
 	}
 
 	@Override
-	public String getEditorTooltip() {
+	public String getDisplayTooltip() {
 		if (item == null)
 			return null;
 		return item.getDescription();
