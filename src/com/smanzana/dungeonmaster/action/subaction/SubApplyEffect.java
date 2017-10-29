@@ -65,7 +65,7 @@ public class SubApplyEffect extends SubAction {
 	}
 
 	@Override
-	protected String getClassKey() {
+	public String getClassKey() {
 		return SubApplyEffect.ClassKey();
 	}
 	

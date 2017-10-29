@@ -65,7 +65,7 @@ public class SubRest extends SubAction {
 	}
 
 	@Override
-	protected String getClassKey() {
+	public String getClassKey() {
 		return SubRest.ClassKey();
 	}
 	

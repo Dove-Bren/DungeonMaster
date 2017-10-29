@@ -266,7 +266,7 @@ public class Action extends SubAction {
 	}
 
 	@Override
-	protected String getClassKey() {
+	public String getClassKey() {
 		return ClassKey();
 	}
 	

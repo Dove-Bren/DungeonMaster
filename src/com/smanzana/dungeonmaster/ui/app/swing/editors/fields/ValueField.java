@@ -338,6 +338,9 @@ public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IE
 	public ValueField(ValueSpecifier current) {
 		typeFields = new EnumMap<>(Type.class);
 		
+		if (current == null)
+			current = new ValueConstant(0);
+		
 		original = current;
 		
 		JComboBox<Type> comboField = new JComboBox<>();
@@ -372,45 +375,20 @@ public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IE
 		wrapper.add(Box.createRigidArea(new Dimension(0, 20)));
 		
 		ValueEditor<?> editor;
-		int val1;
-		int val2;
 		// Constant
-		if (currentType == Type.CONSTANT)
-			val1 = current.fetchValue();
-		else
-			val1 = 0;
-		editor = new ConstantField(this, val1);
+		editor = new ConstantField(this, 0);
 		typeFields.put(Type.CONSTANT, editor);
 		editor.setVisible(false);
 		wrapper.add(editor);
 		
 		// Range
-		if (currentType == Type.RANGE) {
-			ValueRange range = (ValueRange) current;
-			val1 = range.getMin();
-			val2 = range.getMax();
-		} else {
-			val1 = 0;
-			val2 = 1;
-		}
-		editor = new RangeField(this, val1, val2);
+		editor = new RangeField(this, 0, 1);
 		typeFields.put(Type.RANGE, editor);
 		editor.setVisible(false);
 		wrapper.add(editor);
 		
 		// Dice
-		boolean zero;
-		if (currentType == Type.DICE) {
-			Dice die = (Dice) current;
-			val1 = die.getDieCount();
-			val2 = die.getDieFaces();
-			zero = die.includesZero();
-		} else {
-			val1 = 1;
-			val2 = 6;
-			zero = false;
-		}
-		editor = new DiceField(this, val1, val2, zero);
+		editor = new DiceField(this, 1, 6, false);
 		typeFields.put(Type.DICE, editor);
 		editor.setVisible(false);
 		wrapper.add(editor);
@@ -418,15 +396,8 @@ public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IE
 		// DiceSet
 		List<Dice> diceFieldList = new LinkedList<>();
 		Dice diceFieldTemplate = new Dice(1, 6, false);;
-		if (currentType == Type.DICESET) {
-			DiceSet set = (DiceSet) current;
-			for (Dice d : set.getDice()) {
-				diceFieldList.add(d);
-			}
-		} else {
-			diceFieldList.add(new Dice(1, 6, false));
-			diceFieldList.add(new Dice(2, 4, false));
-		}
+		diceFieldList.add(new Dice(1, 6, false));
+		diceFieldList.add(new Dice(2, 4, false));
 		editor = new DiceSetField(this, diceFieldTemplate, diceFieldList);
 		typeFields.put(Type.DICESET, editor);
 		editor.setVisible(false);
@@ -443,10 +414,6 @@ public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IE
 			typeFields.get(currentType).setVisible(false);
 		typeFields.get(newType).setVisible(true);
 
-		if (newType == Type.DICESET) {
-			System.out.println(((DiceSet) typeFields.get(newType).getValueSpecifier()).getDice().size());
-		}
-		
 		currentType = newType;
 		
 		wrapper.validate();

@@ -11,8 +11,11 @@ import com.smanzana.dungeonmaster.action.PartyAction;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.SubActionField;
 import com.smanzana.dungeonmaster.utils.Displayable;
+import com.smanzana.dungeonmaster.utils.ValueConstant;
 import com.smanzana.templateeditor.api.ICustomData;
+import com.smanzana.templateeditor.api.annotations.DataLoaderFactory;
 import com.smanzana.templateeditor.editor.fields.EditorField;
 
 /**
@@ -22,9 +25,10 @@ import com.smanzana.templateeditor.editor.fields.EditorField;
  * @author Skyler
  *
  */
+@DataLoaderFactory
 public abstract class SubAction implements DataCompatible, Displayable, ICustomData {
 	
-	protected static enum DataType {
+	public static enum DataType {
 		AMOUNT_HP,
 		AMOUNT_MP,
 		AMOUNT_STAMINA,
@@ -83,7 +87,7 @@ public abstract class SubAction implements DataCompatible, Displayable, ICustomD
 		
 	}
 	
-	protected abstract String getClassKey();
+	public abstract String getClassKey();
 	
 	protected static void registerFactory(String classKey, SubActionFactory<?> factory, boolean sysonly) {
 		init();
@@ -121,18 +125,20 @@ public abstract class SubAction implements DataCompatible, Displayable, ICustomD
 	 * and the key they are read out of a DataNode
 	 * @return
 	 */
-	protected abstract Map<DataType, String> getApplicableTypes();
+	public abstract Map<DataType, String> getApplicableTypes();
 	
 	@Override
 	public EditorField<SubAction> getField() {
-		return null;
-		//return new IntField(temperature);
+		return new SubActionField(this);
 	}
 
 	@Override
 	public SubAction fillFromField(EditorField<?> field) {
-		return null;
-		//this.temperature = (Integer) field.getObject();
+		return ((SubActionField) field).getObject();
+	}
+	
+	protected static SubAction construct() {
+		return new SubDamage(new ValueConstant(0));
 	}
 	
 }

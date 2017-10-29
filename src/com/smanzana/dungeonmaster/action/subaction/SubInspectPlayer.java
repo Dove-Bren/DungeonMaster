@@ -63,7 +63,7 @@ public class SubInspectPlayer extends SubAction {
 	}
 
 	@Override
-	protected String getClassKey() {
+	public String getClassKey() {
 		return SubInspectPlayer.ClassKey();
 	}
 	

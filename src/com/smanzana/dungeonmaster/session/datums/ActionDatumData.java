@@ -13,6 +13,7 @@ import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.utils.Dice;
+import com.smanzana.dungeonmaster.utils.ValueConstant;
 import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 import com.smanzana.templateeditor.api.annotations.DataLoaderDescription;
 import com.smanzana.templateeditor.api.annotations.DataLoaderList;
@@ -64,6 +65,7 @@ public class ActionDatumData implements DatumData {
 	
 	public ActionDatumData() {
 		this.subactions = new LinkedList<>();
+		this.subactions.add(new SubDamage(new ValueConstant(4)));
 		
 		templateSubaction = new SubDamage(new Dice(2, 4, false));
 	}

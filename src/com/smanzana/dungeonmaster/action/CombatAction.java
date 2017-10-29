@@ -62,7 +62,7 @@ public class CombatAction extends Action {
 	}
 
 	@Override
-	protected String getClassKey() {
+	public String getClassKey() {
 		return ClassKey();
 	}
 	

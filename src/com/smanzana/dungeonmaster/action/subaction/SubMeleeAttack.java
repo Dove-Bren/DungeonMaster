@@ -81,7 +81,7 @@ public class SubMeleeAttack extends SubAction {
 	}
 
 	@Override
-	protected String getClassKey() {
+	public String getClassKey() {
 		return SubMeleeAttack.ClassKey();
 	}
 	

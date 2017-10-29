@@ -68,7 +68,7 @@ public class SubInspectNPC extends SubAction {
 	}
 
 	@Override
-	protected String getClassKey() {
+	public String getClassKey() {
 		return SubInspectNPC.ClassKey();
 	}
 	

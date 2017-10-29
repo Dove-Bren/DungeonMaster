@@ -10,9 +10,14 @@ import java.util.Map;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.EffectField;
 import com.smanzana.dungeonmaster.utils.ValueCapsule;
+import com.smanzana.templateeditor.api.ICustomData;
+import com.smanzana.templateeditor.api.annotations.DataLoaderFactory;
+import com.smanzana.templateeditor.editor.fields.EditorField;
 
-public abstract class Effect implements DataCompatible {
+@DataLoaderFactory
+public abstract class Effect implements DataCompatible, ICustomData {
 	
 	protected static enum Phase {
 		BEFORE_DAMAGE,
@@ -21,25 +26,48 @@ public abstract class Effect implements DataCompatible {
 		TURN_END,
 		ON_USE,
 	}
+	
+	public static enum DataType {
+		AMOUNT_HP,
+	}
 
-	private static Map<String, EffectFactory<?>> factories = new HashMap<>();
+	private static Map<String, EffectFactory<?>> factories;
 	
 	public static Effect fromData(DataNode node) {
 		if (node == null)
 			return null;
 		
+		init();
+		
 		DataNode type = node.getChild("type");
 		if (type == null)
 			return null;
 		
+		Effect ef = constructFromType(type.getValue());
+
+		ef.load(node);
+		return ef;
+	}
+	
+	public static Effect constructFromType(String type) {
+		if (type == null)
+			return null;
 		
-		EffectFactory<?> factory = factories.get(type.getValue());
+		
+		EffectFactory<?> factory = factories.get(type);
 		if (factory == null)
 			return null;
 		
-		Effect ef = factory.construct();
-		ef.load(node);
-		return ef;
+		return factory.construct();
+	}
+	
+	private static void init() {
+		if (factories != null)
+			return;
+		
+		factories = new HashMap<>();
+		
+		PoisonEffect.init();
 	}
 	
 	/**
@@ -48,8 +76,9 @@ public abstract class Effect implements DataCompatible {
 	 * @param type
 	 * @param factory
 	 */
-	protected static void registerEffect(String type, EffectFactory<?> factory) {
-		factories.put(type, factory);
+	protected static void registerEffect(String classKey, EffectFactory<?> factory) {
+		init();
+		factories.put(classKey, factory);
 	}
 	
 	public static void doPostEffects(Collection<Effect> effects, Pawn caster, Pawn target, ValueCapsule value) {
@@ -106,7 +135,11 @@ public abstract class Effect implements DataCompatible {
 		this.durationCount = duration;
 	}
 	
-	protected abstract String getClassKey();
+	public static Collection<String> getRegisteredEffectKeys() {
+		return factories.keySet();
+	}
+	
+	public abstract String getClassKey();
 
 	public String getName() {
 		return name;
@@ -168,5 +201,23 @@ public abstract class Effect implements DataCompatible {
 	}
 	
 	public abstract Effect clone();
+	
+	public abstract Map<DataType, String> getApplicableTypes();
+	
+
+	
+	@Override
+	public EditorField<Effect> getField() {
+		return new EffectField(this);
+	}
+
+	@Override
+	public Effect fillFromField(EditorField<?> field) {
+		return ((EffectField) field).getObject();
+	}
+	
+	protected static Effect construct() {
+		return new PoisonEffect("", "", 1, 5);
+	}
 	
 }

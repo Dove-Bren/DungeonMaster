@@ -60,7 +60,7 @@ public class SubDamage extends SubAction {
 	}
 
 	@Override
-	protected String getClassKey() {
+	public String getClassKey() {
 		return SubDamage.ClassKey();
 	}
 	
@@ -79,7 +79,7 @@ public class SubDamage extends SubAction {
 	}
 
 	@Override
-	protected Map<DataType, String> getApplicableTypes() {
+	public Map<DataType, String> getApplicableTypes() {
 		Map<DataType, String> map = new TreeMap<>();
 		map.put(DataType.AMOUNT_HP, "amount");
 		return map;

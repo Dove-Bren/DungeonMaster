@@ -101,7 +101,7 @@ public class SubHeal extends SubAction {
 	}
 
 	@Override
-	protected String getClassKey() {
+	public String getClassKey() {
 		return SubHeal.ClassKey();
 	}
 	
