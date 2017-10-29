@@ -25,7 +25,7 @@ public class SubRest extends SubAction {
 	}
 	
 	protected static void register() {
-		SubAction.registerFactory(ClassKey(), new Factory());
+		SubAction.registerFactory(ClassKey(), new Factory(), true);
 	}
 	
 	// TODO display string?
@@ -71,5 +71,15 @@ public class SubRest extends SubAction {
 	
 	protected static String ClassKey() {
 		return "rest";
+	}
+
+	@Override
+	public String getDisplayName() {
+		return "Rest";
+	}
+
+	@Override
+	public String getDisplayTooltip() {
+		return "Restore all status for the entire party.";
 	}
 }

@@ -26,7 +26,7 @@ public class CombatAction extends Action {
 	}
 	
 	public static void register() {
-		SubAction.registerFactory(ClassKey(), new Factory());
+		SubAction.registerFactory(ClassKey(), new Factory(), true);
 	}
 	
 	private Attributes savingThrow;

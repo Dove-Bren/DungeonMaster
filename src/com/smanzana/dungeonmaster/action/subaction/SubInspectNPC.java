@@ -23,7 +23,7 @@ public class SubInspectNPC extends SubAction {
 	}
 	
 	protected static void register() {
-		SubAction.registerFactory(ClassKey(), new Factory());
+		SubAction.registerFactory(ClassKey(), new Factory(), true);
 	}
 	
 	private NPC npc;
@@ -74,5 +74,15 @@ public class SubInspectNPC extends SubAction {
 	
 	protected static String ClassKey() {
 		return "internal_inspectnpc";
+	}
+
+	@Override
+	public String getDisplayName() {
+		return "Inspect NPC";
+	}
+
+	@Override
+	public String getDisplayTooltip() {
+		return "Inspect the statistics and inventory on an NPC";
 	}
 }

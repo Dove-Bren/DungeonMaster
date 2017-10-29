@@ -42,7 +42,7 @@ public class Action extends SubAction {
 	}
 	
 	public static void register() {
-		SubAction.registerFactory(ClassKey(), new Factory());
+		SubAction.registerFactory(ClassKey(), new Factory(), false);
 	}
 
 	public static enum TargetType {

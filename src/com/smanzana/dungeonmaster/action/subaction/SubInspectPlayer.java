@@ -22,7 +22,7 @@ public class SubInspectPlayer extends SubAction {
 	}
 	
 	protected static void register() {
-		SubAction.registerFactory(ClassKey(), new Factory());
+		SubAction.registerFactory(ClassKey(), new Factory(), true);
 	}
 	
 	private Player player;
@@ -69,5 +69,15 @@ public class SubInspectPlayer extends SubAction {
 	
 	protected static String ClassKey() {
 		return "internal_inspectplayer";
+	}
+
+	@Override
+	public String getDisplayName() {
+		return "Inspect Player";
+	}
+
+	@Override
+	public String getDisplayTooltip() {
+		return "Inspect Player personal information";
 	}
 }
