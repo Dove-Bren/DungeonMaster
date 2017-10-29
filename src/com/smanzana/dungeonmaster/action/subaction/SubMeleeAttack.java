@@ -1,5 +1,8 @@
 package com.smanzana.dungeonmaster.action.subaction;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.inventory.item.Equipment.Slot;
 import com.smanzana.dungeonmaster.inventory.item.Weapon;
@@ -97,6 +100,12 @@ public class SubMeleeAttack extends SubAction {
 	@Override
 	public String getDisplayTooltip() {
 		return "Perform a Melee Strike with currently-equipped equipment";
+	}
+
+	@Override
+	public Map<DataType, String> getApplicableTypes() {
+		Map<DataType, String> map = new TreeMap<>();
+		return map;
 	}
 	
 }

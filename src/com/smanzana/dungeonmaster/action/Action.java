@@ -3,6 +3,8 @@ package com.smanzana.dungeonmaster.action;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.action.subaction.SubAction;
@@ -282,6 +284,12 @@ public class Action extends SubAction {
 	@Override
 	public String getDisplayTooltip() {
 		return this.description;
+	}
+
+	@Override
+	public Map<DataType, String> getApplicableTypes() {
+		Map<DataType, String> map = new TreeMap<>();
+		return map;
 	}
 	
 }

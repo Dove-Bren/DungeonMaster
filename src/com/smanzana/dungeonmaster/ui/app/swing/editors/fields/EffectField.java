@@ -145,9 +145,13 @@ public class EffectField implements ItemListener, EditorField<Effect>, IEditorOw
 	
 	private void updateField(String newType) {
 		
-		if (currentType != null)
-			typeFields.get(currentType).comp.setVisible(false);
-		typeFields.get(newType).comp.setVisible(true);
+		for (DataType d : DataType.values()) {
+			typeFields.get(d).comp.setVisible(false);
+		}
+		Map<DataType, String> applicables = typeMaps.get(newType);
+		for (DataType d : applicables.keySet()) {
+			typeFields.get(d).comp.setVisible(true);
+		}
 
 		currentType = newType;
 		

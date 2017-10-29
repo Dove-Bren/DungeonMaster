@@ -136,6 +136,7 @@ public abstract class Effect implements DataCompatible, ICustomData {
 	}
 	
 	public static Collection<String> getRegisteredEffectKeys() {
+		init();
 		return factories.keySet();
 	}
 	

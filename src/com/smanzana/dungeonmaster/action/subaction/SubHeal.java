@@ -1,5 +1,8 @@
 package com.smanzana.dungeonmaster.action.subaction;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
@@ -117,6 +120,15 @@ public class SubHeal extends SubAction {
 	@Override
 	public String getDisplayTooltip() {
 		return "Restore health, stamina, and/or mana";
+	}
+
+	@Override
+	public Map<DataType, String> getApplicableTypes() {
+		Map<DataType, String> map = new TreeMap<>();
+		map.put(DataType.AMOUNT_HP, "health");
+		map.put(DataType.AMOUNT_MP, "mana");
+		map.put(DataType.AMOUNT_STAMINA, "stamina");
+		return map;
 	}
 	
 }

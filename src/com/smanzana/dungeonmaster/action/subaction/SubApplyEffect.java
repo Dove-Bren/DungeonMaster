@@ -1,5 +1,8 @@
 package com.smanzana.dungeonmaster.action.subaction;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.smanzana.dungeonmaster.battle.effects.Effect;
 import com.smanzana.dungeonmaster.pawn.Mob;
 import com.smanzana.dungeonmaster.pawn.Pawn;
@@ -81,6 +84,13 @@ public class SubApplyEffect extends SubAction {
 	@Override
 	public String getDisplayTooltip() {
 		return "Applies a status effect";
+	}
+
+	@Override
+	public Map<DataType, String> getApplicableTypes() {
+		Map<DataType, String> map = new TreeMap<>();
+		map.put(DataType.EFFECT, "effect");
+		return map;
 	}
 	
 }

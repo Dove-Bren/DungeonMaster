@@ -66,7 +66,7 @@ public class PoisonEffect extends Effect {
 	public DataNode write(String key) {
 		DataNode base = super.write(key);
 		
-		base.addChild(new DataNode("damage", damage + "", null));
+		base.addChild(damage.write("damage"));
 		
 		return base;
 	}

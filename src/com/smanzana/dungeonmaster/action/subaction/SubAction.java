@@ -67,7 +67,7 @@ public abstract class SubAction implements DataCompatible, Displayable, ICustomD
 		 SubDamage.register();
 		 SubHeal.register();
 		 SubMeleeAttack.register();
-		 SubCast.register();
+		 //SubCast.register();
 		 
 		 Action.register();
 		 CombatAction.register();

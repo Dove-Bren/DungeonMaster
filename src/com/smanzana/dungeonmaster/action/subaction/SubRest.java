@@ -1,5 +1,8 @@
 package com.smanzana.dungeonmaster.action.subaction;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
@@ -25,7 +28,7 @@ public class SubRest extends SubAction {
 	}
 	
 	protected static void register() {
-		SubAction.registerFactory(ClassKey(), new Factory(), true);
+		SubAction.registerFactory(ClassKey(), new Factory(), false);
 	}
 	
 	// TODO display string?
@@ -81,5 +84,11 @@ public class SubRest extends SubAction {
 	@Override
 	public String getDisplayTooltip() {
 		return "Restore all status for the entire party.";
+	}
+
+	@Override
+	public Map<DataType, String> getApplicableTypes() {
+		Map<DataType, String> map = new TreeMap<>();
+		return map;
 	}
 }
