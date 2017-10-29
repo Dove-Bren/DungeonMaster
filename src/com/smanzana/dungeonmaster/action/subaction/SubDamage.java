@@ -1,6 +1,7 @@
 package com.smanzana.dungeonmaster.action.subaction;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
@@ -79,8 +80,9 @@ public class SubDamage extends SubAction {
 
 	@Override
 	protected Map<DataType, String> getApplicableTypes() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<DataType, String> map = new TreeMap<>();
+		map.put(DataType.AMOUNT_HP, "amount");
+		return map;
 	}
 	
 }

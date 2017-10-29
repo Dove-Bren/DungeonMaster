@@ -9,6 +9,9 @@ import java.util.Map;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.StepField;
+import com.smanzana.templateeditor.api.ICustomData;
+import com.smanzana.templateeditor.editor.fields.EditorField;
 
 /**
  * Called 'step list', but more accurately described as a map between range maxs and bonuses.
@@ -24,7 +27,7 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
  * @author Skyler
  *
  */
-public class StepList implements DataCompatible {
+public class StepList implements DataCompatible, ICustomData {
 	
 	/**
 	 * Uses max of range as key.
@@ -203,5 +206,15 @@ public class StepList implements DataCompatible {
 	
 	public Collection<Integer> getValues() {
 		return map.values();
+	}
+
+	@Override
+	public EditorField<?> getField() {
+		return new StepField(this);
+	}
+
+	@Override
+	public ICustomData fillFromField(EditorField<?> field) {
+		return ((StepField) field).getObject();
 	}
 }

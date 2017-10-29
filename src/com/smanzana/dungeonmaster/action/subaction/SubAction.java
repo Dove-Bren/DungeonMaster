@@ -1,6 +1,5 @@
 package com.smanzana.dungeonmaster.action.subaction;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +14,6 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.Displayable;
 import com.smanzana.templateeditor.api.ICustomData;
 import com.smanzana.templateeditor.editor.fields.EditorField;
-import com.smanzana.templateeditor.editor.fields.IntField;
 
 /**
  * An actual piece of "DO SOMETHING".

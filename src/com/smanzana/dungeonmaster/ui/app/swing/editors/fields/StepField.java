@@ -2,7 +2,6 @@ package com.smanzana.dungeonmaster.ui.app.swing.editors.fields;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -27,14 +26,11 @@ import javax.swing.JTextField;
 
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 import com.smanzana.dungeonmaster.utils.StepList;
+import com.smanzana.templateeditor.IEditorOwner;
 import com.smanzana.templateeditor.editor.fields.EditorField;
 
-public class StepField implements ActionListener, EditorField, PropertyChangeListener {
+public class StepField implements ActionListener, EditorField<StepList>, PropertyChangeListener {
 
-	public static interface StepFieldCallback {
-		public void setField(String value);
-	}
-	
 	private static class RangeSegment extends JPanel implements PropertyChangeListener {
 		
 		private static final long serialVersionUID = -6013376481894020315L;
@@ -147,27 +143,22 @@ public class StepField implements ActionListener, EditorField, PropertyChangeLis
 	
 	private JPanel wrapper;
 	private JPanel segmentWrapper;
-	private StepFieldCallback hook;
 	private RangeSegment segments[];
 	private int segmentCount = 0;
 	private JButton segmentButton;
 	private JFormattedTextField largeField; // holds high value
+	private IEditorOwner owner;
 	
-	public StepField(String title, StepFieldCallback hook) {
-		this(title, hook, null);
+	public StepField() {
+		this(null);
 	}
 	
-	public StepField(String title, StepFieldCallback hook, StepList startingList) {
-		this.hook = hook;
+	public StepField(StepList startingList) {
 		
 		wrapper = new JPanel();
 		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.LINE_AXIS));
 		wrapper.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		wrapper.add(Box.createRigidArea(new Dimension(10, 0)));
-		JLabel label = new JLabel(title);
-		label.setFont(label.getFont().deriveFont(Font.BOLD));
-		wrapper.add(label);
-		wrapper.add(Box.createRigidArea(new Dimension(20, 0)));
 		wrapper.add(Box.createHorizontalGlue());
 		
 		segmentWrapper = new JPanel();
@@ -240,8 +231,8 @@ public class StepField implements ActionListener, EditorField, PropertyChangeLis
 		StepList steps = toStepList();
 		fromStepList(steps);
 		
-		if (this.hook != null)
-			this.hook.setField(steps.serialize());
+		if (this.owner != null)
+			this.owner.dirty();
 		
 		segmentButton.setEnabled(segmentCount < 15);		
 		wrapper.validate();
@@ -265,11 +256,7 @@ public class StepField implements ActionListener, EditorField, PropertyChangeLis
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		if (hook != null) {
-			; //FIXME TODO
-			System.out.println("performed!");
 			update();
-		}
 	}
 	
 	private StepList toStepList() {
@@ -330,5 +317,26 @@ public class StepField implements ActionListener, EditorField, PropertyChangeLis
 		}
 
 		update();
+	}
+
+	@Override
+	public StepList getObject() {
+		return toStepList();
+	}
+
+	@Override
+	public void setObject(StepList obj) {
+		fromStepList(obj);
+	}
+
+	@Override
+	public StepList getOriginal() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setOwner(IEditorOwner owner) {
+		this.owner = owner;
 	}
 }
