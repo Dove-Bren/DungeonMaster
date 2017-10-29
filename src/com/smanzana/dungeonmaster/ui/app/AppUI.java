@@ -24,6 +24,7 @@ import com.smanzana.dungeonmaster.ui.common.MessageBox;
 import com.smanzana.dungeonmaster.ui.common.NPCView;
 import com.smanzana.dungeonmaster.ui.common.PlayerView;
 import com.smanzana.dungeonmaster.ui.common.TargetView;
+import com.smanzana.templateeditor.uiutils.UIColor;
 
 public class AppUI extends Comm {
 	

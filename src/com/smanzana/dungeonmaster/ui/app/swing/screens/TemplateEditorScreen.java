@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -38,16 +39,20 @@ import com.smanzana.dungeonmaster.session.configuration.Config;
 import com.smanzana.dungeonmaster.session.configuration.KeywordConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
-import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.UIConfState;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
+import com.smanzana.templateeditor.IEditorOwner;
+import com.smanzana.templateeditor.api.FieldData;
+import com.smanzana.templateeditor.api.ObjectDataLoader;
+import com.smanzana.templateeditor.data.SimpleFieldData;
+import com.smanzana.templateeditor.editor.EnumMapEditor;
 import com.smanzana.templateeditor.editor.IEditor;
 import com.smanzana.templateeditor.uiutils.UIColor;
 
-public class TemplateEditorScreen extends JPanel implements ActionListener {
+public class TemplateEditorScreen extends JPanel implements ActionListener, IEditorOwner {
 	
 	private static enum Command {
 		// FILE
@@ -100,8 +105,10 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 	private JScrollPane sourcePanel;
 	private JPanel editorPanel;
 	private IEditor<?> currentEditor;
+	private ObjectDataLoader<?> currentLoader;
 	private Map<Command, JMenuItem> menuItems;
 	private Object lastEditorObject;
+	private boolean dirty;
 	
 	public TemplateEditorScreen(AppUI UI) {
 		super(new BorderLayout());
@@ -110,6 +117,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		lastEditorObject = null;
 		menuItems = new EnumMap<>(Command.class);
 		this.ui = UI;
+		dirty = false;
 	}
 	
 	public void init() {
@@ -268,23 +276,23 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 			    
 			    if (obj instanceof Config) {
 			    	Config<?> conf = (Config<?>) obj;
-			        setText(conf.getEditorName());
-			        setToolTipText(conf.getEditorTooltip());
+			        setText(conf.getDisplayName());
+			        setToolTipText(conf.getDisplayTooltip());
 			        
 			        if (configIcon != null)
 			    		setIcon(configIcon);
 			    } else if (obj instanceof Datum<?>) {
 			    	Datum<?> datum = (Datum<?>) obj;
-			    	setText(datum.getEditorName());
-			        setToolTipText(datum.getEditorTooltip());
+			    	setText(datum.getDisplayName());
+			        setToolTipText(datum.getDisplayTooltip());
 			        
 			        if (datumIcon != null && datumOpenIcon != null)
 			    		setIcon(sourceTree.isExpanded(new TreePath(((DefaultMutableTreeNode) value).getPath()))
 			    				? datumOpenIcon : datumIcon);
 			    } else if (obj instanceof DatumData) {
 			    	DatumData data = (DatumData) obj;
-			    	setText(data.getEditorName());
-			    	setToolTipText(data.getEditorTooltip());
+			    	setText(data.getDisplayName());
+			    	setToolTipText(data.getDisplayTooltip());
 			    	
 			    	if (dataIcon != null)
 			    		setIcon(dataIcon);
@@ -457,6 +465,8 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		if (currentTemplate == null)
 			return true;
 		
+		closeEditor();
+		
 		if (force) {
 			// Write out a force temp file to let them know next time
 			File tmp = new File(DungeonMaster.PATH_TEMPLATES, ".badclose");
@@ -507,6 +517,16 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		updateTree();
 	}
 	
+	private void closeEditor() {
+		// Pulls data back from the editor into our source object
+		if (currentLoader == null) {
+			// we have to iterate ourselvses. Currently this only means config
+			toConfig(currentEditor.fetchData());
+		} else {
+			this.lastEditorObject = currentLoader.fetchEdittedValue();
+		}
+	}
+	
 	// Doesn't care if exists or not; just opens. Commands should
 	// handle whether it should or shouldn't
 	private boolean openTemplate(String name) {
@@ -536,7 +556,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		updateTree();
 		
 		// testing
-		openEditor(new ConfigEditor(currentTemplate, MechanicsConfig.instance()));
+		//openEditor(new ConfigEditor(currentTemplate, MechanicsConfig.instance()));
 		//testing
 		
 		UIConfState.instance().set(UIConfState.Key.LASTTEMPLATE, target.getPath());
@@ -597,7 +617,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 		}
 	}
 	
-	private void openEditor(DMEditor editor) {
+	private void openEditor(IEditor<?> editor) {
 		if (currentEditor != null) {
 			// UH OH //TODO
 			currentEditor.getComponent().setVisible(false);
@@ -635,16 +655,73 @@ public class TemplateEditorScreen extends JPanel implements ActionListener {
 			return;
 		
 		lastEditorObject = node.getUserObject();
-		DMEditor editor = null;
+		IEditor<?> editor = null;
 		if (lastEditorObject instanceof Config<?>) {
-			editor = new ConfigEditor(currentTemplate, (Config<?>) lastEditorObject);
-		} else if (lastEditorObject instanceof ActionDatumData) {
-			editor = new DatumEditor(currentTemplate, (ActionDatumData) lastEditorObject);
+			editor = new EnumMapEditor<>(this, toMap((Config<?>) lastEditorObject));//new ConfigEditor(currentTemplate, (Config<?>) lastEditorObject);
+		} else {
+			currentLoader = new ObjectDataLoader<>(lastEditorObject);
+			editor = IEditor.createTemplateEditor(this, currentLoader);
+			
 		}
 		
 		if (editor != null)
 			openEditor(editor);
 		
+	}
+	
+	private <T extends Enum<T>> Map<T, FieldData> toMap(Config<T> config) {
+		Map<T, FieldData> map = new HashMap<>();
+		
+		// TODO for each enum make a mapping
+		for (T key : config.getKeyList()) {
+			SimpleFieldData data = null;
+			switch (config.getFieldType(key)) {
+			case BOOL:
+				data = FieldData.simple(config.getBool(key));
+				break;
+			case DOUBLE:
+				data = FieldData.simple(config.getDouble(key));
+				break;
+			case INT:
+				data = FieldData.simple(config.getInt(key));
+				break;
+			case STRING:
+				data = FieldData.simple(config.getString(key));
+				break;
+			default:
+				System.out.println("Missing FieldType key from config reading (TemplateEditorScreen)");
+				data = null;
+				break;
+			}
+			
+			map.put(key, data);
+		}
+		
+		return map;
+	}
+	
+	private <T extends Enum<T>> Config<T> toConfig(Map<?, FieldData> data) {
+		if (lastEditorObject instanceof Config<?>) {
+			Map<T, FieldData> castmap = (Map<T, FieldData>) data;
+			
+			@SuppressWarnings("unchecked")
+			Config<T> conf = (Config<T>) lastEditorObject;
+			
+			for (T key : castmap.keySet()) {
+				conf.setValue(key.name(), ( (SimpleFieldData) castmap.get(key)).getValue());
+			}
+			
+			return conf;
+			
+		} else {
+			System.err.println("Found mismatched internal editor object");
+			return null;
+		}
+	}
+
+	@Override
+	public void dirty() {
+		this.dirty = true;
 	}
 	
 }
