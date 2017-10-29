@@ -237,7 +237,7 @@ public abstract class SessionBase {
 		saveDatum(configDir, PATH_ACTIONS, this.actionDatum);
 		saveDatum(configDir, PATH_SPELLS, this.spellDatum);
 		saveDatum(configDir, PATH_SETTING, this.settingDatum);
-		saveDatum(configDir, PATH_SETTING, this.settingDatum);
+		saveDatum(configDir, PATH_NPC, this.npcDatum);
 		saveDatum(configDir, PATH_ITEM, this.itemDatum);
 	}
 	

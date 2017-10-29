@@ -8,6 +8,8 @@ import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.utils.StatSet;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
+import com.smanzana.templateeditor.api.annotations.DataLoaderName;
 
 /**
  * NPC (npc, or mob, really) template
@@ -37,8 +39,11 @@ public class NPCDatumData implements DatumData {
 		
 	}
 	
+	@DataLoaderName
 	private String templateName;
+	@DataLoaderData
 	private String profileName;
+	@DataLoaderData
 	private StatSet stats;
 	private Inventory inventory;
 	private int xp;

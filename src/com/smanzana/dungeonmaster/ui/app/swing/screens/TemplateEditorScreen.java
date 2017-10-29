@@ -54,6 +54,8 @@ import com.smanzana.templateeditor.uiutils.UIColor;
 
 public class TemplateEditorScreen extends JPanel implements ActionListener, IEditorOwner {
 	
+	private static final long serialVersionUID = -3067843906669791834L;
+
 	private static enum Command {
 		// FILE
 		NEW("new"),
@@ -108,7 +110,6 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 	private ObjectDataLoader<?> currentLoader;
 	private Map<Command, JMenuItem> menuItems;
 	private Object lastEditorObject;
-	private boolean dirty;
 	
 	public TemplateEditorScreen(AppUI UI) {
 		super(new BorderLayout());
@@ -117,7 +118,6 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		lastEditorObject = null;
 		menuItems = new EnumMap<>(Command.class);
 		this.ui = UI;
-		dirty = false;
 	}
 	
 	public void init() {
@@ -505,6 +505,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		if (selection == JOptionPane.YES_OPTION)
 			currentTemplate.save();
 		
+		currentTemplate = null;
 		clearEditorPanel();
 		
 		return true;
@@ -528,6 +529,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			// we have to iterate ourselvses. Currently this only means config
 			toConfig(currentEditor.fetchData());
 		} else {
+			currentEditor.fetchData();
 			this.lastEditorObject = currentLoader.fetchEdittedValue();
 		}
 	}
@@ -574,6 +576,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		// Save & Save as need a template
 		menuItems.get(Command.SAVE).setEnabled(currentTemplate != null);
 		menuItems.get(Command.SAVEAS).setEnabled(currentTemplate != null);
+		menuItems.get(Command.CLOSE).setEnabled(currentTemplate != null);
 		menuItems.get(Command.OPENLAST).setEnabled(UIConfState.instance().get(UIConfState.Key.LASTTEMPLATE) != null);
 	}
 	
@@ -660,6 +663,10 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		if (node.getUserObject() == lastEditorObject)
 			return;
 		
+		if (node.getUserObject() instanceof Datum<?>) {
+			return;
+		}
+		
 		lastEditorObject = node.getUserObject();
 		IEditor<?> editor = null;
 		if (lastEditorObject instanceof Config<?>) {
@@ -709,6 +716,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 	
 	private <T extends Enum<T>> Config<T> toConfig(Map<?, FieldData> data) {
 		if (lastEditorObject instanceof Config<?>) {
+			@SuppressWarnings("unchecked")
 			Map<T, FieldData> castmap = (Map<T, FieldData>) data;
 			
 			@SuppressWarnings("unchecked")
@@ -731,6 +739,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		if (this.currentTemplate != null) {
 			this.currentTemplate.dirty();
 			this.saveEditor();
+			this.sourcePanel.repaint();
 		}
 	}
 	
