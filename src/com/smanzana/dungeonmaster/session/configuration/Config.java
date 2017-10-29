@@ -273,7 +273,7 @@ public abstract class Config<T extends Enum<T>> implements Displayable {
 		}
 		
 		String keyName = inputLine.substring(0, pos);
-		String valueString =  inputLine.substring(pos + 1);
+		String valueString =  inputLine.substring(pos + 1).trim();
 		
 		T key = getKey(keyName);
 		

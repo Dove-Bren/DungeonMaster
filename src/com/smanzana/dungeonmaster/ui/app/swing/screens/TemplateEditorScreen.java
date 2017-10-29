@@ -396,10 +396,12 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			DungeonMaster.shutdown();
 			break;
 		case SAVE:
+			saveEditor();
 			currentTemplate.save();
 			break;
 		case SAVEAS:
 			{
+				saveEditor();
 				JFileChooser fc = new JFileChooser(new File(DungeonMaster.PATH_TEMPLATES));
 				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				
@@ -465,7 +467,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		if (currentTemplate == null)
 			return true;
 		
-		closeEditor();
+		saveEditor();
 		
 		if (force) {
 			// Write out a force temp file to let them know next time
@@ -517,8 +519,11 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		updateTree();
 	}
 	
-	private void closeEditor() {
+	private void saveEditor() {
 		// Pulls data back from the editor into our source object
+		if (currentEditor == null)
+			return;
+		
 		if (currentLoader == null) {
 			// we have to iterate ourselvses. Currently this only means config
 			toConfig(currentEditor.fetchData());
@@ -576,6 +581,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		
 		if (currentTemplate == null) {
 			sourceTree.setVisible(false);
+			sourcePanel.revalidate();
 			return;
 		}
 		
@@ -721,7 +727,10 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 
 	@Override
 	public void dirty() {
-		this.dirty = true;
+		if (this.currentTemplate != null) {
+			this.currentTemplate.dirty();
+			this.saveEditor();
+		}
 	}
 	
 }
