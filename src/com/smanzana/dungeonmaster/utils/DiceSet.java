@@ -11,7 +11,7 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
  * @author Skyler
  *
  */
-public class DiceSet implements ValueSpecifier {
+public class DiceSet extends ValueSpecifier {
 	
 	private List<Dice> dice;
 	
@@ -23,6 +23,14 @@ public class DiceSet implements ValueSpecifier {
 		this();
 		for (Dice d : dice)
 			this.dice.add(d);
+	}
+	
+	public void addDice(Dice dice) {
+		this.dice.add(dice);
+	}
+	
+	public List<Dice> getDice() {
+		return dice;
 	}
 	
 	public int roll() {

@@ -8,6 +8,8 @@ import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.utils.StatSet;
+import com.smanzana.dungeonmaster.utils.ValueConstant;
+import com.smanzana.dungeonmaster.utils.ValueSpecifier;
 import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 import com.smanzana.templateeditor.api.annotations.DataLoaderName;
 
@@ -45,13 +47,21 @@ public class NPCDatumData implements DatumData {
 	private String profileName;
 	@DataLoaderData
 	private StatSet stats;
+	@DataLoaderData
 	private Inventory inventory;
+	@DataLoaderData
 	private int xp;
+	@DataLoaderData
 	private boolean willTrade;
+	@DataLoaderData
+	private ValueSpecifier love;
 	
 	public NPCDatumData() {
 		this.inventory = new Inventory();
 		this.stats = new StatSet();
+		
+		// remove
+		love = new ValueConstant(5);
 	}
 	
 	public NPCDatumData(String templateName, String profileName) {

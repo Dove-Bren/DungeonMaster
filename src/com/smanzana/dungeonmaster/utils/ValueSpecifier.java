@@ -2,15 +2,18 @@ package com.smanzana.dungeonmaster.utils;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.ui.app.swing.editors.fields.ValueField;
+import com.smanzana.templateeditor.api.ICustomData;
+import com.smanzana.templateeditor.editor.fields.EditorField;
 
-public interface ValueSpecifier extends DataCompatible {
+public abstract class ValueSpecifier implements DataCompatible, ICustomData {
 
 	/**
 	 * Gets a value specified by this specifier.
 	 * For Dice or Ranges, this means a random number in the valid set of returns
 	 * @return
 	 */
-	public int fetchValue();
+	public abstract int fetchValue();
 	
 	public static ValueSpecifier fromData(DataNode data) {
 		// Crappy but oh well. Bite me
@@ -35,6 +38,26 @@ public interface ValueSpecifier extends DataCompatible {
 		
 		ret.load(data);
 		return ret;
+	}
+	
+	/**
+	 * Construct an editor field to represent this field.
+	 * The editor field should be initialized to the current state of this piece of data.
+	 * @return An editor to be displayed to represent and edit this field
+	 */
+	@Override
+	public EditorField<?> getField() {
+		return new ValueField(this);
+	}
+	
+	/**
+	 * Pull data out from the given field to update this piece of data.
+	 * The passed field will be the same as produced with a corresponding call to {@link #getField()}.
+	 * @param field
+	 */
+	@Override
+	public ValueSpecifier fillFromField(EditorField<?> field) {
+		return ((ValueField) field).getObject();
 	}
 	
 }

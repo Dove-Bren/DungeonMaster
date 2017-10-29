@@ -1,5 +1,7 @@
 package com.smanzana.dungeonmaster.action.subaction;
 
+import java.util.Map;
+
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.ValueSpecifier;
@@ -73,6 +75,12 @@ public class SubDamage extends SubAction {
 	@Override
 	public String getDisplayTooltip() {
 		return "Deal raw damage";
+	}
+
+	@Override
+	protected Map<DataType, String> getApplicableTypes() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

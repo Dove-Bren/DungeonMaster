@@ -2,7 +2,7 @@ package com.smanzana.dungeonmaster.utils;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
-public class ValueConstant implements ValueSpecifier {
+public class ValueConstant extends ValueSpecifier {
 
 	private int value;
 	

@@ -7,10 +7,16 @@ import com.smanzana.dungeonmaster.action.Action;
 import com.smanzana.dungeonmaster.action.Action.TargetType;
 import com.smanzana.dungeonmaster.action.PartyAction;
 import com.smanzana.dungeonmaster.action.subaction.SubAction;
+import com.smanzana.dungeonmaster.action.subaction.SubDamage;
 import com.smanzana.dungeonmaster.action.subaction.SubRest;
 import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
+import com.smanzana.dungeonmaster.utils.Dice;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
+import com.smanzana.templateeditor.api.annotations.DataLoaderDescription;
+import com.smanzana.templateeditor.api.annotations.DataLoaderList;
+import com.smanzana.templateeditor.api.annotations.DataLoaderName;
 
 /**
  * Stores:
@@ -37,17 +43,29 @@ public class ActionDatumData implements DatumData {
 		
 	}
 	
+	@DataLoaderName
 	private String name;
+	@DataLoaderDescription
 	private String description;
+	@DataLoaderData
 	private boolean beneficial;
+	@DataLoaderData
 	private boolean isParty; // is a party action
+	@DataLoaderData
 	private String partyPrompt;
+	@DataLoaderData
 	private TargetType targetType;
+	@DataLoaderList(templateName="templateSubaction")
 	private List<SubAction> subactions;
+	@DataLoaderData
 	private Attributes attribute;
+	
+	public SubAction templateSubaction;
 	
 	public ActionDatumData() {
 		this.subactions = new LinkedList<>();
+		
+		templateSubaction = new SubDamage(new Dice(2, 4, false));
 	}
 	
 	public ActionDatumData(String name, String description, boolean beneficial, Attributes attribute, TargetType targetType) {

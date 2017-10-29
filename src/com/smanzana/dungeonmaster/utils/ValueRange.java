@@ -12,7 +12,7 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
  * @author Skyler
  *
  */
-public class ValueRange implements DataCompatible, ValueSpecifier {
+public class ValueRange extends ValueSpecifier implements DataCompatible {
 
 	private int min;
 	private int range;

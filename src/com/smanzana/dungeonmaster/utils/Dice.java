@@ -5,7 +5,7 @@ import java.util.Random;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 
-public class Dice implements DataCompatible, ValueSpecifier {
+public class Dice extends ValueSpecifier implements DataCompatible {
 
 	private int dieCount;
 	private int dieFaces;
@@ -34,6 +34,10 @@ public class Dice implements DataCompatible, ValueSpecifier {
 	
 	public int getDieFaces() {
 		return this.dieFaces;
+	}
+	
+	public boolean includesZero() {
+		return includeZero;
 	}
 	
 	public int roll() {

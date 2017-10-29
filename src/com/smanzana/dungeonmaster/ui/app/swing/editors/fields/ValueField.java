@@ -1,26 +1,37 @@
 package com.smanzana.dungeonmaster.ui.app.swing.editors.fields;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 
 import com.smanzana.dungeonmaster.utils.Dice;
 import com.smanzana.dungeonmaster.utils.DiceSet;
 import com.smanzana.dungeonmaster.utils.ValueConstant;
 import com.smanzana.dungeonmaster.utils.ValueRange;
 import com.smanzana.dungeonmaster.utils.ValueSpecifier;
+import com.smanzana.templateeditor.IEditorOwner;
+import com.smanzana.templateeditor.api.FieldData;
+import com.smanzana.templateeditor.editor.fields.BoolField;
 import com.smanzana.templateeditor.editor.fields.EditorField;
+import com.smanzana.templateeditor.editor.fields.GenericListField;
 import com.smanzana.templateeditor.editor.fields.IntField;
-import com.smanzana.templateeditor.editor.fields.IntField.IntFieldCallback;
+import com.smanzana.templateeditor.uiutils.TextUtil;
 
 /**
  * Construct a {@link ValueSpecifier}.<br />
@@ -29,11 +40,7 @@ import com.smanzana.templateeditor.editor.fields.IntField.IntFieldCallback;
  * @author Skyler
  *
  */
-public class ValueField implements ActionListener, EditorField {
-
-	public static interface ValueFieldCallback {
-		public void setField(ValueSpecifier value);
-	}
+public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IEditorOwner {
 	
 	private static enum Type {
 		CONSTANT,
@@ -42,53 +49,408 @@ public class ValueField implements ActionListener, EditorField {
 		DICESET
 	}
 	
-	private JPanel wrapper;
-	private ValueFieldCallback hook;
-	private Map<Type, JComponent> typeFields; // holds the panel belonging to each type
-	
-	public ValueField(String title, ValueFieldCallback hook) {
-		this(title, hook, null);
+	private static abstract class ValueEditor<T extends ValueSpecifier> extends JPanel {
+		private static final long serialVersionUID = 1L;
+
+		public abstract T getValueSpecifier();
 	}
 	
-	public ValueField(String title, ValueFieldCallback hook, ValueSpecifier current) {
-		this.hook = hook;
+	private static class ConstantField extends ValueEditor<ValueConstant> {
+		
+		private static final long serialVersionUID = 3128237228839503771L;
+		private IntField field;
+		
+		public ConstantField(IEditorOwner owner, int startingVal) {
+			super();
+
+			field = new IntField(startingVal);
+			field.setOwner(owner);
+			JLabel label = new JLabel("Constant Value");
+			this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			this.add(label);
+			this.add(Box.createRigidArea(new Dimension(20, 0)));
+			this.add(field.getComponent());
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			
+		}
+		
+		public int getValue() {
+			return field.getObject();
+		}
+		
+		public void setValue(int value) {
+			field.setObject(value);
+		}
+
+		@Override
+		public ValueConstant getValueSpecifier() {
+			return new ValueConstant(getValue());
+		}
+	}
+	
+	private static class RangeField extends ValueEditor<ValueRange> implements IEditorOwner {
+		
+		private static final long serialVersionUID = 312823727939503771L;
+		private IntField fieldMin;
+		private IntField fieldMax;
+		
+		public RangeField(IEditorOwner owner, int startingMin, int startingMax) {
+			super();
+
+			fieldMin = new IntField(startingMin);
+			fieldMax = new IntField(startingMax);
+			fieldMin.setOwner(owner);
+			fieldMax.setOwner(owner);
+			JLabel label = new JLabel("Value Range: ");
+			this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			this.add(label);
+			this.add(Box.createRigidArea(new Dimension(20, 0)));
+			this.add(fieldMin.getComponent());
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			label = new JLabel(" - ");
+			this.add(label);
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			this.add(fieldMax.getComponent());
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+
+		}
+		
+		public int getMin() {
+			return fieldMin.getObject();
+		}
+		
+		public int getMax() {
+			return fieldMax.getObject();
+		}
+		
+		public void setValues(int min, int max) {
+			fieldMin.setObject(min);
+			fieldMax.setObject(max);
+		}
+
+		@Override
+		public void dirty() {
+			int min = getMin(),
+					max = getMax();
+			if (min > max) {
+				fieldMin.setObject(max);
+				fieldMax.setObject(min);
+			} else if (min == max) {
+				fieldMax.setObject(min + 1);
+			}
+		}
+
+		@Override
+		public ValueRange getValueSpecifier() {
+			return new ValueRange(getMin(), getMax());
+		}
+	}
+	
+	private static class DiceField extends ValueEditor<Dice> implements IEditorOwner {
+		
+		private static final long serialVersionUID = 31246464939673771L;
+		private IntField fieldNum;
+		private IntField fieldFaces;
+		private BoolField fieldZero;
+		
+		public DiceField(IEditorOwner owner, int startingNum, int startingFaces, boolean includeZero) {
+			super();
+
+			fieldNum = new IntField(startingNum);
+			fieldNum.setOwner(owner);
+			fieldFaces = new IntField(startingFaces);
+			fieldFaces.setOwner(owner);
+			fieldZero = new BoolField(includeZero);
+			fieldZero.setOwner(owner);
+			JLabel label = new JLabel("Dice: ");
+			this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			this.add(label);
+			this.add(Box.createRigidArea(new Dimension(20, 0)));
+			this.add(fieldNum.getComponent());
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			label = new JLabel("d");
+			this.add(label);
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			this.add(fieldFaces.getComponent());
+			this.add(Box.createRigidArea(new Dimension(30, 0)));
+			label = new JLabel("0-bounded: ");
+			this.add(label);
+			this.add(Box.createRigidArea(new Dimension(5, 0)));
+			this.add(fieldZero.getComponent());
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+
+		}
+		
+		public int getNum() {
+			return fieldNum.getObject();
+		}
+		
+		public int getFaces() {
+			return fieldFaces.getObject();
+		}
+		
+		public boolean getZero() {
+			return fieldZero.getObject();
+		}
+		
+		public void setValues(int num, int faces, boolean zero) {
+			fieldNum.setObject(num);
+			fieldFaces.setObject(faces);
+			fieldZero.setObject(zero);
+		}
+
+		@Override
+		public void dirty() {
+			int num = getNum(),
+				faces = getFaces();
+			
+			if (num < 1)
+				fieldNum.setObject(1);
+			if (faces < 2)
+				fieldFaces.setObject(2);
+		}
+
+		@Override
+		public Dice getValueSpecifier() {
+			return new Dice(getNum(), getFaces(), getZero());
+		}
+	}
+	
+	private static class DiceSetField extends ValueEditor<DiceSet> {
+		
+		private static final long serialVersionUID = -1107297129151127038L;
+
+		private static class DiceSetFieldData extends FieldData {
+			private DiceField field;
+			private IEditorOwner cloneOwner;
+			
+			public DiceSetFieldData(IEditorOwner owner, DiceField field) {
+				this.field = field;
+				cloneOwner = owner;
+			}
+			
+			@Override
+			public FieldData clone() {
+				return new DiceSetFieldData(cloneOwner, new DiceField(
+						cloneOwner,
+						field.getNum(),
+						field.getFaces(),
+						field.getZero()
+						));
+			}
+
+			@Override
+			public EditorField<?> constructField() {
+				return new EditorField<DiceField>() {
+
+					@Override
+					public JComponent getComponent() {
+						return field;
+					}
+
+					@Override
+					public DiceField getObject() {
+						return null;
+					}
+
+					@Override
+					public void setObject(DiceField obj) {
+						;
+					}
+
+					@Override
+					public DiceField getOriginal() {
+						return field;
+					}
+
+					@Override
+					public void setOwner(IEditorOwner owner) {
+						;
+					}
+				};
+			}
+
+			@Override
+			public void fillFromField(EditorField<?> field) {
+				;
+			}
+		}
+		
+		private GenericListField<DiceSetFieldData> list;
+		
+		public DiceSetField(IEditorOwner owner, Dice template, List<Dice> inputList) {
+			super();
+
+			List<DiceSetFieldData> dataList = new ArrayList<>(inputList.size());
+			for (Dice f : inputList)
+				dataList.add(new DiceSetFieldData(owner, new DiceField(owner, f.getDieCount(), f.getDieFaces(), f.includesZero())));
+			list = new GenericListField<>(new DiceSetFieldData(owner, new DiceField(owner, template.getDieCount(), template.getDieFaces(), template.includesZero())), dataList);
+			list.setOwner(owner);
+			JLabel label = new JLabel("Dice Set: ");
+			this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			this.add(label);
+			this.add(Box.createRigidArea(new Dimension(20, 0)));
+			this.add(list.getComponent());
+			this.add(Box.createRigidArea(new Dimension(10, 0)));
+
+		}
+		
+		public List<Dice> getDice() {
+			List<DiceSetFieldData> data = list.getObject();
+			List<Dice> out = new ArrayList<>(data.size());
+			for (DiceSetFieldData d : data)
+				out.add(d.field.getValueSpecifier());
+			return out;
+		}
+		
+		public void setValues(IEditorOwner owner, List<Dice> newDice) {
+			List<DiceSetFieldData> dataList = new ArrayList<>(newDice.size());
+			for (Dice f : newDice)
+				dataList.add(new DiceSetFieldData(owner, new DiceField(owner, f.getDieCount(), f.getDieFaces(), f.includesZero())));
+			
+			list.setObject(dataList);
+		}
+
+		@Override
+		public DiceSet getValueSpecifier() {
+			DiceSet set = new DiceSet();
+			for (Dice f : getDice()) {
+				set.addDice(f);
+			}
+			return set;
+		}
+	}
+	
+	private JPanel wrapper;
+	private Map<Type, ValueEditor<?>> typeFields; // holds the panel belonging to each type
+	private Type currentType;
+	private ValueSpecifier original;
+	private IEditorOwner owner;
+	
+	public ValueField() {
+		this(null);
+	}
+	
+	public ValueField(ValueSpecifier current) {
 		typeFields = new EnumMap<>(Type.class);
 		
-		if (current == null)
-			current = new ValueConstant(0);
+		original = current;
+		
+		JComboBox<Type> comboField = new JComboBox<>();
+		for (Type t : Type.values())
+		comboField.addItem(t);
+		
+		comboField.setEditable(false);
+		comboField.setRenderer(new ListCellRenderer<Type>() {
+			@Override
+			public Component getListCellRendererComponent(JList<? extends Type> arg0, Type arg1, int arg2, boolean arg3,
+					boolean arg4) {
+				JLabel ret = new JLabel(TextUtil.pretty(arg1.name()));
+				
+				ret.setOpaque(true);
+				if (arg3) {
+					ret.setBackground(Color.DARK_GRAY);
+					ret.setForeground(Color.WHITE);
+				} else {
+					ret.setBackground(Color.LIGHT_GRAY);
+					ret.setForeground(Color.BLACK);
+				}
+				
+				return ret;
+			}
+		});
+		comboField.addItemListener(this);
 		
 		wrapper = new JPanel();
-		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.LINE_AXIS));
-		wrapper.add(Box.createRigidArea(new Dimension(10, 0)));
-		wrapper.add(Box.createHorizontalGlue());
-		JLabel label = new JLabel(title);
-		label.setFont(label.getFont().deriveFont(Font.BOLD));
-		wrapper.add(label);
-		wrapper.add(Box.createRigidArea(new Dimension(20, 0)));
+		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.PAGE_AXIS));
+		wrapper.add(Box.createRigidArea(new Dimension(0, 10)));
+		wrapper.add(comboField);
+		wrapper.add(Box.createRigidArea(new Dimension(0, 20)));
 		
-		JPanel typePanel;
-		
+		ValueEditor<?> editor;
+		int val1;
+		int val2;
 		// Constant
-		typePanel = (new IntField("", new IntFieldCallback() {
-			@Override
-			public void setField(int value) {
-				((ValueConstant) getCurrentValue()).setValue(value);
+		if (currentType == Type.CONSTANT)
+			val1 = current.fetchValue();
+		else
+			val1 = 0;
+		editor = new ConstantField(this, val1);
+		typeFields.put(Type.CONSTANT, editor);
+		editor.setVisible(false);
+		wrapper.add(editor);
+		
+		// Range
+		if (currentType == Type.RANGE) {
+			ValueRange range = (ValueRange) current;
+			val1 = range.getMin();
+			val2 = range.getMax();
+		} else {
+			val1 = 0;
+			val2 = 1;
+		}
+		editor = new RangeField(this, val1, val2);
+		typeFields.put(Type.RANGE, editor);
+		editor.setVisible(false);
+		wrapper.add(editor);
+		
+		// Dice
+		boolean zero;
+		if (currentType == Type.DICE) {
+			Dice die = (Dice) current;
+			val1 = die.getDieCount();
+			val2 = die.getDieFaces();
+			zero = die.includesZero();
+		} else {
+			val1 = 1;
+			val2 = 6;
+			zero = false;
+		}
+		editor = new DiceField(this, val1, val2, zero);
+		typeFields.put(Type.DICE, editor);
+		editor.setVisible(false);
+		wrapper.add(editor);
+		
+		// DiceSet
+		List<Dice> diceFieldList = new LinkedList<>();
+		Dice diceFieldTemplate = new Dice(1, 6, false);;
+		if (currentType == Type.DICESET) {
+			DiceSet set = (DiceSet) current;
+			for (Dice d : set.getDice()) {
+				diceFieldList.add(d);
 			}
-		}, current instanceof ValueConstant ? current.fetchValue() + "" : "0").getComponent());
-		wrapper.add(typePanel);
+		} else {
+			diceFieldList.add(new Dice(1, 6, false));
+			diceFieldList.add(new Dice(2, 4, false));
+		}
+		editor = new DiceSetField(this, diceFieldTemplate, diceFieldList);
+		typeFields.put(Type.DICESET, editor);
+		editor.setVisible(false);
+		wrapper.add(editor);
 		
-		
-		
-		
-		
-		
-		wrapper.add(Box.createHorizontalGlue());
+		wrapper.add(Box.createRigidArea(new Dimension(0, 10)));
 
-		wrapper.validate();
+		setObject(current);
 	}
 	
-	private ValueSpecifier getCurrentValue() {
+	private void updateField(Type newType) {
 		
+		if (currentType != null)
+			typeFields.get(currentType).setVisible(false);
+		typeFields.get(newType).setVisible(true);
+
+		if (newType == Type.DICESET) {
+			System.out.println(((DiceSet) typeFields.get(newType).getValueSpecifier()).getDice().size());
+		}
+		
+		currentType = newType;
+		
+		wrapper.validate();
+		wrapper.repaint();
 	}
 	
 	public JPanel getComponent() {
@@ -96,11 +458,73 @@ public class ValueField implements ActionListener, EditorField {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		if (hook != null)
-			hook.setField(Integer.parseInt(textfield.getText()));
+	public ValueSpecifier getObject() {
+		return typeFields.get(currentType).getValueSpecifier();
 	}
-	
-	
-	
+
+	@Override
+	public void setObject(ValueSpecifier obj) {
+		Type newType;
+		if (obj == null) {
+			obj = new ValueConstant(0);
+			newType = Type.CONSTANT;
+		}
+		
+		// deduce type
+		if (obj instanceof ValueConstant) {
+			newType = Type.CONSTANT;
+			ConstantField field = (ConstantField) typeFields.get(newType);
+			field.setValue(obj.fetchValue());
+		} else if (obj instanceof ValueRange) {
+			newType = Type.RANGE;
+			RangeField field = (RangeField) typeFields.get(newType);
+			ValueRange o = (ValueRange) obj;
+			field.setValues(o.getMin(), o.getMax());
+		} else if (obj instanceof Dice) {
+			newType = Type.DICE;
+			DiceField field = (DiceField) typeFields.get(newType);
+			Dice o = (Dice) obj;
+			field.setValues(o.getDieCount(), o.getDieFaces(), o.includesZero());
+		} else if (obj instanceof DiceSet) {
+			newType = Type.DICESET;
+			DiceSetField field = (DiceSetField) typeFields.get(newType);
+			DiceSet o = (DiceSet) obj;
+			field.setValues(this, o.getDice());
+		} else {
+			System.err.println("Missing switch case in ValueField!");
+			obj = new ValueConstant(0);
+			newType = Type.CONSTANT;
+		}
+		
+		updateField(newType);
+	}
+
+	@Override
+	public ValueSpecifier getOriginal() {
+		return original;
+	}
+
+	@Override
+	public void setOwner(IEditorOwner owner) {
+		this.owner = owner;
+	}
+
+	@Override
+	public void itemStateChanged(ItemEvent arg0) {
+		if (arg0.getStateChange() != ItemEvent.SELECTED)
+			return;
+		
+		Type newType = (Type) arg0.getItem();
+		if (newType == currentType)
+			return;
+		
+		dirty();
+		updateField(newType);
+	}
+
+	@Override
+	public void dirty() {
+		if (this.owner != null)
+			this.owner.dirty();
+	}
 }
