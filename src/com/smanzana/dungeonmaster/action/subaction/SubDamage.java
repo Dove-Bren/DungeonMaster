@@ -56,6 +56,8 @@ public class SubDamage extends SubAction {
 	public DataNode write(String key) {
 		DataNode base = super.write(key);
 		
+		base.addChild(damage.write("amount"));
+		
 		return base;
 	}
 

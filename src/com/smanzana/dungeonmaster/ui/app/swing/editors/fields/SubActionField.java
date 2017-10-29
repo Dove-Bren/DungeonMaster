@@ -81,7 +81,6 @@ public class SubActionField implements ItemListener, EditorField<SubAction>, IEd
 		JComboBox<String> comboField = new JComboBox<>();
 		SubAction act;
 		for (String subactionType : SubAction.getRegisteredTypes()) {
-			System.out.println("Registering " + subactionType);
 			comboField.addItem(subactionType);
 			act = SubAction.constructFromType(subactionType);
 			typeMaps.put(subactionType, act.getApplicableTypes());
@@ -153,6 +152,8 @@ public class SubActionField implements ItemListener, EditorField<SubAction>, IEd
 		Map<DataType, String> applicables = typeMaps.get(newType);
 		for (DataType d : applicables.keySet()) {
 			typeFields.get(d).comp.setVisible(true);
+			typeFields.get(d).comp.validate();
+			System.out.println("Setting " + typeFields.get(d).comp + " (" + d.name() + ") visible");
 		}
 
 		currentType = newType;
@@ -204,19 +205,22 @@ public class SubActionField implements ItemListener, EditorField<SubAction>, IEd
 		DataNode node = obj.write("dummy");
 		newType = obj.getClassKey();
 
-		System.out.println("Fetching " + newType);
 		Map<DataType, String> map = typeMaps.get(newType);
 		for (DataType type : map.keySet()) {
 			String subkey = map.get(type);
 			// for each type, set value to what's in DataNode at map.get(type)
+			DataNode child = node.getChild(subkey);
+			if (child == null)
+				System.err.println("Failed child lookup for key " + subkey + " of data type " + obj.getClassKey());
+			
 			switch (type) {
 			case AMOUNT_HP:
 			case AMOUNT_MP:
 			case AMOUNT_STAMINA:
-				((ValueField) typeFields.get(type).field).setObject(ValueSpecifier.fromData(node.getChild(subkey)));
+				((ValueField) typeFields.get(type).field).setObject(ValueSpecifier.fromData(child));
 				break;
 			case EFFECT:
-				((EffectField) typeFields.get(type).field).setObject(Effect.fromData(node.getChild(subkey)));
+				((EffectField) typeFields.get(type).field).setObject(Effect.fromData(child));
 				break;
 			}
 		}
