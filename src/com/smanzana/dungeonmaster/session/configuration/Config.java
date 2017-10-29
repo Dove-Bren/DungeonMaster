@@ -250,7 +250,7 @@ public abstract class Config<T extends Enum<T>> implements Displayable {
 	 * @param key
 	 * @return comments as a string, or null
 	 */
-	protected abstract List<String> getComments(T key);
+	public abstract List<String> getComments(T key);
 	
 	public List<String> getComments(String keyName) {
 		T key = getKey(keyName);

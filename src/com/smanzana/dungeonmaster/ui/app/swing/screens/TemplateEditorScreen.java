@@ -12,8 +12,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -676,7 +676,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 	}
 	
 	private <T extends Enum<T>> Map<T, FieldData> toMap(Config<T> config) {
-		Map<T, FieldData> map = new HashMap<>();
+		Map<T, FieldData> map = new TreeMap<>();
 		
 		// TODO for each enum make a mapping
 		for (T key : config.getKeyList()) {
@@ -700,6 +700,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 				break;
 			}
 			
+			data.desc(config.getComments(key));
 			map.put(key, data);
 		}
 		

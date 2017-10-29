@@ -85,7 +85,7 @@ public class CombatBonusConfig extends Config<CombatBonusKey> {
 	}
 
 	@Override
-	protected List<String> getComments(CombatBonusKey key) {
+	public List<String> getComments(CombatBonusKey key) {
 		return commentMap.get(key);
 	}
 	

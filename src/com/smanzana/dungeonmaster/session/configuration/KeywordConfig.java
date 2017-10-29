@@ -78,7 +78,7 @@ public class KeywordConfig extends Config<KeywordKey> {
 	}
 
 	@Override
-	protected List<String> getComments(KeywordKey key) {
+	public List<String> getComments(KeywordKey key) {
 		return commentMap.get(key);
 	}
 	

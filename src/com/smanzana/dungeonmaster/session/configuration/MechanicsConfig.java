@@ -103,7 +103,7 @@ public class MechanicsConfig extends Config<MechanicsKey> {
 	}
 
 	@Override
-	protected List<String> getComments(MechanicsKey key) {
+	public List<String> getComments(MechanicsKey key) {
 		return commentMap.get(key);
 	}
 	

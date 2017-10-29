@@ -85,7 +85,7 @@ public class RollTableConfig extends Config<RollTableKey> {
 	}
 
 	@Override
-	protected List<String> getComments(RollTableKey key) {
+	public List<String> getComments(RollTableKey key) {
 		return commentMap.get(key);
 	}
 	
