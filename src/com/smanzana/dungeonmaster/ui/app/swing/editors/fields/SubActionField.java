@@ -183,6 +183,7 @@ public class SubActionField implements ItemListener, EditorField<SubAction>, IEd
 		wrapper.add(Box.createVerticalGlue());
 
 		setObject(current);
+		comboField.setSelectedItem(currentType);
 	}
 	
 	private void updateField(String newType) {

@@ -175,6 +175,7 @@ public class EffectField implements ItemListener, EditorField<Effect>, IEditorOw
 		wrapper.add(Box.createRigidArea(new Dimension(0, 10)));
 
 		setObject(current);
+		comboField.setSelectedItem(currentType);
 	}
 	
 	private void updateField(String newType) {

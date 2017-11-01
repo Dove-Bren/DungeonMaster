@@ -443,6 +443,7 @@ public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IE
 		wrapper.add(Box.createRigidArea(new Dimension(0, 10)));
 
 		setObject(current);
+		comboField.setSelectedItem(currentType);
 	}
 	
 	private void updateField(Type newType) {
