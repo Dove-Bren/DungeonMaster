@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.smanzana.dungeonmaster.utils.Displayable;
+import com.smanzana.dungeonmaster.utils.StepList;
 
 public abstract class Config<T extends Enum<T>> implements Displayable {
 	
@@ -24,6 +25,7 @@ public abstract class Config<T extends Enum<T>> implements Displayable {
 		BOOL,
 		INT,
 		DOUBLE,
+		STEPLIST,
 	}
 	
 	protected static class ConfigValue {
@@ -45,6 +47,8 @@ public abstract class Config<T extends Enum<T>> implements Displayable {
 				this.valueType = ValueType.DOUBLE;
 			if (value instanceof Boolean)
 				this.valueType = ValueType.BOOL;
+			if (value instanceof StepList)
+				this.valueType = ValueType.STEPLIST;
 		}
 		
 		public ValueType getType() {
@@ -62,6 +66,8 @@ public abstract class Config<T extends Enum<T>> implements Displayable {
 				return (o instanceof Double);
 			case BOOL:
 				return (o instanceof Boolean);
+			case STEPLIST:
+				return (o instanceof StepList);
 			}
 			
 			return false;
@@ -91,6 +97,13 @@ public abstract class Config<T extends Enum<T>> implements Displayable {
 		public Boolean getBooleanValue() {
 			if (valueType == ValueType.BOOL)
 				return (Boolean) value;
+			
+			return null;
+		}
+		
+		public StepList getSteplistValue() {
+			if (valueType == ValueType.STEPLIST)
+				return (StepList) value;
 			
 			return null;
 		}
@@ -140,6 +153,9 @@ public abstract class Config<T extends Enum<T>> implements Displayable {
 				else if (serial.equalsIgnoreCase("false"))
 					this.value = Boolean.FALSE;
 				break;
+			case STEPLIST:
+				this.value = StepList.deserialize(serial);
+				break;
 			}
 		}
 	}
@@ -184,6 +200,10 @@ public abstract class Config<T extends Enum<T>> implements Displayable {
 		return values.get(key).getDoubleValue();
 	}
 	
+	public StepList getStepList(T key) {
+		return values.get(key).getSteplistValue();
+	}
+	
 	public Object getValue(String keyName) {
 		T key = getKey(keyName);
 		ValueType type = null;
@@ -202,6 +222,8 @@ public abstract class Config<T extends Enum<T>> implements Displayable {
 			return getInt(key);
 		case STRING:
 			return getString(key);
+		case STEPLIST:
+			return getStepList(key);
 		}
 		
 		return null;

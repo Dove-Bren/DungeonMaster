@@ -200,6 +200,11 @@ public class StepList implements DataCompatible, ICustomData {
 		return list;
 	}
 	
+	@Override
+	public String toString() {
+		return serialize();
+	}
+	
 	public Collection<Integer> getMaxs() {
 		return map.keySet();
 	}

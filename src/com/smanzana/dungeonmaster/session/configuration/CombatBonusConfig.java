@@ -52,12 +52,12 @@ public class CombatBonusConfig extends Config<CombatBonusKey> {
 	protected void setupDefaults()
 	{
 		// Default 0 until 1:15-18, 2:19-21, 3+
-		setValue(CombatBonusKey.BONUS_CHARISMA, "14:0,18:1,21:2");
-		setValue(CombatBonusKey.BONUS_CONSTITUTION, "14:0,18:1,21:2");
-		setValue(CombatBonusKey.BONUS_DEXTERITY, "14:0,18:1,21:2");
-		setValue(CombatBonusKey.BONUS_INTELLIGENCE, "14:0,18:1,21:2");
-		setValue(CombatBonusKey.BONUS_STRENGTH, "14:0,18:1,21:2");
-		setValue(CombatBonusKey.BONUS_WISDOM, "14:0,18:1,21:2");
+		setValue(CombatBonusKey.BONUS_CHARISMA, StepList.deserialize("14:0,18:1,21:2"));
+		setValue(CombatBonusKey.BONUS_CONSTITUTION, StepList.deserialize("14:0,18:1,21:2"));
+		setValue(CombatBonusKey.BONUS_DEXTERITY, StepList.deserialize("14:0,18:1,21:2"));
+		setValue(CombatBonusKey.BONUS_INTELLIGENCE, StepList.deserialize("14:0,18:1,21:2"));
+		setValue(CombatBonusKey.BONUS_STRENGTH, StepList.deserialize("14:0,18:1,21:2"));
+		setValue(CombatBonusKey.BONUS_WISDOM, StepList.deserialize("14:0,18:1,21:2"));
 	}
 
 	@Override
@@ -100,10 +100,8 @@ public class CombatBonusConfig extends Config<CombatBonusKey> {
 	
 	public int getBonus(Attributes attrib, int score) {
 		CombatBonusKey key = keyFromAttrib(attrib);
-		String raw = this.getString(key);
 		
-		// parse it!
-		StepList list = StepList.deserialize(raw);
+		StepList list = this.getStepList(key);
 		return list.getValue(score);
 	}
 	

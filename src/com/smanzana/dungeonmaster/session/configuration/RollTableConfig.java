@@ -52,12 +52,12 @@ public class RollTableConfig extends Config<RollTableKey> {
 	protected void setupDefaults()
 	{
 		// Default D&D5e
-		setValue(RollTableKey.BONUS_CHARISMA, "1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9");
-		setValue(RollTableKey.BONUS_CONSTITUTION, "1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9");
-		setValue(RollTableKey.BONUS_DEXTERITY, "1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9");
-		setValue(RollTableKey.BONUS_INTELLIGENCE, "1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9");
-		setValue(RollTableKey.BONUS_STRENGTH, "1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9");
-		setValue(RollTableKey.BONUS_WISDOM, "1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9");
+		setValue(RollTableKey.BONUS_CHARISMA, StepList.deserialize("1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9"));
+		setValue(RollTableKey.BONUS_CONSTITUTION, StepList.deserialize("1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9"));
+		setValue(RollTableKey.BONUS_DEXTERITY, StepList.deserialize("1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9"));
+		setValue(RollTableKey.BONUS_INTELLIGENCE, StepList.deserialize("1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9"));
+		setValue(RollTableKey.BONUS_STRENGTH, StepList.deserialize("1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9"));
+		setValue(RollTableKey.BONUS_WISDOM, StepList.deserialize("1:-5,3:-4,5:-3,7:-2,9:-1,11:0,13:1,15:2,17:3,19:4,21:5,23:6,25:7,27:8,29:9"));
 	}
 
 	@Override
@@ -100,10 +100,9 @@ public class RollTableConfig extends Config<RollTableKey> {
 	
 	public int getBonus(Attributes attrib, int score) {
 		RollTableKey key = keyFromAttrib(attrib);
-		String raw = this.getString(key);
 		
 		// parse it!
-		StepList list = StepList.deserialize(raw);
+		StepList list = this.getStepList(key);
 		return list.getValue(score);
 	}
 	

@@ -47,6 +47,7 @@ import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 import com.smanzana.templateeditor.IEditorOwner;
 import com.smanzana.templateeditor.api.FieldData;
 import com.smanzana.templateeditor.api.ObjectDataLoader;
+import com.smanzana.templateeditor.data.CustomFieldData;
 import com.smanzana.templateeditor.data.SimpleFieldData;
 import com.smanzana.templateeditor.editor.EnumMapEditor;
 import com.smanzana.templateeditor.editor.IEditor;
@@ -697,7 +698,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		
 		// TODO for each enum make a mapping
 		for (T key : config.getKeyList()) {
-			SimpleFieldData data = null;
+			FieldData data = null;
 			switch (config.getFieldType(key)) {
 			case BOOL:
 				data = FieldData.simple(config.getBool(key));
@@ -711,8 +712,11 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			case STRING:
 				data = FieldData.simple(config.getString(key));
 				break;
+			case STEPLIST:
+				data = FieldData.custom(config.getStepList(key));
+				break;
 			default:
-				System.out.println("Missing FieldType key from config reading (TemplateEditorScreen)");
+				System.out.println("Missing FieldType key (" + config.getFieldType(key) + ") from config reading (TemplateEditorScreen)");
 				data = null;
 				break;
 			}
@@ -732,8 +736,16 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			@SuppressWarnings("unchecked")
 			Config<T> conf = (Config<T>) lastEditorObject;
 			
+			FieldData d;
 			for (T key : castmap.keySet()) {
-				conf.setValue(key.name(), ( (SimpleFieldData) castmap.get(key)).getValue());
+				d = castmap.get(key);
+				if (d instanceof SimpleFieldData)
+					conf.setValue(key.name(), ( (SimpleFieldData) d).getValue());
+				else if (d instanceof CustomFieldData) {
+					conf.setValue(key.name(), ((CustomFieldData) d).getData());
+				} else {
+					System.out.println("Missing field data type in toConfig");
+				}
 			}
 			
 			return conf;
