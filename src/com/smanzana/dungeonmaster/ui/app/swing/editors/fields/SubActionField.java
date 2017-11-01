@@ -97,6 +97,7 @@ public class SubActionField implements ItemListener, EditorField<SubAction>, IEd
 	}
 	
 	public SubActionField(SubAction current) {
+		System.out.println("Subaction field created with current: " + current);
 		typeMaps = new TreeMap<>();
 		typeFields = new EnumMap<>(DataType.class);
 		
@@ -238,7 +239,6 @@ public class SubActionField implements ItemListener, EditorField<SubAction>, IEd
 		String newType;
 		if (obj == null) {
 			obj = new SubDamage(new ValueConstant(0));
-			newType = obj.getClassKey();
 		}
 		
 		// Get mapping of DataType to serialization key
