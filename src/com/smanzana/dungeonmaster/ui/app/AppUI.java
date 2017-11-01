@@ -109,7 +109,7 @@ public class AppUI extends Comm {
 		try {
 			UIColor.saveToFile(FILE_COLOR);
 		} catch (FileNotFoundException e) {
-			;
+			System.out.println("Failed to save to file " + FILE_COLOR + ": FNF");
 		}
 		try {
 			UIConfState.saveToFile(FILE_UISTATE);

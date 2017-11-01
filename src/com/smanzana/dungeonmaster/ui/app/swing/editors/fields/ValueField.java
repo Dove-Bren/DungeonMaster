@@ -3,6 +3,7 @@ package com.smanzana.dungeonmaster.ui.app.swing.editors.fields;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import com.smanzana.templateeditor.editor.fields.EditorField;
 import com.smanzana.templateeditor.editor.fields.GenericListField;
 import com.smanzana.templateeditor.editor.fields.IntField;
 import com.smanzana.templateeditor.uiutils.TextUtil;
+import com.smanzana.templateeditor.uiutils.UIColor;
 
 /**
  * Construct a {@link ValueSpecifier}.<br />
@@ -53,6 +55,19 @@ public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IE
 		private static final long serialVersionUID = 1L;
 
 		public abstract T getValueSpecifier();
+		
+		protected ValueEditor() {
+			super();
+			color();
+		}
+		
+		protected void color() {
+			color(this);
+		}
+		
+		protected void color(JComponent comp) {
+			UIColor.setColors(comp, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
+		}
 	}
 	
 	private static class ConstantField extends ValueEditor<ValueConstant> {
@@ -66,13 +81,14 @@ public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IE
 			field = new IntField(startingVal);
 			field.setOwner(owner);
 			JLabel label = new JLabel("Constant Value");
+			UIColor.setColors(label, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
 			this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 			this.add(Box.createRigidArea(new Dimension(10, 0)));
 			this.add(label);
 			this.add(Box.createRigidArea(new Dimension(20, 0)));
+			color(field.getComponent());
 			this.add(field.getComponent());
 			this.add(Box.createRigidArea(new Dimension(10, 0)));
-			
 		}
 		
 		public int getValue() {
@@ -103,15 +119,19 @@ public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IE
 			fieldMin.setOwner(owner);
 			fieldMax.setOwner(owner);
 			JLabel label = new JLabel("Value Range: ");
+			color(label);
 			this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 			this.add(Box.createRigidArea(new Dimension(10, 0)));
 			this.add(label);
 			this.add(Box.createRigidArea(new Dimension(20, 0)));
+			color(fieldMin.getComponent());
 			this.add(fieldMin.getComponent());
 			this.add(Box.createRigidArea(new Dimension(10, 0)));
 			label = new JLabel(" - ");
+			color(label);
 			this.add(label);
 			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			color(fieldMax.getComponent());
 			this.add(fieldMax.getComponent());
 			this.add(Box.createRigidArea(new Dimension(10, 0)));
 
@@ -165,22 +185,29 @@ public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IE
 			fieldZero = new BoolField(includeZero);
 			fieldZero.setOwner(owner);
 			JLabel label = new JLabel("Dice: ");
+			color(label);
 			this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 			this.add(Box.createRigidArea(new Dimension(10, 0)));
 			this.add(label);
 			this.add(Box.createRigidArea(new Dimension(20, 0)));
+			color(fieldNum.getComponent());
 			this.add(fieldNum.getComponent());
-			this.add(Box.createRigidArea(new Dimension(10, 0)));
 			label = new JLabel("d");
+			color(label);
+			label.setHorizontalAlignment(JLabel.CENTER);
+			label.setBorder(null);
 			this.add(label);
-			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			color(fieldFaces.getComponent());
 			this.add(fieldFaces.getComponent());
 			this.add(Box.createRigidArea(new Dimension(30, 0)));
 			label = new JLabel("0-bounded: ");
+			color(label);
 			this.add(label);
 			this.add(Box.createRigidArea(new Dimension(5, 0)));
+			color(fieldZero.getComponent());
 			this.add(fieldZero.getComponent());
 			this.add(Box.createRigidArea(new Dimension(10, 0)));
+			this.add(Box.createHorizontalGlue());
 
 		}
 		
@@ -289,7 +316,9 @@ public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IE
 				dataList.add(new DiceSetFieldData(owner, new DiceField(owner, f.getDieCount(), f.getDieFaces(), f.includesZero())));
 			list = new GenericListField<>(new DiceSetFieldData(owner, new DiceField(owner, template.getDieCount(), template.getDieFaces(), template.includesZero())), dataList);
 			list.setOwner(owner);
+			color(list.getComponent());
 			JLabel label = new JLabel("Dice Set: ");
+			color(label);
 			this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 			this.add(Box.createRigidArea(new Dimension(10, 0)));
 			this.add(label);
@@ -367,10 +396,18 @@ public class ValueField implements ItemListener, EditorField<ValueSpecifier>, IE
 			}
 		});
 		comboField.addItemListener(this);
+		comboField.setMaximumSize(new Dimension(Short.MAX_VALUE, comboField.getPreferredSize().height));
 		
 		wrapper = new JPanel();
 		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.PAGE_AXIS));
+		UIColor.setColors(wrapper, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
 		wrapper.add(Box.createRigidArea(new Dimension(0, 10)));
+		JLabel label = new JLabel("Value Type");
+		label.setFont(label.getFont().deriveFont(Font.BOLD));
+		label.setHorizontalAlignment(JLabel.CENTER);
+		label.setAlignmentX(.5f);
+		UIColor.setColors(label, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
+		wrapper.add(label);
 		wrapper.add(comboField);
 		wrapper.add(Box.createRigidArea(new Dimension(0, 20)));
 		

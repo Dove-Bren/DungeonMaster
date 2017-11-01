@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.utils.ValueConstant;
 import com.smanzana.dungeonmaster.utils.ValueSpecifier;
 
 /**
@@ -17,7 +18,7 @@ public class SubDamage extends SubAction {
 	private static class Factory implements SubActionFactory<SubDamage> {
 		@Override
 		public SubDamage construct(DataNode data) {
-			SubDamage ret = new SubDamage(null);
+			SubDamage ret = new SubDamage(new ValueConstant(0));
 			ret.load(data);
 			return ret;
 		}

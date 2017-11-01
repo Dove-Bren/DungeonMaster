@@ -3,6 +3,7 @@ package com.smanzana.dungeonmaster.ui.app.swing.editors.fields;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.EnumMap;
@@ -10,6 +11,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -18,17 +20,22 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
+import javax.swing.border.BevelBorder;
 
 import com.smanzana.dungeonmaster.battle.effects.Effect;
 import com.smanzana.dungeonmaster.battle.effects.Effect.DataType;
 import com.smanzana.dungeonmaster.battle.effects.PoisonEffect;
+import com.smanzana.dungeonmaster.session.configuration.KeywordConfig;
+import com.smanzana.dungeonmaster.session.configuration.KeywordKey;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.Dice;
 import com.smanzana.dungeonmaster.utils.ValueConstant;
 import com.smanzana.dungeonmaster.utils.ValueSpecifier;
 import com.smanzana.templateeditor.IEditorOwner;
 import com.smanzana.templateeditor.editor.fields.EditorField;
+import com.smanzana.templateeditor.uiutils.ColoredLineBorder;
 import com.smanzana.templateeditor.uiutils.TextUtil;
+import com.smanzana.templateeditor.uiutils.UIColor;
 
 /**
  * Construct a {@link ValueSpecifier}.<br />
@@ -43,15 +50,35 @@ public class EffectField implements ItemListener, EditorField<Effect>, IEditorOw
 	
 	private static class EditorWrapper {
 		public EditorField<?> field;
-		public JComponent comp;
+		public JPanel comp;
 		
-		public EditorWrapper(EditorField<?> field) {
-			this(field, field.getComponent());
+		public EditorWrapper(String label, EditorField<?> field) {
+			this(label, field, field.getComponent());
 		}
 		
-		public EditorWrapper(EditorField<?> field, JComponent comp) {
+		public EditorWrapper(String strLabel, EditorField<?> field, JComponent comp) {
 			this.field = field;
-			this.comp = comp;
+			this.comp = new JPanel();
+			UIColor.setColors(this.comp, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
+			this.comp.setLayout(new BoxLayout(this.comp, BoxLayout.PAGE_AXIS));
+			ColoredLineBorder border = new ColoredLineBorder(Color.BLACK);
+			UIColor.setColor(border, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND);
+			comp.setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createLineBorder(this.comp.getBackground(), 5, false),
+					BorderFactory.createBevelBorder(BevelBorder.LOWERED,
+							border.getColor(),
+							border.getColor()
+							)));
+			this.comp.add(comp);
+			
+			if (strLabel != null) {
+				JLabel label = new JLabel(strLabel);
+				label.setFont(label.getFont().deriveFont(Font.BOLD));
+				label.setHorizontalAlignment(JLabel.CENTER);
+				label.setAlignmentX(.5f);
+				UIColor.setColors(label, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
+				this.comp.add(label, 0);
+			}
 		}
 	}
 	
@@ -103,17 +130,26 @@ public class EffectField implements ItemListener, EditorField<Effect>, IEditorOw
 			}
 		});
 		comboField.addItemListener(this);
+		comboField.setMaximumSize(new Dimension(Short.MAX_VALUE, comboField.getPreferredSize().height));
 		
 		wrapper = new JPanel();
 		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.PAGE_AXIS));
+		UIColor.setColors(wrapper, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
 		wrapper.add(Box.createRigidArea(new Dimension(0, 10)));
+		JLabel label = new JLabel("Effect Type");
+		label.setFont(label.getFont().deriveFont(Font.BOLD));
+		label.setHorizontalAlignment(JLabel.CENTER);
+		label.setAlignmentX(.5f);
+		UIColor.setColors(label, UIColor.Key.EDITOR_MAIN_PANE_FOREGROUND, UIColor.Key.EDITOR_MAIN_PANE_BACKGROUND);
+		wrapper.add(label);
 		wrapper.add(comboField);
 		wrapper.add(Box.createRigidArea(new Dimension(0, 20)));
 		
 		EditorWrapper editor;
 		
 		// Amount-hp
-		editor = new EditorWrapper(new ValueField(new ValueConstant(0)));
+		editor = new EditorWrapper(KeywordConfig.instance().getKeyword(KeywordKey.HP),
+				new ValueField(new ValueConstant(0)));
 		typeFields.put(DataType.AMOUNT_HP, editor);
 		editor.comp.setVisible(false);
 		wrapper.add(editor.comp);

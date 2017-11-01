@@ -17,6 +17,7 @@ import com.smanzana.dungeonmaster.utils.ValueConstant;
 import com.smanzana.templateeditor.api.ICustomData;
 import com.smanzana.templateeditor.api.annotations.DataLoaderFactory;
 import com.smanzana.templateeditor.editor.fields.EditorField;
+import com.smanzana.templateeditor.editor.fields.PopupFormField;
 
 /**
  * An actual piece of "DO SOMETHING".
@@ -129,12 +130,24 @@ public abstract class SubAction implements DataCompatible, Displayable, ICustomD
 	
 	@Override
 	public EditorField<SubAction> getField() {
-		return new SubActionField(this);
+		return new PopupFormField<SubAction>(new SubActionField(this),
+				new PopupFormField.Formatter<SubAction>() {
+					@Override
+					public String getDisplayName(EditorField<SubAction> obj) {
+						return obj.getObject().getDisplayName();
+					}
+
+					@Override
+					public String getDisplayDescription(EditorField<SubAction> obj) {
+						return obj.getObject().getDisplayTooltip();
+					}
+				});
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public SubAction fillFromField(EditorField<?> field) {
-		return ((SubActionField) field).getObject();
+		return ((PopupFormField<SubAction>) field).getObject();
 	}
 	
 	protected static SubAction construct() {
