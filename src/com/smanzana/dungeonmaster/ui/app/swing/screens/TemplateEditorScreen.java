@@ -333,7 +333,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		switch (cmd) {
 		case NEW:
 			{
-				if (!clearEditor()) {
+				if (!closeTemplate()) {
 					break;
 				}
 				String name = JOptionPane.showInputDialog(getParent(), "Enter the name of the new template", "New Template", JOptionPane.PLAIN_MESSAGE);
@@ -354,11 +354,11 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			}
 			break;
 		case CLOSE:
-			clearEditor();
+			closeTemplate();
 			break;
 		case OPEN:
 			{
-				if (!clearEditor()) {
+				if (!closeTemplate()) {
 					break;
 				}
 				
@@ -384,13 +384,13 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			openTemplate(sel);
 			break;
 		case MAINMENU:
-			if (!clearEditor()) {
+			if (!closeTemplate()) {
 				break;
 			}
 			ui.goMainScreen();
 			break;
 		case QUIT:
-			if (!clearEditor()) {
+			if (!closeTemplate()) {
 				break;
 			}
 			DungeonMaster.shutdown();
@@ -456,18 +456,23 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		return true;
 	}
 	
-	// Returns true if editor was successfully cleared.
-	// False means something's still open so don't close or open anything new
-	private boolean clearEditor() {
-		return clearEditor(false);
+	private void closeEditor() {
+		saveEditor();
+		clearEditorPanel();
 	}
 	
-	private boolean clearEditor(boolean force) {
+	// Returns true if template was successfully cleared.
+	// False means something's still open so don't close or open anything new
+	private boolean closeTemplate() {
+		return closeTemplate(false);
+	}
+	
+	private boolean closeTemplate(boolean force) {
 	
 		if (currentTemplate == null)
 			return true;
-		
-		saveEditor();
+
+		closeEditor();
 		
 		if (force) {
 			// Write out a force temp file to let them know next time
@@ -494,7 +499,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		
 		if (!currentTemplate.isDirty()) {
 			currentTemplate = null;
-			clearEditorPanel();
+			updateTree();
 			return true;
 		}
 		
@@ -506,7 +511,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			currentTemplate.save();
 		
 		currentTemplate = null;
-		clearEditorPanel();
+		updateTree(); // special cause it uses template info
 		
 		return true;
 	}
@@ -517,7 +522,6 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			currentEditor.getComponent().setVisible(false);
 		currentEditor = null;
 		updateEditor();
-		updateTree();
 	}
 	
 	private void saveEditor() {
@@ -629,8 +633,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 	private void openEditor(IEditor<?> editor) {
 		if (currentEditor != null) {
 			// UH OH //TODO
-			currentEditor.getComponent().setVisible(false);
-			currentEditor = null;
+			closeEditor();
 		}
 		
 		currentEditor = editor;
@@ -642,7 +645,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 	}
 	
 	public void shutdown() {
-		clearEditor(true);
+		closeTemplate(true);
 	}
 
 	public void doMousePressed(MouseEvent e) {
@@ -666,6 +669,9 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		if (node.getUserObject() instanceof Datum<?>) {
 			return;
 		}
+		
+		if (currentEditor != null)
+			closeEditor();
 		
 		lastEditorObject = node.getUserObject();
 		IEditor<?> editor = null;

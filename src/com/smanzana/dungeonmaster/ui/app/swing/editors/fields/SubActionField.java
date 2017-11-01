@@ -97,7 +97,6 @@ public class SubActionField implements ItemListener, EditorField<SubAction>, IEd
 	}
 	
 	public SubActionField(SubAction current) {
-		System.out.println("Subaction field created with current: " + current);
 		typeMaps = new TreeMap<>();
 		typeFields = new EnumMap<>(DataType.class);
 		
@@ -195,7 +194,6 @@ public class SubActionField implements ItemListener, EditorField<SubAction>, IEd
 		for (DataType d : applicables.keySet()) {
 			typeFields.get(d).comp.setVisible(true);
 			typeFields.get(d).comp.validate();
-			System.out.println("Setting " + typeFields.get(d).comp + " (" + d.name() + ") visible");
 		}
 
 		currentType = newType;

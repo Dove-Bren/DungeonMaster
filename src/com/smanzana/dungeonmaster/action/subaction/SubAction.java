@@ -147,7 +147,6 @@ public abstract class SubAction implements DataCompatible, Displayable, ICustomD
 	@SuppressWarnings("unchecked")
 	@Override
 	public SubAction fillFromField(EditorField<?> field) {
-		System.out.println("fillFromField in SubAction <<<<<<<<<<<<<<");
 		return ((PopupFormField<SubAction>) field).getObject();
 	}
 	
