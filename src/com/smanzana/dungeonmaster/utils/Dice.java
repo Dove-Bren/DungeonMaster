@@ -83,7 +83,7 @@ public class Dice extends ValueSpecifier implements DataCompatible {
 	@Override
 	public DataNode write(String key) {
 		// 1d3, 2d4, 5d5: (includes 0)
-		return new DataNode(key, this.dieFaces + "d" + this.dieCount + (this.includeZero ? ":" : ""), null);
+		return new DataNode(key, this.dieCount + "d" + this.dieFaces + (this.includeZero ? ":" : ""), null);
 	}
 
 	@Override
