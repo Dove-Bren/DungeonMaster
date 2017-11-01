@@ -457,7 +457,12 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 	}
 	
 	private void closeEditor() {
-		saveEditor();
+		closeEditor(true);
+	}
+	
+	private void closeEditor(boolean save) {
+		if (save)
+			saveEditor();
 		clearEditorPanel();
 	}
 	
@@ -472,7 +477,6 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		if (currentTemplate == null)
 			return true;
 
-		closeEditor();
 		
 		if (force) {
 			// Write out a force temp file to let them know next time
@@ -497,19 +501,19 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			return true;
 		}
 		
-		if (!currentTemplate.isDirty()) {
-			currentTemplate = null;
-			updateTree();
-			return true;
+		boolean save = true;
+		if (currentTemplate.isDirty()) {
+			// No rush. Ask if they want to save, discard, or cancel
+			int selection = JOptionPane.showConfirmDialog(getParent(), "Save changes before closing?", "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
+			if (selection == JOptionPane.CANCEL_OPTION)
+				return false;
+			if (selection == JOptionPane.NO_OPTION)
+				save = false;
+			if (selection == JOptionPane.YES_OPTION)
+				currentTemplate.save();
 		}
 		
-		// No rush. Ask if they want to save, discard, or cancel
-		int selection = JOptionPane.showConfirmDialog(getParent(), "Save changes before closing?", "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
-		if (selection == JOptionPane.CANCEL_OPTION)
-			return false;
-		if (selection == JOptionPane.YES_OPTION)
-			currentTemplate.save();
-		
+		closeEditor(save);
 		currentTemplate = null;
 		updateTree(); // special cause it uses template info
 		
