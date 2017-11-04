@@ -64,7 +64,7 @@ public abstract class Equipment extends Item {
 	@DataLoaderList(templateName = "templateEffect")
 	protected List<Effect> effects;
 	protected Effect templateEffect = Effect.templateEffect;
-	
+	@DataLoaderData
 	protected Map<Attributes, Integer> abilityScoreRequirements;
 	@DataLoaderData
 	protected int levelRequirement;
