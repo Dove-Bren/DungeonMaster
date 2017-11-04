@@ -19,11 +19,11 @@ public class Weapon extends Equipment {
 	
 	@DataLoaderData
 	private ValueSpecifier attack;
-	@DataLoaderData
+	@DataLoaderData(name="Is Shield",description="Is this a shield? Shields add their 'attack' value to defense. Shields can only be equiped in the off-hand.")
 	private boolean isShield;
 	
 	public Weapon() {
-		this("", "", 0, Slot.OFF_HAND, 1, 0, false);
+		this("", "", 0, 1, 0, false);
 	}
 	
 	/**
@@ -36,12 +36,12 @@ public class Weapon extends Equipment {
 	 * @param attack
 	 * @param isShield
 	 */
-	public Weapon(String name, String description, int value, Slot slot, int durability, int attack, boolean isShield) {
-		this(name, description, value, slot, durability, new ValueConstant(attack), isShield);
+	public Weapon(String name, String description, int value, int durability, int attack, boolean isShield) {
+		this(name, description, value, durability, new ValueConstant(attack), isShield);
 	}
 	
-	public Weapon(String name, String description, int value, Slot slot, int durability, ValueSpecifier attack, boolean isShield) {
-		super(name, description, value, slot, durability);
+	public Weapon(String name, String description, int value, int durability, ValueSpecifier attack, boolean isShield) {
+		super(name, description, value, durability);
 		this.attack = attack;
 		this.isShield = isShield;
 	}
@@ -87,8 +87,10 @@ public class Weapon extends Equipment {
 			if (this.isShield)
 				return false;
 			// fall through
+		case OFF_HAND:
+			return true;
 		default:
-			return super.fitsSlot(slot);
+			return false;
 		}
 	}
 	
@@ -104,5 +106,4 @@ public class Weapon extends Equipment {
 	protected static void register() {
 		Item.registerType(ClassKey(), new Factory());
 	}
-
 }

@@ -17,19 +17,26 @@ public class Armor extends Equipment {
 	
 	@DataLoaderData
 	private int defense;
+	@DataLoaderData
+	private Slot slot;
 	
 	public Armor() {
 		this("", "", 0, Slot.HEAD, 1, 0);
 	}
 	
 	public Armor(String name, String description, int value, Slot slot, int durability, int defense) {
-		super(name, description, value, slot, durability);
+		super(name, description, value, durability);
 		this.defense = defense;
+		this.slot = slot;
 	}
 	
 	public int getDefense()
 	{
 		return defense;
+	}
+	
+	public Slot getSlot() {
+		return this.slot;
 	}
 	
 	@Override
@@ -41,12 +48,22 @@ public class Armor extends Equipment {
 			this.defense = DataNode.parseInt(node);
 		}
 		
+		if (null != (node = root.getChild("slot"))) {
+			try {
+				this.slot = Slot.valueOf(node.getValue().toUpperCase());
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+				System.out.println("Failed to convert " + node.getValue() + " to an equipment slot");
+			}
+		}
+		
 	}
 	
 	@Override
 	public DataNode write(String key) {
 		DataNode base = super.write(key);
 		
+		base.addChild(new DataNode("slot", slot.name(), null));
 		base.addChild(new DataNode("defense", this.defense + "", null));
 		
 		return base;
@@ -65,4 +82,8 @@ public class Armor extends Equipment {
 		Item.registerType(ClassKey(), new Factory());
 	}
 
+	@Override
+	public boolean fitsSlot(Slot slot) {
+		return slot == this.slot;
+	}
 }

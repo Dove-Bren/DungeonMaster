@@ -55,27 +55,27 @@ public abstract class Equipment extends Item {
 		}
 	}
 	
-	@DataLoaderData
-	protected Slot slot;
+//	@DataLoaderData
+//	protected Slot slot;
 	@DataLoaderData
 	protected int durability;
-	@DataLoaderData
+	@DataLoaderData(name="Maximum Durability")
 	protected int maxDurability;
 	@DataLoaderList(templateName = "templateEffect")
 	protected List<Effect> effects;
 	protected Effect templateEffect = Effect.templateEffect;
-	@DataLoaderData
+	@DataLoaderData(name="Required Ability Scores")
 	protected Map<Attributes, Integer> abilityScoreRequirements;
-	@DataLoaderData
+	@DataLoaderData(name="Level Requirement")
 	protected int levelRequirement;
 	
 	public Equipment() {
-		this("", "", 0, Slot.HEAD, 1);
+		this("", "", 0, 1);
 	}
 	
-	public Equipment(String name, String description, int value, Slot slot, int durability) {
+	public Equipment(String name, String description, int value, int durability) {
 		super(name, description, value);
-		this.slot = slot;
+		//this.slot = slot;
 		this.maxDurability = this.durability = durability;
 		this.effects = new LinkedList<Effect>();
 		this.abilityScoreRequirements = new EnumMap<>(Attributes.class);
@@ -90,10 +90,6 @@ public abstract class Equipment extends Item {
 //	Also usable takes a string action. It would be cool to have a tag
 //	that said this was supposed to be the name of something else.
 //	Also a 'verifier' method to check if a value is valid! That's cool!
-	
-	public Slot getSlot() {
-		return this.slot;
-	}
 	
 	public int getDurability() {
 		return durability;
@@ -191,15 +187,6 @@ public abstract class Equipment extends Item {
 		DataNode node;
 		this.effects.clear();
 		
-		if (null != (node = root.getChild("slot"))) {
-			try {
-				this.slot = Slot.valueOf(node.getValue().toUpperCase());
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-				System.out.println("Failed to convert " + node.getValue() + " to an equipment slot");
-			}
-		}
-		
 		if (null != (node = root.getChild("durability"))) {
 			this.durability = DataNode.parseInt(node);
 		}
@@ -236,7 +223,6 @@ public abstract class Equipment extends Item {
 	public DataNode write(String key) {
 		DataNode base = super.write(key);
 		
-		base.addChild(new DataNode("slot", slot.name(), null));
 		base.addChild(new DataNode("durability", this.durability + "", null));
 		base.addChild(new DataNode("maxdurability", this.maxDurability + "", null));
 		base.addChild(DataNode.serializeAll("effects", "effect", effects));
@@ -276,12 +262,5 @@ public abstract class Equipment extends Item {
 		return equip;
 	}
 	
-	public boolean fitsSlot(Slot slot) {
-		if (slot == Slot.MAIN_HAND || slot == Slot.OFF_HAND)
-			return this.slot == Slot.MAIN_HAND || this.slot == Slot.OFF_HAND;
-		
-		return (this.slot == slot);
-	}
-	
-	public abstract boolean verifySlot(Slot slot);
+	public abstract boolean fitsSlot(Slot slot);
 }
