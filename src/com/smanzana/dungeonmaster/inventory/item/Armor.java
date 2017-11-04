@@ -1,9 +1,21 @@
 package com.smanzana.dungeonmaster.inventory.item;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 public class Armor extends Equipment {
 
+	private static class Factory implements ItemFactory<Armor> {
+		@Override
+		public Armor construct(DataNode data) {
+			Armor armor = new Armor();
+			armor.load(data);
+			return armor;
+		}
+		
+	}
+	
+	@DataLoaderData
 	private int defense;
 	
 	public Armor() {
@@ -38,6 +50,19 @@ public class Armor extends Equipment {
 		base.addChild(new DataNode("defense", this.defense + "", null));
 		
 		return base;
+	}
+	
+	@Override
+	protected String getClassKey() {
+		return ClassKey();
+	}
+	
+	protected static String ClassKey() {
+		return "armor";
+	}
+	
+	protected static void register() {
+		Item.registerType(ClassKey(), new Factory());
 	}
 
 }

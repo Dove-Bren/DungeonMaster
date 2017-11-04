@@ -10,8 +10,12 @@ import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.Notable;
 import com.smanzana.dungeonmaster.utils.NoteUtil;
+import com.smanzana.templateeditor.api.ISuperclass;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
+import com.smanzana.templateeditor.api.annotations.DataLoaderDescription;
+import com.smanzana.templateeditor.api.annotations.DataLoaderName;
 
-public abstract class Item implements Notable, DataCompatible, Cloneable {
+public abstract class Item implements Notable, DataCompatible, Cloneable, ISuperclass {
 	
 	protected static interface ItemFactory<T extends Item> {
 		
@@ -26,7 +30,8 @@ public abstract class Item implements Notable, DataCompatible, Cloneable {
 		
 		Junk.register();
 		Usable.register();
-		Equipment.register();
+		Weapon.register();
+		Armor.register();
 	}
 	
 	protected static void registerType(String typeKey, ItemFactory<?> factory) {
@@ -52,8 +57,11 @@ public abstract class Item implements Notable, DataCompatible, Cloneable {
 		return factories.get(key).construct(node);
 	}
 	
+	@DataLoaderName
 	protected String name;
+	@DataLoaderDescription
 	protected String description;
+	@DataLoaderData
 	protected int value;
 	
 	private List<String> notes;
@@ -134,11 +142,29 @@ public abstract class Item implements Notable, DataCompatible, Cloneable {
 	
 	protected abstract String getClassKey();
 	
+	@Override
 	public Item clone() {
 		DataNode serial = this.write("dummy");
 		Item out = Item.fromData(serial);
 		
 		return out;
+	}
+	
+	@Override
+	public List<ISuperclass> getChildTypes() {
+		List<ISuperclass> list = new LinkedList<>();
+		
+		list.add(new Junk());
+		list.add(new Armor());
+		list.add(new Weapon());
+		//list.add(new Usable());
+		
+		return list;
+	}
+	
+	@Override
+	public String getChildName(ISuperclass child) {
+		return ((Item) child).getClassKey();
 	}
 	
 }

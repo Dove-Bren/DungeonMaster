@@ -4,6 +4,7 @@ import com.smanzana.dungeonmaster.inventory.item.Item;
 import com.smanzana.dungeonmaster.inventory.item.Junk;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 /**
  * Stores:
@@ -31,6 +32,8 @@ public class ItemDatumData implements DatumData {
 		
 	}
 	
+	//@DataLoaderData(expand=true)
+	@DataLoaderData
 	private Item item;
 	
 	public ItemDatumData() {

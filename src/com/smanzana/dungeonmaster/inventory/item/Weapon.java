@@ -3,10 +3,23 @@ package com.smanzana.dungeonmaster.inventory.item;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.ValueConstant;
 import com.smanzana.dungeonmaster.utils.ValueSpecifier;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 public class Weapon extends Equipment {
 
+	private static class Factory implements ItemFactory<Weapon> {
+		@Override
+		public Weapon construct(DataNode data) {
+			Weapon wep = new Weapon();
+			wep.load(data);
+			return wep;
+		}
+		
+	}
+	
+	@DataLoaderData
 	private ValueSpecifier attack;
+	@DataLoaderData
 	private boolean isShield;
 	
 	public Weapon() {
@@ -77,6 +90,19 @@ public class Weapon extends Equipment {
 		default:
 			return super.fitsSlot(slot);
 		}
+	}
+	
+	@Override
+	protected String getClassKey() {
+		return ClassKey();
+	}
+	
+	protected static String ClassKey() {
+		return "weapon";
+	}
+	
+	protected static void register() {
+		Item.registerType(ClassKey(), new Factory());
 	}
 
 }

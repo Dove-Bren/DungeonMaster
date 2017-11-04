@@ -32,6 +32,7 @@ public abstract class Effect implements DataCompatible, ICustomData {
 	}
 
 	private static Map<String, EffectFactory<?>> factories;
+	public static Effect templateEffect = new PoisonEffect("Poison", "Gradually degrades health", 1, 5);
 	
 	public static Effect fromData(DataNode node) {
 		if (node == null)

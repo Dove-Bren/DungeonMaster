@@ -12,21 +12,23 @@ import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
+import com.smanzana.templateeditor.api.annotations.DataLoaderList;
 
 public abstract class Equipment extends Item {
 	
-	private static class Factory implements ItemFactory<Equipment> {
-
-		@Override
-		public Equipment construct(DataNode data) {
-			return Equipment.fromData(data);
-		}
-		
-	}
-	
-	{
-		Item.registerType(getClassKey(), new Factory());
-	}
+//	private static class Factory implements ItemFactory<Equipment> {
+//
+//		@Override
+//		public Equipment construct(DataNode data) {
+//			return Equipment.fromData(data);
+//		}
+//		
+//	}
+//	
+//	{
+//		Item.registerType(getClassKey(), new Factory());
+//	}
 	
 	public enum Slot
 	{
@@ -53,12 +55,18 @@ public abstract class Equipment extends Item {
 		}
 	}
 	
+	@DataLoaderData
 	protected Slot slot;
+	@DataLoaderData
 	protected int durability;
+	@DataLoaderData
 	protected int maxDurability;
+	@DataLoaderList(templateName = "templateEffect")
 	protected List<Effect> effects;
+	protected Effect templateEffect = Effect.templateEffect;
 	
 	protected Map<Attributes, Integer> abilityScoreRequirements;
+	@DataLoaderData
 	protected int levelRequirement;
 	
 	public Equipment() {
@@ -75,6 +83,13 @@ public abstract class Equipment extends Item {
 		for (Attributes atr : Attributes.values())
 			this.abilityScoreRequirements.put(atr, 0);
 	}
+	
+//	Things look like they're working for subclass stuff.
+//	Except that items (equipment specifically) is broken down weird.
+//	Need to keep either figuring that out OR simplifying it.
+//	Also usable takes a string action. It would be cool to have a tag
+//	that said this was supposed to be the name of something else.
+//	Also a 'verifier' method to check if a value is valid! That's cool!
 	
 	public Slot getSlot() {
 		return this.slot;
@@ -178,7 +193,7 @@ public abstract class Equipment extends Item {
 		
 		if (null != (node = root.getChild("slot"))) {
 			try {
-				this.slot = Slot.valueOf(node.getValue());
+				this.slot = Slot.valueOf(node.getValue().toUpperCase());
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 				System.out.println("Failed to convert " + node.getValue() + " to an equipment slot");
@@ -236,25 +251,25 @@ public abstract class Equipment extends Item {
 		return base;
 	}	
 	
-	@Override
-	protected String getClassKey() {
-		return ClassKey();
-	}
-	
-	protected static String ClassKey() {
-		return "equipment";
-	}
-	
-	protected static void register() {
-		Item.registerType(ClassKey(), new Factory());
-	}
+//	@Override
+//	protected String getClassKey() {
+//		return ClassKey();
+//	}
+//	
+//	protected static String ClassKey() {
+//		return "equipment";
+//	}
+//	
+//	protected static void register() {
+//		Item.registerType(ClassKey(), new Factory());
+//	}
 	
 	public static Equipment fromData(DataNode node) {
 		// use slot to determine if weapon or armor
 		if (null == node.getChild("slot"))
 			return null;
 		
-		Slot slot = Slot.valueOf(node.getValue());
+		Slot slot = Slot.valueOf(node.getValue().toUpperCase());
 		Equipment equip = (slot.getIsArmor() ? new Armor() : new Weapon());
 		equip.load(node);
 		
@@ -267,4 +282,6 @@ public abstract class Equipment extends Item {
 		
 		return (this.slot == slot);
 	}
+	
+	public abstract boolean verifySlot(Slot slot);
 }
