@@ -39,6 +39,7 @@ public class ProfileDatumData implements DatumData {
 	
 	public ProfileDatumData() {
 		this.additional = new LinkedList<>();
+		first = new NameSet();
 	}
 	
 	public ProfileDatumData(String profileName, String race) {

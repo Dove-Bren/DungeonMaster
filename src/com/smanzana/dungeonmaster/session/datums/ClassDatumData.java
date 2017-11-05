@@ -58,6 +58,7 @@ public class ClassDatumData implements DatumData {
 		}
 		
 		this.promotions = new LinkedList<>();
+		this.hitdice = new Dice(1, 1, false);
 	}
 	
 	public ClassDatumData(String name, String description) {

@@ -37,7 +37,7 @@ public class ItemDatumData implements DatumData {
 	private Item item;
 	
 	public ItemDatumData() {
-		
+		item = new Junk();
 	}
 	
 	public ItemDatumData(Item item) {

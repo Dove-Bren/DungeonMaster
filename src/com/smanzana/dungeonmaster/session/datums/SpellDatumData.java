@@ -33,7 +33,7 @@ public class SpellDatumData implements DatumData {
 	private Spell spell;
 	
 	public SpellDatumData() {
-		
+		spell = new Spell("Sample Spell", "", 5, 1);
 	}
 	
 	public SpellDatumData(Spell spell) {

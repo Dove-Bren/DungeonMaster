@@ -51,7 +51,9 @@ public class Datum<T extends DatumData> implements Displayable {
 		this.data.add(data);
 	}
 	
-	
+	public void removeData(T data) {
+		this.data.remove(data);
+	}
 	
 	public void saveToFile(File outFile) throws FileNotFoundException {
 		// Convert data list into DataNode object wrapper, then serialize that
@@ -113,6 +115,10 @@ public class Datum<T extends DatumData> implements Displayable {
 	@Override
 	public String getDisplayTooltip() {
 		return tooltip;
+	}
+	
+	public T createEmptyData() {
+		return factory.constructEmptyData();
 	}
 	
 }

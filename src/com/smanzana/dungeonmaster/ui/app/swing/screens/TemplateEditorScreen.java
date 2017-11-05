@@ -11,7 +11,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -23,6 +25,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
@@ -235,6 +238,10 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			@Override
 			public void mousePressed(MouseEvent e) {
 				doMousePressed(e);
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				doMouseReleased(e);
 			}
 		});
 		//sourceTree.setBackground(Color.WHITE);
@@ -629,7 +636,9 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 	
 	private void addDatumToTree(DefaultMutableTreeNode root, Datum<?> datum) {
 		DefaultMutableTreeNode node = new DefaultMutableTreeNode(datum);
-		for (DatumData data : datum.getData()) {
+		List<? extends DatumData> list = datum.getData();
+		Collections.sort(list, DatumData.comparator);
+		for (DatumData data : list) {
 			node.add(new DefaultMutableTreeNode(data));
 		}
 		
@@ -661,9 +670,97 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 	public void shutdown() {
 		closeTemplate(true);
 	}
+	
+	@SuppressWarnings("rawtypes")
+	private void doPopup(DefaultMutableTreeNode node, int mousex, int mousey) {
+		if (node.getUserObject() instanceof Config)
+			return;
+		
+		JPopupMenu menu;
+		menu = new JPopupMenu();
+		JMenuItem item;
+		if (node.getUserObject() instanceof Datum) {
+			Datum datum = (Datum) node.getUserObject();
+			item = new JMenuItem("New");
+			item.setActionCommand("add");
+			menu.add(item);
+			item.addActionListener(new ActionListener() {
+				@SuppressWarnings("unchecked")
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// Only one event.
+					DatumData d = datum.createEmptyData();
+					datum.addData(d);
+					
+					sourceModel.insertNodeInto(new DefaultMutableTreeNode(d),
+							node, node.getChildCount());
+				}
+			});
+		}
+		if (node.getUserObject() instanceof DatumData) {
+			DefaultMutableTreeNode parent = ((DefaultMutableTreeNode) node.getParent());
+			Datum datum = (Datum) parent.getUserObject();
+			DatumData data = (DatumData) ((DefaultMutableTreeNode) node).getUserObject();
+			item = new JMenuItem("New");
+			item.addActionListener(new ActionListener() {
+				@SuppressWarnings("unchecked")
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					DatumData d = datum.createEmptyData();
+					datum.addData(d);
+					
+					sourceModel.insertNodeInto(new DefaultMutableTreeNode(d),
+							parent, parent.getChildCount());
+				}
+			});
+			menu.add(item);
+
+			item = new JMenuItem("Delete");
+			item.addActionListener(new ActionListener() {
+				@SuppressWarnings("unchecked")
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					datum.removeData(data);
+					if (lastEditorObject == data) {
+						closeEditor(false);
+					}
+					
+					sourceModel.removeNodeFromParent(node);
+				}
+			});
+			menu.add(item);
+		}
+		
+		
+		menu.show(sourceTree, mousex, mousey);
+	}
+	
+	public void doMouseReleased(MouseEvent e) {
+		System.out.println("Popuptrigger? " + e.isPopupTrigger());
+		if (!e.isPopupTrigger())
+			return;
+		
+		TreePath selPath = sourceTree.getPathForLocation(e.getX(), e.getY());
+        if (selPath == null)
+        	return;
+        
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
+		
+		if (currentTemplate == null)
+			return;
+		
+		if (node == null)
+			return;
+		
+		sourceTree.setSelectionPath(selPath);
+		
+		doPopup(node, e.getX(), e.getY());
+	}
 
 	public void doMousePressed(MouseEvent e) {
-		if (e.getClickCount() != 2)
+		System.out.println("Popuptrigger? " + e.isPopupTrigger());
+		if (e.getClickCount() != 2
+				&& !e.isPopupTrigger())
 			return;
 		TreePath selPath = sourceTree.getPathForLocation(e.getX(), e.getY());
         if (selPath == null)
@@ -677,10 +774,15 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		if (node == null)
 			return;
 		
+		if (e.isPopupTrigger()) {
+			doPopup(node, e.getX(), e.getY());
+			return;
+		} // else
+		
 		if (node.getUserObject() == lastEditorObject)
 			return;
 		
-		if (node.getUserObject() instanceof Datum<?>) {
+		if (node.getUserObject() instanceof Datum) {
 			return;
 		}
 		

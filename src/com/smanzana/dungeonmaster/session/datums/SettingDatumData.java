@@ -32,7 +32,7 @@ public class SettingDatumData implements DatumData {
 	private Setting setting;
 	
 	public SettingDatumData() {
-		;
+		setting = new Setting();
 	}
 	
 	public SettingDatumData(Setting setting) {

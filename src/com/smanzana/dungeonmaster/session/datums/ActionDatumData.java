@@ -68,6 +68,8 @@ public class ActionDatumData implements DatumData {
 		this.subactions.add(new SubDamage(new ValueConstant(4)));
 		
 		templateSubaction = new SubDamage(new Dice(2, 4, false));
+		targetType = TargetType.SELF;
+		attribute = Attributes.STRENGTH;
 	}
 	
 	public ActionDatumData(String name, String description, boolean beneficial, Attributes attribute, TargetType targetType) {
