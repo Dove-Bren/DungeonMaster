@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.dungeonmaster.session.SessionBase;
+import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
 
 /**
@@ -62,5 +63,9 @@ public class SessionTemplate extends SessionBase {
 		list.add(this.spellDatum);
 		
 		return list;
+	}
+	
+	public Datum<ActionDatumData> getActionDatum() {
+		return this.actionDatum;
 	}
 }

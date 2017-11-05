@@ -30,6 +30,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
@@ -98,12 +99,18 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		}
 	}
 	
+	private static TemplateEditorScreen instance = null;
+	public static TemplateEditorScreen instance() {
+		return instance;
+	}
+	
 	private AppUI ui;
 	private SessionTemplate currentTemplate;
 	
 	// GUI members
 	private JMenuBar menubar;
 	private JTree sourceTree;
+	private TreeNode currentTreeNode;
 	private DefaultTreeModel sourceModel;
 	private JScrollPane sourcePanel;
 	private JPanel editorPanel;
@@ -122,6 +129,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 	}
 	
 	public void init() {
+		TemplateEditorScreen.instance = this;
 		
 		menubar = new JMenuBar();
 		JMenu menu;
@@ -526,6 +534,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		if (currentEditor != null)
 			currentEditor.getComponent().setVisible(false);
 		currentEditor = null;
+		currentTreeNode = null;
 		updateEditor();
 	}
 	
@@ -679,6 +688,7 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			closeEditor();
 		
 		lastEditorObject = node.getUserObject();
+		currentTreeNode = node;
 		IEditor<?> editor = null;
 		if (lastEditorObject instanceof Config<?>) {
 			editor = new EnumMapEditor<>(this, toMap((Config<?>) lastEditorObject));//new ConfigEditor(currentTemplate, (Config<?>) lastEditorObject);
@@ -761,8 +771,17 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		if (this.currentTemplate != null) {
 			this.currentTemplate.dirty();
 			this.saveEditor();
+			
+			if (currentTreeNode != null)
+				this.sourceModel.nodeChanged(
+					currentTreeNode
+					);
 			this.sourcePanel.repaint();
 		}
+	}
+	
+	public SessionTemplate getCurrentTemplate() {
+		return currentTemplate;
 	}
 	
 }

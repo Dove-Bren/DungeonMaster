@@ -157,7 +157,7 @@ public abstract class Item implements Notable, DataCompatible, Cloneable, ISuper
 		list.add(new Junk());
 		list.add(new Armor());
 		list.add(new Weapon());
-		//list.add(new Usable());
+		list.add(new Usable());
 		
 		return list;
 	}
