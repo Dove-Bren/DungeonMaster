@@ -3,6 +3,7 @@ package com.smanzana.dungeonmaster.session.datums;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.setting.Setting;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 /**
  * Stores:
@@ -29,6 +30,7 @@ public class SettingDatumData implements DatumData {
 		
 	}
 	
+	@DataLoaderData(expand=true)
 	private Setting setting;
 	
 	public SettingDatumData() {

@@ -4,27 +4,42 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.smanzana.dungeonmaster.action.Action;
 import com.smanzana.dungeonmaster.action.ActionRegistry;
 import com.smanzana.dungeonmaster.action.Interactable;
 import com.smanzana.dungeonmaster.pawn.Player;
+import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
+import com.smanzana.dungeonmaster.session.datums.Datum;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.dungeonmaster.ui.app.swing.screens.TemplateEditorScreen;
 import com.smanzana.dungeonmaster.utils.Notable;
 import com.smanzana.dungeonmaster.utils.NoteUtil;
+import com.smanzana.templateeditor.api.IRuntimeEnumerable;
+import com.smanzana.templateeditor.api.annotations.DataLoaderDescription;
+import com.smanzana.templateeditor.api.annotations.DataLoaderName;
+import com.smanzana.templateeditor.api.annotations.DataLoaderRuntimeEnum;
 
 /**
  * A place/location. THAT kind of setting.
  * @author Skyler
  *
  */
-public class Setting implements Notable, DataCompatible, Interactable {
+public class Setting implements Notable, DataCompatible, Interactable, IRuntimeEnumerable<String> {
 
+	@DataLoaderName
 	private String title;
+	@DataLoaderDescription
 	private String description;
+	
 	private List<String> notes;
+	
+	@DataLoaderRuntimeEnum("player")
 	private List<String> playerActions;
+	@DataLoaderRuntimeEnum("admin")
 	private List<String> adminActions;
 	
 	public Setting() {
@@ -155,6 +170,20 @@ public class Setting implements Notable, DataCompatible, Interactable {
 		base.addChild(DataNode.serializeAllStrings("adminactions", "action", adminActions));
 		
 		return base;
+	}
+
+	@Override
+	public Map<String, String> fetchValidValues(String key) {
+		Datum<ActionDatumData> datum = TemplateEditorScreen.instance()
+				.getCurrentTemplate().getActionDatum();
+		
+		Map<String, String> values = new TreeMap<>();
+		
+		for (ActionDatumData d : datum.getData()) {
+			values.put(d.getName(), d.getName());
+		}
+		
+		return values;
 	}
 		
 }
