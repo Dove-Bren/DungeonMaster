@@ -257,7 +257,7 @@ public abstract class Equipment extends Item {
 		if (null == node.getChild("slot"))
 			return null;
 		
-		Slot slot = Slot.valueOf(node.getValue().toUpperCase());
+		Slot slot = Slot.valueOf(node.getChild("slot").getValue().toUpperCase());
 		Equipment equip = (slot.getIsArmor() ? new Armor() : new Weapon());
 		equip.load(node);
 		

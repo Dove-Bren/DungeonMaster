@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 /**
  * Holds a range of potential values
@@ -14,7 +15,9 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
  */
 public class ValueRange extends ValueSpecifier implements DataCompatible {
 
+	@DataLoaderData
 	private int min;
+	@DataLoaderData
 	private int range;
 	
 	public ValueRange(int min, int max) {

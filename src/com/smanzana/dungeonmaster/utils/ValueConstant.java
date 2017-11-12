@@ -1,9 +1,11 @@
 package com.smanzana.dungeonmaster.utils;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 public class ValueConstant extends ValueSpecifier {
 
+	@DataLoaderData
 	private int value;
 	
 	public ValueConstant(int value) {

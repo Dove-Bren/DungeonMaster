@@ -4,11 +4,15 @@ import java.util.Random;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 public class Dice extends ValueSpecifier implements DataCompatible {
 
+	@DataLoaderData(name="Count",description="in 3d4, the 3")
 	private int dieCount;
+	@DataLoaderData(name="Faces",description="in 3d4, the 4")
 	private int dieFaces;
+	@DataLoaderData(name="Include Zero",description="on a d4, true means 0-3 and false means 1-4")
 	private boolean includeZero;
 	
 	/**

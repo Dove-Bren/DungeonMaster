@@ -12,6 +12,10 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.utils.Dice;
 import com.smanzana.dungeonmaster.utils.ValueRange;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
+import com.smanzana.templateeditor.api.annotations.DataLoaderDescription;
+import com.smanzana.templateeditor.api.annotations.DataLoaderList;
+import com.smanzana.templateeditor.api.annotations.DataLoaderName;
 
 /**
  * Stores:
@@ -39,13 +43,27 @@ public class ClassDatumData implements DatumData {
 		
 	}
 	
+	@DataLoaderName
 	private String name;
+	@DataLoaderDescription
 	private String description;
+	@DataLoaderData
+	@DataLoaderList(templateName="valueTemplate",factoryName="constructTemplateValue")
 	private Map<Attributes, ValueRange> startRanges;
+	@DataLoaderData
+	@DataLoaderList(templateName="valueTemplate",factoryName="constructTemplateValue")
 	private Map<Attributes, ValueRange> growthRanges;
+	@DataLoaderData
 	private Map<Integer, String> spellUnlocks;
+	@DataLoaderData
 	private List<String> promotions;
+	@DataLoaderData
 	private Dice hitdice;
+	
+	protected static ValueRange valueTemplate = constructTemplateValue();
+	protected static ValueRange constructTemplateValue() {
+		return new ValueRange(0, 1);
+	}
 	
 	public ClassDatumData() {
 		this.startRanges = new EnumMap<>(Attributes.class);
