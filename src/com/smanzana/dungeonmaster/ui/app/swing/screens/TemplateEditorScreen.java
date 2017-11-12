@@ -736,7 +736,6 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 	}
 	
 	public void doMouseReleased(MouseEvent e) {
-		System.out.println("Popuptrigger? " + e.isPopupTrigger());
 		if (!e.isPopupTrigger())
 			return;
 		

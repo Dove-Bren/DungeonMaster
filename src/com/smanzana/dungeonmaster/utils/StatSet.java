@@ -8,6 +8,7 @@ import java.util.Map;
 import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 /**
  * Holds a value for each attribute.
@@ -18,13 +19,21 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
  */
 public class StatSet implements DataCompatible {
 
+	@DataLoaderData(name="Maximum Health")
 	private int maxHealth;
+	@DataLoaderData
 	private int health;
+	@DataLoaderData(name="Maximum Mana")
 	private int maxMana;
+	@DataLoaderData
 	private int mana;
+	@DataLoaderData(name="Maximum Stamina")
 	private int maxStamina;
+	@DataLoaderData
 	private int stamina;
+	@DataLoaderData(name="Base AC",description="Base AC. Only applies when the proper mechanics options are enabled.")
 	private int baseAC;
+	@DataLoaderData(name="Ability Scores")
 	private Map<Attributes, Integer> abilityScores;
 	
 	public StatSet() {

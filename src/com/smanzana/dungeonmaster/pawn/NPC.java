@@ -161,6 +161,7 @@ public class NPC extends Entity {
 				.race(getRace())
 				.trades(willTrade)
 				);
+		mob.inventory.replaceWith(inventory);
 		
 		// Look up NPCDatumData and create Mob with this.* + datum data missing pieces
 		if (templateName == null) {
@@ -192,7 +193,7 @@ public class NPC extends Entity {
 		
 		npc.willTrade = data.isWillTrade();
 		
-		npc.inventory = data.getInventory();
+		npc.inventory.replaceWith(data.getInventory());
 		npc.stats = data.getStats();
 		
 		return npc;

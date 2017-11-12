@@ -7,6 +7,7 @@ import com.smanzana.dungeonmaster.inventory.item.Junk;
 import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
+import com.smanzana.dungeonmaster.session.datums.data.InventoryData;
 import com.smanzana.dungeonmaster.utils.StatSet;
 import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 import com.smanzana.templateeditor.api.annotations.DataLoaderName;
@@ -46,14 +47,14 @@ public class NPCDatumData implements DatumData {
 	@DataLoaderData
 	private StatSet stats;
 	@DataLoaderData
-	private Inventory inventory;
+	private InventoryData inventory;
 	@DataLoaderData
 	private int xp;
 	@DataLoaderData
 	private boolean willTrade;
 	
 	public NPCDatumData() {
-		this.inventory = new Inventory();
+		this.inventory = new InventoryData();
 		this.stats = new StatSet();
 	}
 	
@@ -69,7 +70,7 @@ public class NPCDatumData implements DatumData {
 		this.templateName = templateName;
 		this.profileName = profileName;
 		this.stats = stats;
-		this.inventory = inventory;
+		this.inventory = new InventoryData(inventory);
 		this.xp = xp;
 		this.willTrade = willTrade;
 	}
@@ -111,7 +112,7 @@ public class NPCDatumData implements DatumData {
 	}
 
 	public Inventory getInventory() {
-		return inventory;
+		return inventory.toInventory();
 	}
 
 	@Override
@@ -131,8 +132,9 @@ public class NPCDatumData implements DatumData {
 		}
 		
 		if ((node = root.getChild("inventory")) != null) {
-			this.inventory = new Inventory();
-			this.inventory.load(node);
+			Inventory inv = new Inventory();
+			inv.load(node);
+			this.inventory = new InventoryData(inv);
 		}
 		
 		if ((node = root.getChild("stats")) != null) {
@@ -149,7 +151,7 @@ public class NPCDatumData implements DatumData {
 		node.addChild(new DataNode("templatename", templateName, null));
 		node.addChild(new DataNode("profilename", profileName, null));
 		node.addChild(new DataNode("xp", xp + "", null));
-		node.addChild(this.inventory.write("inventory"));
+		node.addChild(this.inventory.toInventory().write("inventory"));
 		node.addChild(this.stats.write("stats"));
 		
 		return node;
@@ -168,7 +170,7 @@ public class NPCDatumData implements DatumData {
 		data.stats.setAbilityScore(Attributes.STRENGTH, 16);
 		data.stats.setAbilityScore(Attributes.CONSTITUTION, 18);
 		
-		data.inventory.addGold(400);
+		data.inventory.setGold(400);
 		data.inventory.addItem(new Junk("Gold Dust", "Small pile of gold dust", 10));
 		
 		return data;

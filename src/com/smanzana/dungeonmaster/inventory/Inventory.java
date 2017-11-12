@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
@@ -19,6 +20,7 @@ import com.smanzana.dungeonmaster.session.configuration.MechanicsConfig;
 import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 public class Inventory implements DataCompatible {
 
@@ -77,8 +79,11 @@ public class Inventory implements DataCompatible {
 		public boolean steal(Item item, Pawn actor);
 	}
 	
+	@DataLoaderData
 	private int gold;
+	@DataLoaderData
 	private Map<Integer, Item> heldItems;
+	@DataLoaderData
 	private EquipmentSet equipment;
 	private InventoryHook hook;
 	
@@ -297,4 +302,18 @@ public class Inventory implements DataCompatible {
 		
 		return new DataNode(key, null, list);
 	}	
+	
+	/**
+	 * Replaces the contents of this inventory with the contents
+	 * of the other inventory. Maintains entity references and hooks.
+	 * @param other
+	 */
+	public void replaceWith(Inventory other) {
+		heldItems.clear();
+		clearEquipment();
+		for (Entry<Integer, Item> row : other.heldItems.entrySet())
+			heldItems.put(row.getKey(), row.getValue());
+		this.equipment = other.equipment.clone();
+		this.gold = other.gold;
+	}
 }

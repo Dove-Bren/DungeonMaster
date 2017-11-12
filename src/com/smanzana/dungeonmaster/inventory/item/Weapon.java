@@ -3,6 +3,7 @@ package com.smanzana.dungeonmaster.inventory.item;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.ValueConstant;
 import com.smanzana.dungeonmaster.utils.ValueSpecifier;
+import com.smanzana.templateeditor.api.ISuperclass;
 import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 public class Weapon extends Equipment {
@@ -105,5 +106,10 @@ public class Weapon extends Equipment {
 	
 	protected static void register() {
 		Item.registerType(ClassKey(), new Factory());
+	}
+
+	@Override
+	public ISuperclass cloneObject() {
+		return new Weapon(name, description, value, durability, attack, isShield);
 	}
 }

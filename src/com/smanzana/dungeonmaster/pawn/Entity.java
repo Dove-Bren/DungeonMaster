@@ -50,7 +50,9 @@ public abstract class Entity extends Pawn {
 		}
 		
 		if (null != (node = root.getChild("inventory"))) {
-			this.inventory = new Inventory();
+			this.inventory.emptyItems();
+			this.inventory.clearEquipment();
+			this.inventory.setGold(0);
 			this.inventory.load(node);
 		}
 		

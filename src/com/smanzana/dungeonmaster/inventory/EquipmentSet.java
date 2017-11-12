@@ -10,13 +10,25 @@ import com.smanzana.dungeonmaster.inventory.item.Equipment;
 import com.smanzana.dungeonmaster.inventory.item.Weapon;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
+import com.smanzana.templateeditor.api.annotations.DataLoaderList;
 
 public class EquipmentSet implements DataCompatible, Cloneable {
 
+	@DataLoaderData
+	@DataLoaderList(templateName="templateEquipment", factoryName="constructTemplate")
 	private Map<Equipment.Slot, Equipment> equips;
+	
+	protected static Equipment templateEquipment = constructTemplate();
+	private static Equipment constructTemplate() {
+		return (Equipment) Equipment.empty.clone();
+	}
 	
 	public EquipmentSet() {
 		equips = new EnumMap<>(Equipment.Slot.class);
+		for (Equipment.Slot slot : Equipment.Slot.values()) {
+			equips.put(slot, null);
+		}
 	}
 	
 	public void setPiece(Equipment.Slot slot, Equipment item) {
@@ -35,7 +47,8 @@ public class EquipmentSet implements DataCompatible, Cloneable {
 		for (Equipment.Slot slot : Equipment.Slot.values()) {
 			if (null != (node = root.getChild(slot.name()))) {
 				equips.put(slot, Equipment.fromData(node));
-			}
+			} else
+				equips.put(slot, null);
 		}
 		
 	}
@@ -46,7 +59,9 @@ public class EquipmentSet implements DataCompatible, Cloneable {
 		
 		for (Equipment.Slot slot : Equipment.Slot.values()) {
 			if (this.equips.containsKey(slot)) {
-				list.add(equips.get(slot).write(slot.name()));
+				Equipment e = equips.get(slot);
+				if (e != null)
+				list.add(e.write(slot.name()));
 			}
 		}
 		

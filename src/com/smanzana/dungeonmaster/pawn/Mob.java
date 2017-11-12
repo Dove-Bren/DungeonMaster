@@ -233,6 +233,8 @@ public class Mob extends NPC {
 			po.score(attr, stats.getAbilityScore(attr));
 		npc.applyOverlay(po);
 		
+		npc.inventory.replaceWith(inventory);
+		
 		npc.applyOverlay((new NPCOverlay())
 				.name(this.getName())
 				.race(this.getRace())
@@ -255,7 +257,7 @@ public class Mob extends NPC {
 			mob.setRace(prof.getRace());
 		}
 		
-		mob.inventory = data.getInventory();
+		mob.inventory.replaceWith(data.getInventory());
 		mob.stats = data.getStats();
 		mob.setWillTrade(data.isWillTrade());
 		

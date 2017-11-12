@@ -1,6 +1,7 @@
 package com.smanzana.dungeonmaster.inventory.item;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.ISuperclass;
 
 public class Junk extends Item {
 
@@ -35,4 +36,9 @@ public class Junk extends Item {
 		Item.registerType(ClassKey(), new Factory());
 	}
 
+	@Override
+	public ISuperclass cloneObject() {
+		return new Junk(name, description, value);
+	}
+	
 }

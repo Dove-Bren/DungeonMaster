@@ -1,6 +1,7 @@
 package com.smanzana.dungeonmaster.inventory.item;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.ISuperclass;
 import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 public class Armor extends Equipment {
@@ -85,5 +86,10 @@ public class Armor extends Equipment {
 	@Override
 	public boolean fitsSlot(Slot slot) {
 		return slot == this.slot;
+	}
+
+	@Override
+	public ISuperclass cloneObject() {
+		return new Armor(name, description, value, slot, durability, defense);
 	}
 }

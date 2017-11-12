@@ -11,6 +11,7 @@ import com.smanzana.dungeonmaster.session.datums.Datum;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.ui.app.swing.screens.TemplateEditorScreen;
 import com.smanzana.templateeditor.api.IRuntimeEnumerable;
+import com.smanzana.templateeditor.api.ISuperclass;
 import com.smanzana.templateeditor.api.annotations.DataLoaderRuntimeEnum;
 
 public class Usable extends Item implements IRuntimeEnumerable<String> {
@@ -95,6 +96,11 @@ public class Usable extends Item implements IRuntimeEnumerable<String> {
 		}
 		
 		return values;
+	}
+
+	@Override
+	public ISuperclass cloneObject() {
+		return new Usable(name, description, value, action);
 	}
 
 }

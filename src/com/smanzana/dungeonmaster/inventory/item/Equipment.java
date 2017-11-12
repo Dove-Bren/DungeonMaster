@@ -55,6 +55,8 @@ public abstract class Equipment extends Item {
 		}
 	}
 	
+	public static Equipment empty = new Armor();
+	
 //	@DataLoaderData
 //	protected Slot slot;
 	@DataLoaderData
