@@ -1,5 +1,7 @@
 package com.smanzana.dungeonmaster.inventory.item;
 
+import com.smanzana.dungeonmaster.battle.effects.Effect;
+import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.utils.ValueConstant;
 import com.smanzana.dungeonmaster.utils.ValueSpecifier;
@@ -110,6 +112,16 @@ public class Weapon extends Equipment {
 
 	@Override
 	public ISuperclass cloneObject() {
-		return new Weapon(name, description, value, durability, attack, isShield);
+		Weapon weapon = new Weapon(name, description, value, durability, attack, isShield);
+		
+		for (Effect e : this.getEffects())
+			weapon.addEffect(e);
+		
+		for (Attributes attr : Attributes.values())
+			weapon.setAbilityScoreRequirement(attr, this.getAbilityScoreRequirement(attr));
+		
+		weapon.setLevelRequirement(levelRequirement);
+		
+		return weapon;
 	}
 }

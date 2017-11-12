@@ -1,5 +1,7 @@
 package com.smanzana.dungeonmaster.inventory.item;
 
+import com.smanzana.dungeonmaster.battle.effects.Effect;
+import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.templateeditor.api.ISuperclass;
 import com.smanzana.templateeditor.api.annotations.DataLoaderData;
@@ -90,6 +92,16 @@ public class Armor extends Equipment {
 
 	@Override
 	public ISuperclass cloneObject() {
-		return new Armor(name, description, value, slot, durability, defense);
+		Armor armor = new Armor(name, description, value, slot, durability, defense);
+		
+		for (Effect e : this.getEffects())
+			armor.addEffect(e);
+		
+		for (Attributes attr : Attributes.values())
+			armor.setAbilityScoreRequirement(attr, this.getAbilityScoreRequirement(attr));
+		
+		armor.setLevelRequirement(levelRequirement);
+		
+		return armor;
 	}
 }
