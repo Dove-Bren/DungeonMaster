@@ -6,10 +6,14 @@ import java.util.Random;
 
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.annotations.DataLoaderList;
 
 public class NameSet implements DataCompatible {
 
+	@DataLoaderList(templateName="templateString")
 	private List<String> set;
+	
+	protected static String templateString = "";
 	
 	public NameSet() {
 		this.set = new LinkedList<>();

@@ -8,6 +8,9 @@ import java.util.Random;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.utils.NameSet;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
+import com.smanzana.templateeditor.api.annotations.DataLoaderList;
+import com.smanzana.templateeditor.api.annotations.DataLoaderName;
 
 /**
  * Stores:
@@ -32,10 +35,20 @@ public class ProfileDatumData implements DatumData {
 		
 	}
 	
+	@DataLoaderName
 	private String profileName;
+	@DataLoaderData
 	private String race;
+	@DataLoaderData
 	private NameSet first;
+	@DataLoaderList(templateName="template", factoryName="constructFactory")
 	private List<NameSet> additional;
+	
+	protected static NameSet template = constructFactory();
+	
+	protected static NameSet constructFactory() {
+		return new NameSet();
+	}
 	
 	public ProfileDatumData() {
 		this.additional = new LinkedList<>();
