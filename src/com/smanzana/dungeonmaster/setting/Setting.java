@@ -19,6 +19,7 @@ import com.smanzana.dungeonmaster.ui.app.swing.screens.TemplateEditorScreen;
 import com.smanzana.dungeonmaster.utils.Notable;
 import com.smanzana.dungeonmaster.utils.NoteUtil;
 import com.smanzana.templateeditor.api.IRuntimeEnumerable;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 import com.smanzana.templateeditor.api.annotations.DataLoaderDescription;
 import com.smanzana.templateeditor.api.annotations.DataLoaderName;
 import com.smanzana.templateeditor.api.annotations.DataLoaderRuntimeEnum;
@@ -38,8 +39,10 @@ public class Setting implements Notable, DataCompatible, Interactable, IRuntimeE
 	private List<String> notes;
 	
 	@DataLoaderRuntimeEnum("player")
+	@DataLoaderData(name="Player Actions",description="Actions players can take while in this setting")
 	private List<String> playerActions;
 	@DataLoaderRuntimeEnum("admin")
+	@DataLoaderData(name="Admin Actions",description="Actions only the DM can take while in this setting")
 	private List<String> adminActions;
 	
 	public Setting() {
