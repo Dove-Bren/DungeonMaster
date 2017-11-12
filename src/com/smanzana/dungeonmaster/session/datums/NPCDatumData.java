@@ -1,6 +1,8 @@
 package com.smanzana.dungeonmaster.session.datums;
 
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.inventory.item.Junk;
@@ -8,9 +10,12 @@ import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.session.datums.data.InventoryData;
+import com.smanzana.dungeonmaster.ui.app.swing.screens.TemplateEditorScreen;
 import com.smanzana.dungeonmaster.utils.StatSet;
+import com.smanzana.templateeditor.api.IRuntimeEnumerable;
 import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 import com.smanzana.templateeditor.api.annotations.DataLoaderName;
+import com.smanzana.templateeditor.api.annotations.DataLoaderRuntimeEnum;
 
 /**
  * NPC (npc, or mob, really) template
@@ -24,7 +29,7 @@ import com.smanzana.templateeditor.api.annotations.DataLoaderName;
  * @author Skyler
  *
  */
-public class NPCDatumData implements DatumData {
+public class NPCDatumData implements DatumData, IRuntimeEnumerable<String> {
 	
 	public static class NPCDatumFactory implements DatumFactory<NPCDatumData> {
 
@@ -42,7 +47,7 @@ public class NPCDatumData implements DatumData {
 	
 	@DataLoaderName
 	private String templateName;
-	@DataLoaderData
+	@DataLoaderRuntimeEnum
 	private String profileName;
 	@DataLoaderData
 	private StatSet stats;
@@ -184,6 +189,20 @@ public class NPCDatumData implements DatumData {
 	@Override
 	public String getDisplayTooltip() {
 		return "Template NPC";
+	}
+
+	@Override
+	public Map<String, String> fetchValidValues(String key) {
+		Datum<ProfileDatumData> datum = TemplateEditorScreen.instance()
+				.getCurrentTemplate().getProfileDatum();
+		
+		Map<String, String> values = new TreeMap<>();
+		
+		for (ProfileDatumData d : datum.getData()) {
+			values.put(d.getProfileName(), d.getDisplayName());
+		}
+		
+		return values;
 	}
 	
 }

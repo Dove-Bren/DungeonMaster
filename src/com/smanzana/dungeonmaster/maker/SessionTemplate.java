@@ -7,6 +7,7 @@ import java.util.List;
 import com.smanzana.dungeonmaster.session.SessionBase;
 import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
+import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
 
 /**
  * Holds a set of configurations to spawn sessions with
@@ -67,5 +68,9 @@ public class SessionTemplate extends SessionBase {
 	
 	public Datum<ActionDatumData> getActionDatum() {
 		return this.actionDatum;
+	}
+	
+	public Datum<ProfileDatumData> getProfileDatum() {
+		return this.profileDatum;
 	}
 }
