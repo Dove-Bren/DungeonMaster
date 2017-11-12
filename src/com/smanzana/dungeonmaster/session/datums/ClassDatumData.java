@@ -77,6 +77,9 @@ public class ClassDatumData implements DatumData {
 		
 		this.promotions = new LinkedList<>();
 		this.hitdice = new Dice(1, 1, false);
+
+		for (int i = 0; i < 11; i++)
+			spellUnlocks.put(i, null);
 	}
 	
 	public ClassDatumData(String name, String description) {
@@ -87,8 +90,7 @@ public class ClassDatumData implements DatumData {
 	
 	public ClassDatumData(String name, String description, Map<Attributes, ValueRange> startRanges,
 			Map<Attributes, ValueRange> growthRanges, Map<Integer, String> spellUnlocks, List<String> promotions, Dice hitdice) {
-		this.name = name;
-		this.description = description;
+		this(name, description);
 		this.startRanges = startRanges;
 		this.growthRanges = growthRanges;
 		this.spellUnlocks = spellUnlocks;
@@ -102,6 +104,9 @@ public class ClassDatumData implements DatumData {
 			if (!this.startRanges.containsKey(at))
 				this.startRanges.put(at, new ValueRange(0, 0));
 		}
+
+		for (int i = 0; i < 11; i++)
+			spellUnlocks.put(i, null);
 	}
 	
 	public String getName() {
@@ -233,14 +238,14 @@ public class ClassDatumData implements DatumData {
 		}
 		
 		spellUnlocks.clear();
+		for (int i = 0; i < 11; i++)
+			spellUnlocks.put(i, null);
 		if ((node = root.getChild("spell_unlocks")) != null) {
 			for (DataNode child : node.getChildren()) {
 				// have level, spell name
-				if (child.getChild("name") == null || child.getChild("spell") == null)
-					continue;
 				
 				spellUnlocks.put(
-						DataNode.parseInt(child.getChild("name")),
+						DataNode.parseInt(child.getChild("level")),
 						child.getChild("spell").getValue());
 			}
 		}
@@ -287,6 +292,20 @@ public class ClassDatumData implements DatumData {
 		
 		if (hitdice != null)
 			nodes.add(hitdice.write("hitdice"));
+		
+		DataNode spells = new DataNode("spell_unlocks", null, new LinkedList<>());
+		for (Integer k : spellUnlocks.keySet()) {
+			if (spellUnlocks.get(k) != null) {
+				DataNode spell = new DataNode(k + "", null, new LinkedList<>());
+				
+				spell.addChild(new DataNode("level", k + "", null));
+				spell.addChild(new DataNode("spell", spellUnlocks.get(k), null));
+				
+				spells.addChild(spell);
+			}
+				
+		}
+		nodes.add(spells);
 		
 		return new DataNode(key, null, nodes);
 	}
