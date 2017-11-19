@@ -696,8 +696,11 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 					DatumData d = datum.createEmptyData();
 					datum.addData(d);
 					
-					sourceModel.insertNodeInto(new DefaultMutableTreeNode(d),
-							node, node.getChildCount());
+					DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(d);
+					sourceModel.insertNodeInto(newNode,	node, node.getChildCount());
+					sourceTree.setSelectionPath(new TreePath(newNode.getPath()));
+					sourceTree.expandPath(sourceTree.getSelectionPath());
+					doSelection(newNode);
 				}
 			});
 		}
@@ -788,6 +791,11 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			return;
 		}
 		
+		doSelection(node);
+		
+	}
+	
+	private void doSelection(DefaultMutableTreeNode node) {
 		if (currentEditor != null)
 			closeEditor();
 		
@@ -804,7 +812,6 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		
 		if (editor != null)
 			openEditor(editor);
-		
 	}
 	
 	private <T extends Enum<T>> Map<T, FieldData> toMap(Config<T> config) {
