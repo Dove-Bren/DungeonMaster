@@ -5,6 +5,7 @@ import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
 import com.smanzana.dungeonmaster.spell.Spell;
 import com.smanzana.dungeonmaster.utils.Dice;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 /**
  * Stores:
@@ -30,6 +31,7 @@ public class SpellDatumData implements DatumData {
 		
 	}
 	
+	@DataLoaderData(expand=true)
 	private Spell spell;
 	
 	public SpellDatumData() {

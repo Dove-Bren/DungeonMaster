@@ -49,6 +49,7 @@ public abstract class SubAction implements DataCompatible, Displayable, ICustomD
 		public T construct(DataNode data);
 	}
 	
+	public static SubAction templateSubaction = construct();
 	private static Map<String, SubActionFactory<?>> factories = null;
 	private static List<String> editorSubactions = null;
 	

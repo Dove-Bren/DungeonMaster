@@ -6,14 +6,25 @@ import java.util.List;
 import com.smanzana.dungeonmaster.action.subaction.SubAction;
 import com.smanzana.dungeonmaster.session.datums.data.DataCompatible;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
+import com.smanzana.templateeditor.api.annotations.DataLoaderDescription;
+import com.smanzana.templateeditor.api.annotations.DataLoaderList;
+import com.smanzana.templateeditor.api.annotations.DataLoaderName;
 
 public class Spell implements DataCompatible {
 
+	@DataLoaderName
 	private String name;
+	@DataLoaderDescription
 	private String description;
+	@DataLoaderData
 	private int manaCost;
+	@DataLoaderData
 	private int level; // spell level, as in spell slot level
+	@DataLoaderList(templateName="subactionTemplate")
 	private List<SubAction> subactions;
+	
+	protected static final SubAction subactionTemplate = SubAction.templateSubaction;
 	
 	public Spell(String name, String description, int manaCost, int level) {
 		this.name = name;
