@@ -26,8 +26,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
+import com.smanzana.dungeonmaster.session.GameSession;
 import com.smanzana.dungeonmaster.session.SessionBase;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
@@ -97,10 +100,27 @@ public class NewScreen extends JPanel implements ActionListener {
 		mainPanel.add(label);
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 100)));
 		
-		nameField = new JTextField("Session Name");
+		nameField = new JTextField("Session Name", SIZE_PATH);
 		nameField.setEditable(true);
 		nameField.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-		nameField.setColumns(SIZE_PATH);
+		nameField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				updateSubmitButton();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+				insertUpdate(arg0);
+			}
+		});
+		//nameField.setColumns(SIZE_PATH);
 		castSize(nameField);
 		mainPanel.add(nameField);
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -111,10 +131,9 @@ public class NewScreen extends JPanel implements ActionListener {
 		mainPanel.add(label);
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
 		
-		templateField = new JTextField("");
+		templateField = new JTextField("", SIZE_PATH);
 		templateField.setEditable(false);
 		templateField.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-		templateField.setColumns(SIZE_PATH);
 		castSize(templateField);
 		mainPanel.add(templateField);
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -193,14 +212,18 @@ public class NewScreen extends JPanel implements ActionListener {
 			if (!file.exists() || !file.isDirectory())
 				continue;
 			
-			File mechfile = new File(file, SessionBase.PATH_MECHS);
-			if (!mechfile.exists())
+			if (!isValidDir(file))
 				continue;
 			
 			list.add(new TemplateDirectory(file));
 		}
 		
 		return list;
+	}
+	
+	private boolean isValidDir(File dir) {
+		File mechfile = new File(dir, SessionBase.PATH_MECHS);
+		return mechfile.exists();
 	}
 
 	@Override
@@ -216,17 +239,19 @@ public class NewScreen extends JPanel implements ActionListener {
 			File sel = fc.getSelectedFile();
 			if (sel != null) {
 				if (!sel.exists())
-					JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That folder does not exist", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+					JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That folder does not exist.", "Error opening template", JOptionPane.PLAIN_MESSAGE);
 				else if (!sel.isDirectory())
-					JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That is not a directory", "Error opening template", JOptionPane.PLAIN_MESSAGE);
-				else {
+					JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That is not a directory.", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+				else if (!isValidDir(sel)) {
+					JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: The selected directory does not appear to be a valid template.", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+				} else {
 					// oh well just make one wherever it is
 					select(sel.getPath());
 				}
 			}
 		}
 			break;
-		case "?select":
+		case "?create":
 		{
 			File file = new File(templatePath);
 			if (!file.exists() || !file.isDirectory()) {
@@ -246,21 +271,50 @@ public class NewScreen extends JPanel implements ActionListener {
 	
 	private void select(String path) {
 		String display = path;
-		if (path.length() > SIZE_PATH) {
-			int pos = path.length() - (SIZE_PATH - 3);
-			display = "..." + path.substring(pos - 1);
+		int fieldlen = templateField.getColumns();
+		if (path.length() > fieldlen) {
+			int pos = path.length() - (fieldlen - 3);
+			display = "..." + path.substring(pos);
+			
+			System.out.println("path: [" + path + "]");
+			System.out.println("pos: " + pos);
+			System.out.println("display: " + display);
 		}
 		
 		templateField.setText(display);
 		templatePath = path;
 		
-		if (templatePath != null && !templatePath.trim().isEmpty())
-			createButton.setEnabled(true);
+		updateSubmitButton();
+	}
+	
+	private void updateSubmitButton() {
+		createButton.setEnabled(templatePath != null
+				&& !templatePath.trim().isEmpty()
+				&& isNameOK(nameField.getText()));
+	}
+	
+	private boolean isNameOK(String name) {
+		if (name == null || name.trim().isEmpty())
+			return false;
+		
+		if (name.contains("/") || name.contains("\\") || name.contains(":")
+				|| name.contains("*") || name.contains("?") || name.contains("\"")
+				|| name.contains("<") || name.contains(">") || name.contains("|"))
+			return false;
+		
+		return true;
 	}
 	
 	// Called when actually selecting and going to create a new template
 	private void createFromFile(File file) {
 		System.out.println("Create based on file " + file);
+		File outfile = new File(DungeonMaster.PATH_SESSIONS, nameField.getText());
+		//SessionTemplate template = new SessionTemplate(file);
+		//template.save(outfile);
+		
+		GameSession session = new GameSession(file);
+		session.save(outfile);
+		ui.goSessionScreen(session);
 	}
 	
 }

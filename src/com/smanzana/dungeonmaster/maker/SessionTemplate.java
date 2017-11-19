@@ -39,7 +39,6 @@ public class SessionTemplate extends SessionBase {
 	 */
 	public void save() {
 		save(this.root);
-		this.dirty = false;
 	}
 	
 	/**
@@ -51,6 +50,7 @@ public class SessionTemplate extends SessionBase {
 		this.root = newRoot;
 		this.saveConfigs();
 		this.saveDatums();
+		this.dirty = false;
 	}
 	
 	public List<Datum<?>> getDatums() {

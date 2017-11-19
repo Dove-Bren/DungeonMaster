@@ -71,6 +71,24 @@ public class GameSession extends SessionBase implements Notable {
 	}
 	
 	/**
+	 * Saves template out to current root
+	 */
+	public void save() {
+		save(this.root);
+	}
+	
+	/**
+	 * Saves template to new root folder.
+	 * Does no cleanup of the old root
+	 * @param newRoot
+	 */
+	public void save(File newRoot) {
+		this.root = newRoot;
+		this.saveConfigs();
+		this.saveDatums();
+	}
+	
+	/**
 	 * Runs session
 	 * Blocks until it has finished.
 	 * Sessions are responsible for loading and saving all their own data
@@ -134,6 +152,7 @@ public class GameSession extends SessionBase implements Notable {
 				return;
 			
 			receivedShutdown = true;
+			save();
 		}
 	}
 	
