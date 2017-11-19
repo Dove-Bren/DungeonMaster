@@ -30,6 +30,7 @@ import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.session.GameSession;
 import com.smanzana.dungeonmaster.session.SessionBase;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
+import com.smanzana.dungeonmaster.ui.app.AppUIColor;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 
 // Screen for loading an existing session
@@ -84,6 +85,7 @@ public class LoadScreen extends JPanel implements ActionListener {
 		
 	public void init() {
 		JPanel mainPanel = new JPanel();
+		AppUIColor.setColors(mainPanel, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
 		
@@ -97,12 +99,14 @@ public class LoadScreen extends JPanel implements ActionListener {
 		nameField = new JTextField("", SIZE_PATH);
 		nameField.setEditable(false);
 		nameField.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		AppUIColor.setColors(nameField, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		castSize(nameField);
 		mainPanel.add(nameField);
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 		label = new JLabel("Session Name");
 		label.setHorizontalAlignment(JLabel.CENTER);
 		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		AppUIColor.setColors(label, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
 		castSize(label);
 		mainPanel.add(label);
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
@@ -128,8 +132,10 @@ public class LoadScreen extends JPanel implements ActionListener {
 		this.add(mainPanel, BorderLayout.CENTER);
 		
 		JPanel sidePanel = new JPanel(new BorderLayout());
+		AppUIColor.setColors(sidePanel, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		sidePanel.setBorder(BorderFactory.createEtchedBorder());
 		label = new JLabel("Select Session");
+		AppUIColor.setColors(label, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		label.setHorizontalAlignment(JLabel.CENTER);
 		label.setPreferredSize(new Dimension(
@@ -144,6 +150,7 @@ public class LoadScreen extends JPanel implements ActionListener {
 			model.addElement(dir);
 		}
 		sessionList = new JList<>(model);
+		AppUIColor.setColors(sessionList, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		sessionList.setPreferredSize(new Dimension(300, Short.MAX_VALUE));
 		castSize(sessionList);
 		sessionList.setBorder(BorderFactory.createLoweredSoftBevelBorder());

@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
+import com.smanzana.dungeonmaster.ui.app.AppUIColor;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 import com.smanzana.dungeonmaster.ui.app.swing.AppSound;
 import com.smanzana.dungeonmaster.ui.app.swing.AppSound.Sound;
@@ -38,9 +39,11 @@ public class StartScreen extends JPanel {
 	}
 	
 	public void init() {
+		AppUIColor.setColors(this, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
 		
 		JLabel title = new JLabel(AppFrame.createImageIcon("title.png"));
 		buttonPanel = new JPanel();
+		AppUIColor.setColors(buttonPanel, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS));
 		title.setAlignmentX(CENTER_ALIGNMENT);
 		buttonPanel.setAlignmentX(CENTER_ALIGNMENT);

@@ -37,6 +37,12 @@ public class GameSession extends SessionBase implements Notable {
 	
 	public static final String PATH_CONFIG = "data/";
 	
+	/**
+	 * All playable characters that exist in this session.
+	 * Note this is different then the party
+	 */ 
+	private List<Player> PCs;	
+	
 	private List<String> notes;
 	private List<Pawn> party;
 	private Setting setting;
@@ -189,7 +195,11 @@ public class GameSession extends SessionBase implements Notable {
 		return notes;
 	}
 	
-	public List<Player> getPlayers() {
+	public List<Player> getAllPlayers() {
+		return PCs;
+	}
+	
+	public List<Player> getPartyPlayers() {
 		List<Player> players = new LinkedList<>();
 		
 		for (Pawn p : party)
@@ -242,7 +252,7 @@ public class GameSession extends SessionBase implements Notable {
 	 * Tries to claim player with given name to the calling comm.
 	 * If player is already claimed (or name is invalid), returns 0.
 	 * @param playerName
-	 * @return 0 on error. non-zero on success
+	 * @return 0 on error. Returns session key for later use
 	 */
 	public int registerForCharacter(String playerName) {
 		Player p = this.lookupPlayer(playerName);

@@ -33,6 +33,7 @@ import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.session.GameSession;
 import com.smanzana.dungeonmaster.session.SessionBase;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
+import com.smanzana.dungeonmaster.ui.app.AppUIColor;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 
 // Screen for creating a new session from a template
@@ -90,6 +91,7 @@ public class NewScreen extends JPanel implements ActionListener {
 		
 	public void init() {
 		JPanel mainPanel = new JPanel();
+		AppUIColor.setColors(mainPanel, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
 		
@@ -101,6 +103,7 @@ public class NewScreen extends JPanel implements ActionListener {
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 100)));
 		
 		nameField = new JTextField("Session Name", SIZE_PATH);
+		AppUIColor.setColors(nameField, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		nameField.setEditable(true);
 		nameField.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		nameField.getDocument().addDocumentListener(new DocumentListener() {
@@ -125,6 +128,7 @@ public class NewScreen extends JPanel implements ActionListener {
 		mainPanel.add(nameField);
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 		label = new JLabel("Session Name");
+		AppUIColor.setColors(label, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		label.setHorizontalAlignment(JLabel.CENTER);
 		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		castSize(label);
@@ -132,12 +136,14 @@ public class NewScreen extends JPanel implements ActionListener {
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
 		
 		templateField = new JTextField("", SIZE_PATH);
+		AppUIColor.setColors(templateField, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		templateField.setEditable(false);
 		templateField.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		castSize(templateField);
 		mainPanel.add(templateField);
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 		label = new JLabel("Template");
+		AppUIColor.setColors(label, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		label.setHorizontalAlignment(JLabel.CENTER);
 		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		castSize(label);
@@ -166,8 +172,10 @@ public class NewScreen extends JPanel implements ActionListener {
 		this.add(mainPanel, BorderLayout.CENTER);
 		
 		JPanel sidePanel = new JPanel(new BorderLayout());
+		AppUIColor.setColors(sidePanel, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		sidePanel.setBorder(BorderFactory.createEtchedBorder());
 		label = new JLabel("Select Template");
+		AppUIColor.setColors(label, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		label.setHorizontalAlignment(JLabel.CENTER);
 		label.setPreferredSize(new Dimension(
@@ -182,6 +190,7 @@ public class NewScreen extends JPanel implements ActionListener {
 			model.addElement(dir);
 		}
 		templateList = new JList<>(model);
+		AppUIColor.setColors(templateList, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		templateList.setPreferredSize(new Dimension(300, Short.MAX_VALUE));
 		castSize(templateList);
 		templateList.setBorder(BorderFactory.createLoweredSoftBevelBorder());
