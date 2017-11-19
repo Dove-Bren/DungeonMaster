@@ -154,6 +154,14 @@ public class NewScreen extends JPanel implements ActionListener {
 		mainPanel.add(createButton);
 		mainPanel.add(Box.createVerticalGlue());
 		
+		JButton back = new JButton("Back");
+		back.setActionCommand("?back");
+		back.addActionListener(this);
+		back.setEnabled(true);
+		back.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		mainPanel.add(back);
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		
 		
 		this.add(mainPanel, BorderLayout.CENTER);
 		
@@ -262,6 +270,9 @@ public class NewScreen extends JPanel implements ActionListener {
 			createFromFile(file);
 			return;
 		}
+		case "?back":
+			ui.goMainScreen();
+			break;
 		default:
 			// name is name of the path
 			select(command);
