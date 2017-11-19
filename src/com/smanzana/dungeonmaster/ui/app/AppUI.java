@@ -203,12 +203,19 @@ public class AppUI extends Comm {
 		System.out.println("Going to Session Screen");
 	}
 	
-	public void goCharacterCreation(GameSession returnSession) {
-		System.out.println("Going to CharacterCreation Screen");
+	public void goCharacterManagement(GameSession returnSession) {
+		guiFrame.setCurrentSession(returnSession);
+		guiFrame.setScreen(AppFrame.Screen.PLAYMANAGE);
 	}
 	
 	public void goMainScreen() {
 		guiFrame.setScreen(AppFrame.Screen.START);
+	}
+
+	@Override
+	public void showPlayerCreation(int creationKey) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

@@ -147,6 +147,7 @@ public class AppConnectionServer implements Runnable {
 		// Get connection message;
 		String message = null;
 		try {
+			int originalTimeout = connection.getSoTimeout();
 			connection.setSoTimeout(1000);
 			InputStreamReader reader = new InputStreamReader(new BufferedInputStream(connection.getInputStream()));
 			StringBuffer buffer = new StringBuffer();
@@ -163,6 +164,8 @@ public class AppConnectionServer implements Runnable {
 							+ " is larger than the max (" + HEADER_LEN_MAX + ")");
 			}
 			
+			// reset back to original
+			connection.setSoTimeout(originalTimeout);
 			message = buffer.toString();
 			
 		} catch (Exception e) {

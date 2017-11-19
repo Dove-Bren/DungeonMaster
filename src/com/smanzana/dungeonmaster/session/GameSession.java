@@ -69,6 +69,7 @@ public class GameSession extends SessionBase implements Notable {
 		load();
 		notes = new LinkedList<>();
 		party = new LinkedList<>();
+		PCs = new LinkedList<>();
 		requestQueue = new LinkedList<>();
 		playerSessionKeys = new HashMap<>();
 		activePawns = new HashMap<>();

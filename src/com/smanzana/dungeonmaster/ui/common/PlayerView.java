@@ -1,6 +1,7 @@
 package com.smanzana.dungeonmaster.ui.common;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,19 @@ public class PlayerView {
 		this.spells = new ArrayList<>(source.getSpells());
 		this.className = (source.getPlayerClass() == null ? "None" : source.getPlayerClass().getName());
 		this.classDesc = (source.getPlayerClass() == null ? "" : source.getPlayerClass().getDescription());
+	}
+	
+	public PlayerView() {
+		this.name = "";
+		this.race = "";
+		this.background = "";
+		this.zombie = false;
+		this.xp = 0;
+		this.maxxp = 1;
+		this.level = 1;
+		this.spells = new LinkedList<>();
+		this.className = "None";
+		this.classDesc = "";
 	}
 
 	public String getName() {

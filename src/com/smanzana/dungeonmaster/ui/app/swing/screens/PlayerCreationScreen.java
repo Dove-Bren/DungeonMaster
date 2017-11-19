@@ -33,8 +33,9 @@ import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.AppUIColor;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 
-// Screen for loading an existing session
-public class LoadScreen extends JPanel implements ActionListener {
+// Screen for creating a player's backstory. In standalone, displayed.
+// In server mode, embedded in PlayerManagementScreen
+public class PlayerCreationScreen extends JPanel implements ActionListener {
 	
 	private static final long serialVersionUID = -5663285800053540191L;
 
@@ -78,7 +79,7 @@ public class LoadScreen extends JPanel implements ActionListener {
 		}
 	}
 	
-	public LoadScreen(AppUI ui) {
+	public PlayerCreationScreen(AppUI ui) {
 		super(new BorderLayout());
 		this.ui = ui;
 	}
@@ -253,8 +254,7 @@ public class LoadScreen extends JPanel implements ActionListener {
 		
 		GameSession session = new GameSession(file);
 		
-		//ui.goSessionScreen(session);
-		ui.goCharacterManagement(session);
+		ui.goSessionScreen(session);
 	}
 	
 }

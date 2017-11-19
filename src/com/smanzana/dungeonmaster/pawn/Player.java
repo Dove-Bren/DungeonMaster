@@ -316,7 +316,7 @@ public class Player extends Entity {
 	
 	public void awardXP(int amount) {
 		this.xp += amount;
-		if (this.xp > maxXP) {
+		if (this.xp >= maxXP) {
 			this.xp -= maxXP;
 			this.levelup();
 		}

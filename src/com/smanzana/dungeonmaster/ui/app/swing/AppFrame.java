@@ -10,9 +10,11 @@ import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
+import com.smanzana.dungeonmaster.session.GameSession;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.swing.screens.LoadScreen;
 import com.smanzana.dungeonmaster.ui.app.swing.screens.NewScreen;
+import com.smanzana.dungeonmaster.ui.app.swing.screens.PlayerManagementScreen;
 import com.smanzana.dungeonmaster.ui.app.swing.screens.StartScreen;
 import com.smanzana.dungeonmaster.ui.app.swing.screens.TemplateEditorScreen;
 
@@ -29,7 +31,8 @@ public class AppFrame extends JFrame {
 		START,
 		TEMPLATE,
 		NEW,
-		LOAD;
+		LOAD,
+		PLAYMANAGE,
 	}
 
 	// Path relative to resources/GUI/ directory
@@ -77,6 +80,9 @@ public class AppFrame extends JFrame {
 	private TemplateEditorScreen templateScreen;
 	private NewScreen newScreen;
 	private LoadScreen loadScreen;
+	private PlayerManagementScreen playManageScreen;
+	
+	private GameSession activeSession;
 	
 	private AppUI ui;
 	
@@ -88,6 +94,10 @@ public class AppFrame extends JFrame {
 		this.setPreferredSize(new Dimension(1280, 720));
 		this.setMinimumSize(new Dimension(500, 400));
 		pack();
+	}
+	
+	public void setCurrentSession(GameSession session) {
+		activeSession = session;
 	}
 	
 	private void clear() {
@@ -130,6 +140,11 @@ public class AppFrame extends JFrame {
 			loadScreen = new LoadScreen(ui);
 			this.add(loadScreen);
 			loadScreen.init();
+			break;
+		case PLAYMANAGE:
+			playManageScreen = new PlayerManagementScreen(ui, activeSession);
+			this.add(playManageScreen);
+			playManageScreen.init();
 			break;
 		}
 		

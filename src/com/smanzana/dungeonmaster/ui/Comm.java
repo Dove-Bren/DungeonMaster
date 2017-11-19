@@ -53,6 +53,9 @@ public abstract class Comm {
 	
 	public abstract void showTargetSelect(Collection<TargetView<?>> targets, boolean multi, UICallback callback);
 	
+	// Creation key used to associate (and validate) comm with character slot
+	public abstract void showPlayerCreation(int creationKey, PlayerCreationOptions opts);
+	
 	// DM only actions
 	// Sending to player results in no op
 	

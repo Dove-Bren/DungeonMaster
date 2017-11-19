@@ -81,11 +81,11 @@ public abstract class Entity extends Pawn {
 		return name;
 	}
 	
-	protected void setRace(String race) {
+	public void setRace(String race) {
 		this.race = race;
 	}
 	
-	protected void setName(String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 	

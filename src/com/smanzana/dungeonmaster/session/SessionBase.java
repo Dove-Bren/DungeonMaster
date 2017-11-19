@@ -3,6 +3,7 @@ package com.smanzana.dungeonmaster.session;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 import com.smanzana.dungeonmaster.action.Action;
 import com.smanzana.dungeonmaster.action.ActionRegistry;
@@ -78,6 +79,10 @@ public abstract class SessionBase {
 		}
 		
 		return null;
+	}
+	
+	public List<ClassDatumData> getAllClasses() {
+		return classDatum.getData();
 	}
 	
 	public ProfileDatumData lookupProfile(String profileName) {
