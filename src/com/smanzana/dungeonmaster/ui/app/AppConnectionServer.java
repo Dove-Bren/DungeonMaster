@@ -1,6 +1,8 @@
 package com.smanzana.dungeonmaster.ui.app;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -23,10 +25,20 @@ public class AppConnectionServer implements Runnable {
 		 * Called when a comm connects
 		 * @param newComm
 		 */
-		public void onConnect(Comm newComm);
+		public void connect(Comm newComm);
+		
+		/**
+		 * On connection, clients are required to send a connectMessage.
+		 * This filter examines the connectMessage and sees whether it
+		 * should be accepted as a full Comm.
+		 * @param connectMessage
+		 * @return true if accepted. False otherwise
+		 */
+		public boolean filter(String connectMessage);
 	}
 	
 	private static final int PORT_LISTEN = 15251;
+	private static final int HEADER_LEN_MAX = 50;
 	
 	private AppConnectionHook hook;
 	private ServerSocket listenSocket;
@@ -82,8 +94,12 @@ public class AppConnectionServer implements Runnable {
 					return;
 				}
 				
-				hook.onConnect(wrapInComm(connection));
+				onConnect(connection);
 			}
+			
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {}
 			
 			synchronized(running) {
 				run = running;
@@ -124,6 +140,51 @@ public class AppConnectionServer implements Runnable {
 			} finally {
 				listenSocket = null;
 			}
+	}
+	
+	private void onConnect(Socket connection) {
+		
+		// Get connection message;
+		String message = null;
+		try {
+			connection.setSoTimeout(1000);
+			InputStreamReader reader = new InputStreamReader(new BufferedInputStream(connection.getInputStream()));
+			StringBuffer buffer = new StringBuffer();
+			char buf[] = new char[50];
+			int len;
+			while (true) {
+				len = reader.read(buf, 0, 50);
+				if (len == -1)
+					break;
+				
+				buffer.append(buf, 0, len);
+				if (buffer.length() > HEADER_LEN_MAX)
+					throw new IOException("Header length (" + buffer.length() + ")"
+							+ " is larger than the max (" + HEADER_LEN_MAX + ")");
+			}
+			
+			message = buffer.toString();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("Encountered socket exception during handshake. Disconnecting");
+			try { connection.close(); } catch (Exception ex) {};
+			return;
+		}
+		
+		if (message == null) {
+			System.err.println("Recieved no message from connecting client. Disconnecting");
+			try { connection.close(); } catch (Exception ex) {};
+			return;
+		}
+		
+		if (!hook.filter(message)) {
+			System.err.println("Hook rejecting connection. Disconnecting");
+			try { connection.close(); } catch (Exception ex) {};
+			return;
+		}
+		
+		hook.connect(wrapInComm(connection));
 	}
 	
 	private Comm wrapInComm(Socket connection) {
