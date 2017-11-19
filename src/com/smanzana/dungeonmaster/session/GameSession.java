@@ -35,7 +35,7 @@ public class GameSession extends SessionBase implements Notable {
 		
 	}
 	
-	private static final String PATH_CONFIG = "data/";
+	public static final String PATH_CONFIG = "data/";
 	
 	private List<String> notes;
 	private List<Pawn> party;
@@ -60,6 +60,7 @@ public class GameSession extends SessionBase implements Notable {
 		
 	public GameSession(File root) {
 		super(root, PATH_CONFIG);
+		load();
 		notes = new LinkedList<>();
 		party = new LinkedList<>();
 		requestQueue = new LinkedList<>();
@@ -86,6 +87,8 @@ public class GameSession extends SessionBase implements Notable {
 		this.root = newRoot;
 		this.saveConfigs();
 		this.saveDatums();
+		
+		// TODO needs to save notes, etc
 	}
 	
 	/**

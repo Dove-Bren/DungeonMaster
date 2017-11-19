@@ -186,7 +186,7 @@ public class AppUI extends Comm {
 	}
 	
 	public void goLoadSession() {
-		System.out.println("Going to LoadSession Screen");
+		guiFrame.setScreen(AppFrame.Screen.LOAD);
 	}
 	
 	public void goNewSession() {

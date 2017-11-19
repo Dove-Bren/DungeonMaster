@@ -318,13 +318,18 @@ public class NewScreen extends JPanel implements ActionListener {
 	
 	// Called when actually selecting and going to create a new template
 	private void createFromFile(File file) {
-		System.out.println("Create based on file " + file);
 		File outfile = new File(DungeonMaster.PATH_SESSIONS, nameField.getText());
-		//SessionTemplate template = new SessionTemplate(file);
-		//template.save(outfile);
+		
+		if (outfile.exists()) {
+			JOptionPane.showMessageDialog(getParent(), "A session named " + nameField.getText() + " already exists. Select a new name.", "Error creating session", JOptionPane.PLAIN_MESSAGE);
+			return;
+		}
 		
 		GameSession session = new GameSession(file);
 		session.save(outfile);
+		
+		session.addNote("Created from template " + file.getName());
+		
 		ui.goSessionScreen(session);
 	}
 	
