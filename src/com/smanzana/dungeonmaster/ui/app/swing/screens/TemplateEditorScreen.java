@@ -541,10 +541,12 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 		if (currentEditor != null)
 			currentEditor.getComponent().setVisible(false);
 		currentEditor = null;
+		currentLoader = null;
 		currentTreeNode = null;
 		updateEditor();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void saveEditor() {
 		// Pulls data back from the editor into our source object
 		if (currentEditor == null)
@@ -554,7 +556,9 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 			// we have to iterate ourselvses. Currently this only means config
 			toConfig(currentEditor.fetchData());
 		} else {
-			currentEditor.fetchData();
+			// Problem! fetchData returns new data instead of filling existing.
+			// Really it'd be cool to tie the loader and editor together
+			currentLoader.updateData((Map<Integer, FieldData>) currentEditor.fetchData());
 			this.lastEditorObject = currentLoader.fetchEdittedValue();
 		}
 	}
@@ -757,7 +761,6 @@ public class TemplateEditorScreen extends JPanel implements ActionListener, IEdi
 	}
 
 	public void doMousePressed(MouseEvent e) {
-		System.out.println("Popuptrigger? " + e.isPopupTrigger());
 		if (e.getClickCount() != 2
 				&& !e.isPopupTrigger())
 			return;

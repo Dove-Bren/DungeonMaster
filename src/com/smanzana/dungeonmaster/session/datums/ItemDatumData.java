@@ -33,7 +33,7 @@ public class ItemDatumData implements DatumData {
 	}
 	
 	//@DataLoaderData(expand=true)
-	@DataLoaderData
+	@DataLoaderData // expand doesn't work with ISuperType
 	private Item item;
 	
 	public ItemDatumData() {

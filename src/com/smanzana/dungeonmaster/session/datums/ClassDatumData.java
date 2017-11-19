@@ -6,16 +6,20 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.smanzana.dungeonmaster.pawn.Attributes;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.session.datums.data.DatumData;
+import com.smanzana.dungeonmaster.ui.app.swing.screens.TemplateEditorScreen;
 import com.smanzana.dungeonmaster.utils.Dice;
 import com.smanzana.dungeonmaster.utils.ValueRange;
+import com.smanzana.templateeditor.api.IRuntimeEnumerable;
 import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 import com.smanzana.templateeditor.api.annotations.DataLoaderDescription;
 import com.smanzana.templateeditor.api.annotations.DataLoaderList;
 import com.smanzana.templateeditor.api.annotations.DataLoaderName;
+import com.smanzana.templateeditor.api.annotations.DataLoaderRuntimeEnum;
 
 /**
  * Stores:
@@ -27,7 +31,7 @@ import com.smanzana.templateeditor.api.annotations.DataLoaderName;
  * @author Skyler
  *
  */
-public class ClassDatumData implements DatumData {
+public class ClassDatumData implements DatumData, IRuntimeEnumerable<String> {
 	
 	public static class ClassDatumFactory implements DatumFactory<ClassDatumData> {
 
@@ -55,7 +59,7 @@ public class ClassDatumData implements DatumData {
 	private Map<Attributes, ValueRange> growthRanges;
 	@DataLoaderData
 	private Map<Integer, String> spellUnlocks;
-	@DataLoaderData
+	@DataLoaderRuntimeEnum
 	private List<String> promotions;
 	@DataLoaderData
 	private Dice hitdice;
@@ -70,10 +74,8 @@ public class ClassDatumData implements DatumData {
 		this.growthRanges = new EnumMap<>(Attributes.class);
 		this.spellUnlocks = new HashMap<>();
 		
-		for (Attributes at : Attributes.values()) {
-			startRanges.put(at, new ValueRange(0, 0));
-			growthRanges.put(at, new ValueRange(0, 0));
-		}
+		clearStatBases();
+		clearStatGrowths();
 		
 		this.promotions = new LinkedList<>();
 		this.hitdice = new Dice(1, 1, false);
@@ -165,6 +167,18 @@ public class ClassDatumData implements DatumData {
 		return this.startRanges.get(attrib);
 	}
 	
+	public void clearStatBases() {
+		this.startRanges.clear();
+		for (Attributes attr : Attributes.values())
+			this.startRanges.put(attr, new ValueRange(0, 0));
+	}
+	
+	public void clearStatGrowths() {
+		this.growthRanges.clear();
+		for (Attributes attr : Attributes.values())
+			this.growthRanges.put(attr, new ValueRange(0, 0));
+	}
+	
 	public ValueRange getGrowthRange(Attributes attrib) {
 		return this.growthRanges.get(attrib);
 	}
@@ -208,6 +222,7 @@ public class ClassDatumData implements DatumData {
 		}
 		
 		// start ranges
+		this.clearStatBases();
 		if ((node = root.getChild("stats_base")) != null) {
 			// node has 1 child for each attribute which a child that's the range
 			DataNode aNode;
@@ -223,6 +238,7 @@ public class ClassDatumData implements DatumData {
 		}
 		
 		// growth ranges
+		this.clearStatGrowths();
 		if ((node = root.getChild("stats_growth")) != null) {
 			// node has 1 child for each attribute which a child that's the range
 			DataNode aNode;
@@ -273,8 +289,10 @@ public class ClassDatumData implements DatumData {
 		List<DataNode> baseList = new ArrayList<>(Attributes.values().length),
 				growthList = new ArrayList<>(Attributes.values().length);
 		for (Attributes attr : Attributes.values()) {
-			baseList.add(startRanges.get(attr).write(attr.name()));
-			growthList.add(growthRanges.get(attr).write(attr.name()));
+			if (startRanges.get(attr) != null)
+				baseList.add(startRanges.get(attr).write(attr.name()));
+			if (growthRanges.get(attr) != null)
+				growthList.add(growthRanges.get(attr).write(attr.name()));
 		}
 		
 		nodes.add(new DataNode("stats_base", null, baseList));
@@ -346,6 +364,22 @@ public class ClassDatumData implements DatumData {
 	@Override
 	public String getDisplayTooltip() {
 		return getDescription();
+	}
+
+	@Override
+	public Map<String, String> fetchValidValues(String key) {
+		Datum<ClassDatumData> datum = TemplateEditorScreen.instance()
+				.getCurrentTemplate().getClassDatum();
+		
+		Map<String, String> values = new TreeMap<>();
+		
+		for (ClassDatumData d : datum.getData()) {
+			if (d == this)
+				continue;
+			values.put(d.getName(), d.getName());
+		}
+		
+		return values;
 	}
 	
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.smanzana.dungeonmaster.session.SessionBase;
 import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
+import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
 import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
 
@@ -68,6 +69,10 @@ public class SessionTemplate extends SessionBase {
 	
 	public Datum<ActionDatumData> getActionDatum() {
 		return this.actionDatum;
+	}
+	
+	public Datum<ClassDatumData> getClassDatum() {
+		return this.classDatum;
 	}
 	
 	public Datum<ProfileDatumData> getProfileDatum() {
