@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import com.smanzana.dungeonmaster.ui.app.AppUI;
+import com.smanzana.dungeonmaster.ui.app.swing.screens.NewScreen;
 import com.smanzana.dungeonmaster.ui.app.swing.screens.StartScreen;
 import com.smanzana.dungeonmaster.ui.app.swing.screens.TemplateEditorScreen;
 
@@ -25,7 +26,8 @@ public class AppFrame extends JFrame {
 
 	public static enum Screen {
 		START,
-		TEMPLATE;
+		TEMPLATE,
+		NEW;
 	}
 
 	// Path relative to resources/GUI/ directory
@@ -71,6 +73,7 @@ public class AppFrame extends JFrame {
 	
 	private StartScreen startScreen;
 	private TemplateEditorScreen templateScreen;
+	private NewScreen newScreen;
 	
 	private AppUI ui;
 	
@@ -89,10 +92,12 @@ public class AppFrame extends JFrame {
 			startScreen.setVisible(false);
 		if (templateScreen != null)
 			templateScreen.setVisible(false);
-		
+		if (newScreen != null)
+			newScreen.setVisible(false);
 		
 		startScreen = null;
 		templateScreen = null;
+		newScreen = null;
 		this.getContentPane().removeAll();
 		this.setJMenuBar(null);
 	}
@@ -110,6 +115,10 @@ public class AppFrame extends JFrame {
 			this.add(templateScreen);
 			templateScreen.init();
 			break;
+		case NEW:
+			newScreen = new NewScreen(ui);
+			this.add(newScreen);
+			newScreen.init();
 		}
 		
 		this.validate();

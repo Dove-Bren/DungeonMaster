@@ -76,6 +76,12 @@ public class MechanicsConfig extends Config<MechanicsKey> {
 		setValue(MechanicsKey.ITEMS_TRADING, Boolean.TRUE);
 		setValue(MechanicsKey.ITEMS_SELLABLE, Boolean.TRUE);
 		setValue(MechanicsKey.EQUIP_RESTRICT_SCORE, Boolean.TRUE);
+		
+		setValue(MechanicsKey.HP_FROM_CONSTITUTION_SCALE, 0);
+		setValue(MechanicsKey.MP_FROM_WISDOM_SCALE, 0);
+		setValue(MechanicsKey.STAMINA_FROM_DEXTERITY_SCALE, 0);
+		setValue(MechanicsKey.LEVEL_ALLOCATE_POINTS_AMOUNT, 0);
+		setValue(MechanicsKey.LEVEL_ALLOCATE_POINTS_INTERVAL, 0);
 	}
 
 	@Override

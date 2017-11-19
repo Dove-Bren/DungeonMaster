@@ -190,7 +190,7 @@ public class AppUI extends Comm {
 	}
 	
 	public void goNewSession() {
-		System.out.println("Going to NewSession Screen");
+		guiFrame.setScreen(AppFrame.Screen.NEW);
 	}
 	
 	public void goGameScreen() {

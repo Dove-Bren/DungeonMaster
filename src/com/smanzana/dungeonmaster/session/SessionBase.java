@@ -25,7 +25,7 @@ import com.smanzana.dungeonmaster.setting.Setting;
 public abstract class SessionBase {
 	
 	// Config paths
-	private static final String PATH_MECHS = "mechanics.cfg";
+	public static final String PATH_MECHS = "mechanics.cfg";
 	private static final String PATH_COMBONUS = "combatbonuses.cfg";
 	private static final String PATH_ROLLTABLE = "rolltables.cfg";
 	private static final String PATH_KEYWORDS = "keywords.cfg";

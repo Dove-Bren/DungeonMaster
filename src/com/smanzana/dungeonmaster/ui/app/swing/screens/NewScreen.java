@@ -1,0 +1,266 @@
+package com.smanzana.dungeonmaster.ui.app.swing.screens;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
+
+import com.smanzana.dungeonmaster.DungeonMaster;
+import com.smanzana.dungeonmaster.session.SessionBase;
+import com.smanzana.dungeonmaster.ui.app.AppUI;
+import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
+
+// Screen for creating a new session from a template
+public class NewScreen extends JPanel implements ActionListener {
+	
+	private static final long serialVersionUID = 4023498297220637890L;
+	private static final int SIZE_PATH = 50;
+
+	// link to UI for screen switching
+	private AppUI ui;
+	// Editable field for typing session name
+	private JTextField nameField;
+	// Non-editable field displaying template name
+	private JTextField templateField;
+	// Actual path to template. Not for display
+	private String templatePath;
+	// List with all template directories we find
+	private JList<TemplateDirectory> templateList;
+	// Button to open browse dialog
+	private JButton templateBrowse;
+	// Button to actually make the session
+	private JButton createButton;
+	
+	private static class TemplateDirectoryRenderer extends JLabel implements ListCellRenderer<TemplateDirectory> {
+		private static final long serialVersionUID = 5528049648738014428L;
+		private static final ImageIcon icon = AppFrame.createImageIcon("icon/datum_open.png");
+		@Override
+		public Component getListCellRendererComponent(JList<? extends TemplateDirectory> arg0, TemplateDirectory arg1,
+				int arg2, boolean arg3, boolean arg4) {
+			this.setText(arg1.getDisplay());
+			this.setIcon(icon);
+			this.setOpaque(true);
+			this.setBackground(arg3 ? Color.LIGHT_GRAY : Color.WHITE);
+			
+			return this;
+		}
+	}
+	
+	private static class TemplateDirectory {
+		private File file;
+		
+		public TemplateDirectory(File dir) {
+			file = dir;
+		}	
+		
+		public String getDisplay() {
+			return file.getName();
+		}
+	}
+	
+	public NewScreen(AppUI ui) {
+		super(new BorderLayout());
+		this.ui = ui;
+	}
+		
+	public void init() {
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+		
+		JLabel label;
+		label = new JLabel(AppFrame.createImageIcon("title_new.png"));
+		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		castSize(label);
+		mainPanel.add(label);
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 100)));
+		
+		nameField = new JTextField("Session Name");
+		nameField.setEditable(true);
+		nameField.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		nameField.setColumns(SIZE_PATH);
+		castSize(nameField);
+		mainPanel.add(nameField);
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		label = new JLabel("Session Name");
+		label.setHorizontalAlignment(JLabel.CENTER);
+		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		castSize(label);
+		mainPanel.add(label);
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+		
+		templateField = new JTextField("");
+		templateField.setEditable(false);
+		templateField.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		templateField.setColumns(SIZE_PATH);
+		castSize(templateField);
+		mainPanel.add(templateField);
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		label = new JLabel("Template");
+		label.setHorizontalAlignment(JLabel.CENTER);
+		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		castSize(label);
+		mainPanel.add(label);
+		mainPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+		
+		createButton = new JButton("Create Session");
+		createButton.setEnabled(false);
+		createButton.setActionCommand("?create");
+		createButton.addActionListener(this);
+		createButton.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		//castSize(createButton);
+		
+		mainPanel.add(createButton);
+		mainPanel.add(Box.createVerticalGlue());
+		
+		
+		this.add(mainPanel, BorderLayout.CENTER);
+		
+		JPanel sidePanel = new JPanel(new BorderLayout());
+		sidePanel.setBorder(BorderFactory.createEtchedBorder());
+		label = new JLabel("Select Template");
+		label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		label.setHorizontalAlignment(JLabel.CENTER);
+		label.setPreferredSize(new Dimension(
+				label.getPreferredSize().width,
+				label.getPreferredSize().height + 20
+				));
+		castSize(label);
+		sidePanel.add(label, BorderLayout.NORTH);
+		
+		DefaultListModel<TemplateDirectory> model = new DefaultListModel<>();
+		for (TemplateDirectory dir : listDirectories(new File(DungeonMaster.PATH_TEMPLATES))) {
+			model.addElement(dir);
+		}
+		templateList = new JList<>(model);
+		templateList.setPreferredSize(new Dimension(300, Short.MAX_VALUE));
+		castSize(templateList);
+		templateList.setBorder(BorderFactory.createLoweredSoftBevelBorder());
+		templateList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (e.getClickCount() != 2)
+					return;
+				
+				actionPerformed(new ActionEvent(templateList,
+						0, templateList.getSelectedValue().file.getPath()));
+			}
+		});
+		templateList.setCellRenderer(new TemplateDirectoryRenderer());
+		sidePanel.add(templateList, BorderLayout.CENTER);
+		
+		
+		templateBrowse = new JButton("Browse");
+		templateBrowse.setActionCommand("?browse");
+		templateBrowse.addActionListener(this);
+		templateBrowse.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		sidePanel.add(templateBrowse, BorderLayout.SOUTH);
+		
+		sidePanel.add(templateList, BorderLayout.CENTER);
+		this.add(sidePanel, BorderLayout.EAST);
+	}
+	
+	private void castSize(JComponent comp) {
+		comp.setMaximumSize(comp.getPreferredSize());
+	}
+	
+	private List<TemplateDirectory> listDirectories(File root) {
+		List<TemplateDirectory> list = new LinkedList<>();
+		
+		for (File file : root.listFiles()) {
+			if (!file.exists() || !file.isDirectory())
+				continue;
+			
+			File mechfile = new File(file, SessionBase.PATH_MECHS);
+			if (!mechfile.exists())
+				continue;
+			
+			list.add(new TemplateDirectory(file));
+		}
+		
+		return list;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		String command = e.getActionCommand();
+		switch (command) {
+		case "?browse":
+		{
+			JFileChooser fc = new JFileChooser(new File(DungeonMaster.PATH_TEMPLATES));
+			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			fc.showOpenDialog(getParent());
+			
+			File sel = fc.getSelectedFile();
+			if (sel != null) {
+				if (!sel.exists())
+					JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That folder does not exist", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+				else if (!sel.isDirectory())
+					JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: That is not a directory", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+				else {
+					// oh well just make one wherever it is
+					select(sel.getPath());
+				}
+			}
+		}
+			break;
+		case "?select":
+		{
+			File file = new File(templatePath);
+			if (!file.exists() || !file.isDirectory()) {
+				JOptionPane.showMessageDialog(getParent(), "Could not open the selected template: Select another and try again", "Error opening template", JOptionPane.PLAIN_MESSAGE);
+				break;
+			}
+			
+			createFromFile(file);
+			return;
+		}
+		default:
+			// name is name of the path
+			select(command);
+			break;
+		}
+	}
+	
+	private void select(String path) {
+		String display = path;
+		if (path.length() > SIZE_PATH) {
+			int pos = path.length() - (SIZE_PATH - 3);
+			display = "..." + path.substring(pos - 1);
+		}
+		
+		templateField.setText(display);
+		templatePath = path;
+		
+		if (templatePath != null && !templatePath.trim().isEmpty())
+			createButton.setEnabled(true);
+	}
+	
+	// Called when actually selecting and going to create a new template
+	private void createFromFile(File file) {
+		System.out.println("Create based on file " + file);
+	}
+	
+}
