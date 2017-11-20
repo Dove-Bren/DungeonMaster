@@ -45,6 +45,12 @@ public class AppConnectionServer implements Runnable {
 		 * @return
 		 */
 		public String generateConnectionPage();
+		
+		/**
+		 * Called when filter rejected a connection.
+		 * @return
+		 */
+		public String generateRejectionPage();
 	}
 	
 	public static final int DEFAULT_PORT_LISTEN = 8124;
@@ -198,6 +204,7 @@ public class AppConnectionServer implements Runnable {
 		String page = hook.generateConnectionPage();
 		try {
 			PrintWriter writer = new PrintWriter(connection.getOutputStream());
+			writeHeader(writer);
 			writer.print(page);
 			writer.close();
 		} catch (IOException e) {
@@ -269,7 +276,13 @@ public class AppConnectionServer implements Runnable {
 		int key = hook.filter(message);
 		if (key == 0) {
 			System.err.println("Hook rejecting connection. Disconnecting");
-			try { connection.close(); } catch (Exception ex) {};
+			
+			try { 
+				PrintWriter writer = new PrintWriter(connection.getOutputStream());
+				writeHeader(writer);
+				writer.print(hook.generateRejectionPage());
+				writer.close(); 
+			} catch (Exception ex) {};
 			return;
 		}
 		
@@ -278,5 +291,11 @@ public class AppConnectionServer implements Runnable {
 	
 	private Comm wrapInComm(Socket connection) {
 		return new WebUI(connection);
+	}
+	
+	private void writeHeader(PrintWriter writer) {
+		writer.print("HTTP/1.1 200 OK\r\n");
+		writer.print("Content-Type: text/html\r\n");
+		writer.print("\r\n\r\n");
 	}
 }
