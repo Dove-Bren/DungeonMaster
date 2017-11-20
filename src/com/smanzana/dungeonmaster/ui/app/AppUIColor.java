@@ -212,6 +212,10 @@ public class AppUIColor {
 		}
 	}
 	
+	public static Color peek(Key key) {
+		return instance().colors.get(key).color;
+	}
+	
 	/**
 	 * Looks up the color for the given keys and sets the provided component's foreground and background.
 	 * Furthermore, registers the given component to be updated any time the color that matches

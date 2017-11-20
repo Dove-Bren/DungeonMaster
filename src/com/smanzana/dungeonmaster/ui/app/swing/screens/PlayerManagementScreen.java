@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,31 +20,28 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.Border;
 
-import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.pawn.PlayerClass;
 import com.smanzana.dungeonmaster.session.GameSession;
-import com.smanzana.dungeonmaster.session.SessionBase;
 import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
+import com.smanzana.dungeonmaster.ui.Comm;
+import com.smanzana.dungeonmaster.ui.app.AppConnectionServer;
+import com.smanzana.dungeonmaster.ui.app.AppConnectionServer.AppConnectionHook;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.AppUIColor;
-import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 import com.smanzana.templateeditor.EmbeddedEditor;
-import com.smanzana.templateeditor.editor.IEditor;
 
 // Screen for managing creation and delegation of players
-public class PlayerManagementScreen extends JPanel implements ActionListener {
+public class PlayerManagementScreen extends JPanel implements ActionListener,
+	AppConnectionHook {
 	
 	public static class PlayerCreationOptions {
 		// Map class name to description
@@ -155,6 +152,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener {
 	private class PlayerStatus {
 		private int editKey;
 		private Player player;
+		private boolean taken;
 		
 		public PlayerStatus() {
 			this(new Player());
@@ -163,8 +161,17 @@ public class PlayerManagementScreen extends JPanel implements ActionListener {
 		public PlayerStatus(Player player) {
 			this.player = player;
 			editKey = rand.nextInt();
+			this.taken = false;
 		}
 		
+		public boolean isTaken() {
+			return taken;
+		}
+
+		public void setTaken(boolean taken) {
+			this.taken = taken;
+		}
+
 		public String getName() {
 			return player.getName();
 		}
@@ -209,6 +216,9 @@ public class PlayerManagementScreen extends JPanel implements ActionListener {
 	// Done button, which updates depending on status
 	private JButton doneButton;
 	
+	private AppConnectionServer server;
+	private Thread serverThread;
+	
 	public PlayerManagementScreen(AppUI ui, GameSession session) {
 		super(new BorderLayout());
 		this.ui = ui;
@@ -220,6 +230,9 @@ public class PlayerManagementScreen extends JPanel implements ActionListener {
 			dlist.add(d.getDescription());
 		}
 		this.options = new PlayerCreationOptions(clist, dlist);
+		this.server = new AppConnectionServer(this);
+		serverThread = new Thread(this.server);
+		serverThread.start();
 	}
 		
 	public void init() {
@@ -319,10 +332,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener {
 	// Gather up player info, store in session, and then return
 	// to session screen
 	private void commitAndReturn() {
-		Oops! Need to change how connections happen:
-		Connection should be accepted and given a page
-		by the hook. Then that should be submitted
-		and filtered, comm created, etc. Missed a step!
+		
 	}
 	
 	private void select(PlayerStatus selected) {
@@ -347,8 +357,58 @@ public class PlayerManagementScreen extends JPanel implements ActionListener {
 		
 	}
 	
+	private void clientEdit(PlayerStatus status) {
+		System.out.println("Client editting!");
+	}
+	
 	private void updateDoneButton() {
 		doneButton.setEnabled(true);
 		// TODO
+	}
+
+	@Override
+	public void connect(int key, Comm newComm) {
+		Enumeration<PlayerStatus> it = playerListModel.elements();
+		while (it.hasMoreElements()) {
+			PlayerStatus status = it.nextElement();
+			if (status.isTaken() && status.editKey == key) {
+				clientEdit(status);
+				return;
+			}
+		}
+		
+		System.err.println("Got an invalid key for a comm!");
+		newComm.shutdown();
+	}
+
+	@Override
+	public int filter(String connectMessage) {
+		// "key: KEY"
+		if (connectMessage == null || connectMessage.trim().isEmpty()
+				|| connectMessage.indexOf(':') == -1)
+			return 0;
+		
+		int foundKey;
+		try {
+			foundKey = Integer.parseInt(connectMessage.substring(connectMessage.indexOf(':')+1));
+		} catch (NumberFormatException e) {
+			return 0;
+		}
+		
+		Enumeration<PlayerStatus> it = playerListModel.elements();
+		while (it.hasMoreElements()) {
+			PlayerStatus status = it.nextElement();
+			if (!status.isTaken() && status.editKey == foundKey) {
+				status.setTaken(true);
+				return foundKey;
+			}
+		}
+		
+		return 0;
+	}
+
+	@Override
+	public String generateConnectionPage() {
+		return "<html><head><style>body {    background-color: #" + AppUIColor.peek(AppUIColor.Key.BASE_BACKGROUND).getRGB() + ";    color: #" + AppUIColor.peek(AppUIColor.Key.BASE_FOREGROUND).getRGB() + ";    background-color: #333333;    /*color: #FFFFFF;*/}h1 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 50px;    text-align: center;}h2 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 30px;    text-align: center;}p {    width: 500px;    margin-bottom: 50px;    margin-top: 30px;    border: 1px solid white;}#screen_loading {    position: absolute;    top: 0px;    bottom: 0px;    left: 0px;    right: 0px;    z-index: 10000000;    display: none;    background-color: #333333;}#number_error {    text-align: center;    margin-top: 2px;    color: red;    display: none;}</style><script language='JavaScript' type='text/javascript'>function submitKey(key) {    var elem = document.getElementById('form_key');    if (!elem)        return false;    var val = Number(elem.value);    if (isNaN(val)) {        setError('Not a number');        return false;    }            document.getElementById('screen_loading').style.display = 'block';        document.getElementById('form').action =        'http://' + window.location.hostname + ':" + AppConnectionServer.DEFAULT_PORT_LISTEN + "/';        return true;}function setError(error) {    var elem = document.getElementById('number_error');    elem.style.display = 'block';    elem.innerHTML = error;}</script></head><body>    <div id='screen_loading'>        <h2>Loading...</h2>    </div>    <h1>QuestManager</h1>    <h2>Player Creation</h2>    <center><p>    &nbsp;&nbsp;&nbsp;&nbsp;To get started, get a player template key from the DM. This is the key that's given as soon as    a player is created.    </p></center>        <center>        <form id='form' method='post' action=''>            <input id = 'form_key' type='text' name='key' /><br />            <span id='number_error'></span></br />            <button onclick='submitKey();'>Submit</button></center>                    </form>    </center></body></html>";
 	}
 }

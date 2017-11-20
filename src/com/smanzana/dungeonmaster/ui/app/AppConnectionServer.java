@@ -3,6 +3,7 @@ package com.smanzana.dungeonmaster.ui.app;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -23,30 +24,40 @@ public class AppConnectionServer implements Runnable {
 		
 		/**
 		 * Called when a comm connects
+		 * @param key the key provided on the matching successful filter
 		 * @param newComm
 		 */
-		public void connect(Comm newComm);
+		public void connect(int key, Comm newComm);
 		
 		/**
 		 * On connection, clients are required to send a connectMessage.
 		 * This filter examines the connectMessage and sees whether it
 		 * should be accepted as a full Comm.
 		 * @param connectMessage
-		 * @return true if accepted. False otherwise
+		 * @return 0 to reject. Non-zero as key to pass to matching connect call
 		 */
-		public boolean filter(String connectMessage);
+		public int filter(String connectMessage);
+		
+		/**
+		 * Called whenever a connection is received to fetch what
+		 * should be served to them.
+		 * Further communication should happen over port PORT_LISTEN
+		 * @return
+		 */
+		public String generateConnectionPage();
 	}
 	
-	private static final int PORT_LISTEN = 15251;
-	private static final int HEADER_LEN_MAX = 50;
+	public static final int DEFAULT_PORT_LISTEN = 8124;
+	private static final int HEADER_LEN_MAX = 5000;
 	
 	private AppConnectionHook hook;
 	private ServerSocket listenSocket;
+	private ServerSocket webSocket;
 	private boolean valid;
 	private Boolean running;
 	
 	public AppConnectionServer(AppConnectionHook hook) {
-		this(hook, PORT_LISTEN);
+		this(hook, AppConnectionServer.DEFAULT_PORT_LISTEN);
 	}
 	
 	public AppConnectionServer(AppConnectionHook hook, int port) {
@@ -61,6 +72,15 @@ public class AppConnectionServer implements Runnable {
 			running = false;
 			return;
 		}
+		try {
+			webSocket = new ServerSocket(80);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Unable to bind web port");
+			valid = false;
+			running = false;
+			return;
+		}
 		
 		valid = true;
 		
@@ -68,8 +88,10 @@ public class AppConnectionServer implements Runnable {
 	
 	public void run() {
 		boolean run = true;
+		running = true;
 		try {
 			listenSocket.setSoTimeout(100);
+			webSocket.setSoTimeout(100);
 		} catch (SocketException e) {
 			e.printStackTrace();
 			System.err.println("Could not initialize listenSocket");
@@ -89,6 +111,23 @@ public class AppConnectionServer implements Runnable {
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.err.println("Exception on listenSocket accept");
+					stop();
+					shutdown();
+					return;
+				}
+				
+				onConnectEx(connection);
+			}
+			
+			while (true) {
+				Socket connection;
+				try {
+					connection = webSocket.accept();
+				} catch (SocketTimeoutException e) {
+					break;
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.err.println("Exception on webSocket accept");
 					stop();
 					shutdown();
 					return;
@@ -140,9 +179,35 @@ public class AppConnectionServer implements Runnable {
 			} finally {
 				listenSocket = null;
 			}
+		if (webSocket != null && !webSocket.isClosed()) 
+			try {
+				webSocket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				webSocket = null;
+			}
 	}
 	
+	// Connection over port 80; just checking what it is
 	private void onConnect(Socket connection) {
+		if (connection == null || !connection.isConnected()
+				|| connection.isClosed())
+			return;
+		
+		String page = hook.generateConnectionPage();
+		try {
+			PrintWriter writer = new PrintWriter(connection.getOutputStream());
+			writer.print(page);
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Failed to deliver page to connection: "
+					+ connection.getInetAddress());
+		}
+	}
+	
+	private void onConnectEx(Socket connection) {
 		
 		// Get connection message;
 		String message = null;
@@ -151,22 +216,42 @@ public class AppConnectionServer implements Runnable {
 			connection.setSoTimeout(1000);
 			InputStreamReader reader = new InputStreamReader(new BufferedInputStream(connection.getInputStream()));
 			StringBuffer buffer = new StringBuffer();
-			char buf[] = new char[50];
+			char buf[] = new char[HEADER_LEN_MAX];
 			int len;
-			while (true) {
-				len = reader.read(buf, 0, 50);
-				if (len == -1)
+			
+			do {
+				if (connection.isClosed())
 					break;
 				
+				try {
+				len = reader.read(buf, 0, HEADER_LEN_MAX);
+				} catch (SocketTimeoutException e) {
+					len = 0;
+				}
+				if (len == -1) {
+					System.out.println("Got -1 from read");
+					break;
+				}
+				
+				if (len == 0) {
+					System.out.println("got 0 (timeout) from read");
+					break;
+				}
+				
 				buffer.append(buf, 0, len);
-				if (buffer.length() > HEADER_LEN_MAX)
-					throw new IOException("Header length (" + buffer.length() + ")"
-							+ " is larger than the max (" + HEADER_LEN_MAX + ")");
-			}
+				
+				String result = buffer.toString();
+				if (!result.toString().contains("\r\n\r\n")) {
+					System.out.println("Got large (> " + HEADER_LEN_MAX + ") response");
+					break; // No end of header. It's too big. 
+				}
+				
+				message = result.substring(result.indexOf("\r\n\r\n") + 4);
+				
+			} while (false);
 			
 			// reset back to original
 			connection.setSoTimeout(originalTimeout);
-			message = buffer.toString();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -181,13 +266,14 @@ public class AppConnectionServer implements Runnable {
 			return;
 		}
 		
-		if (!hook.filter(message)) {
+		int key = hook.filter(message);
+		if (key == 0) {
 			System.err.println("Hook rejecting connection. Disconnecting");
 			try { connection.close(); } catch (Exception ex) {};
 			return;
 		}
 		
-		hook.connect(wrapInComm(connection));
+		hook.connect(key, wrapInComm(connection));
 	}
 	
 	private Comm wrapInComm(Socket connection) {
