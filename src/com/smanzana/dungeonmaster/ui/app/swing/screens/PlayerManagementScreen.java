@@ -61,8 +61,11 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	
 	private class CreatedScreen extends JPanel {
 		
+		private static final long serialVersionUID = -3932990466722712041L;
+
 		public CreatedScreen(PlayerStatus status) {
 			super();
+			AppUIColor.setColors(this, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
 			this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 			this.add(Box.createRigidArea(new Dimension(0, 50)));
 			JLabel label = new JLabel("New Player Created");
@@ -74,8 +77,8 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 			this.add(label);
 			this.add(Box.createRigidArea(new Dimension(0, 50)));
 			
-			label = new JLabel("Connect a client (via webbrowser pointed to " +
-					ui.getLocalIP() + " (local) or " + ui.getExternalIP()
+			label = new JLabel("Connect a web browser (like Firefox of Chrome) to " +
+					AppUI.getLocalIP() + " (local) or " + AppUI.getExternalIP()
 					+ " (external) and provide the key: " + status.getKey());
 			AppUIColor.setColors(label, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
 			label.setHorizontalAlignment(JLabel.CENTER);
@@ -102,6 +105,25 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 			});
 			label.add(button);
 			this.add(Box.createRigidArea(new Dimension(0, 50)));
+			this.add(Box.createVerticalGlue());
+		}
+	}
+	
+	private class StartScreen extends JPanel {
+		
+		private static final long serialVersionUID = -393434354687412041L;
+
+		public StartScreen() {
+			super();
+			this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+			this.add(Box.createVerticalGlue());
+			JLabel label = new JLabel("To get started, add a player below or"
+					+ " select one from the left.");
+			AppUIColor.setColors(label, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
+			label.setHorizontalAlignment(JLabel.CENTER);
+			label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+			castSize(label);
+			this.add(label);
 			this.add(Box.createVerticalGlue());
 		}
 	}
@@ -160,7 +182,8 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 		
 		public PlayerStatus(Player player) {
 			this.player = player;
-			editKey = rand.nextInt();
+			// TODO make sure unique
+			editKey = rand.nextInt(5000);
 			this.taken = false;
 		}
 		
@@ -181,7 +204,11 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 		}
 		
 		public String getClassName() {
-			return player.getPlayerClass().getName();
+			PlayerClass c = player.getPlayerClass();
+			if (c == null)
+				return "None";
+			
+			return c.getName();
 		}
 		
 		public int getKey() {
@@ -239,6 +266,11 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 		editorPanel = new JPanel(new BorderLayout());
 		AppUIColor.setColors(editorPanel, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
 		
+		JPanel screen = new StartScreen();
+		AppUIColor.setColors(screen, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
+		editorPanel.add(screen, BorderLayout.CENTER);
+		this.add(editorPanel, BorderLayout.CENTER);
+		
 		playerListModel = new DefaultListModel<>();
 		if (!session.getAllPlayers().isEmpty())
 		for (Player player : session.getAllPlayers()) {
@@ -255,6 +287,8 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 				if (e.getClickCount() != 2)
 					return;
 				
+				if (playerList.getSelectedValue() == null)
+					return;
 				actionPerformed(new ActionEvent(playerList.getSelectedValue(),
 						0, "?select"));
 			}
@@ -409,12 +443,12 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 
 	@Override
 	public String generateConnectionPage() {
-		return "<html><head><style>body {    background-color: #" + getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_BACKGROUND)) + ";    color: #" + getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_FOREGROUND)) + ";}h1 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 50px;    text-align: center;}h2 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 30px;    text-align: center;}p {    width: 500px;    margin-bottom: 50px;    margin-top: 30px;    border: 1px solid white;}#screen_loading {    position: absolute;    top: 0px;    bottom: 0px;    left: 0px;    right: 0px;    z-index: 10000000;    display: none;    background-color: #333333;}#number_error {    text-align: center;    margin-top: 2px;    color: red;    display: none;}</style><script language='JavaScript' type='text/javascript'>function submitKey(key) {    var elem = document.getElementById('form_key');    if (!elem)        return false;    var val = Number(elem.value);    if (isNaN(val)) {        setError('Not a number');        return false;    }            document.getElementById('screen_loading').style.display = 'block';        document.getElementById('form').action =        'http://' + window.location.hostname + ':" + AppConnectionServer.DEFAULT_PORT_LISTEN + "/';        return true;}function setError(error) {    var elem = document.getElementById('number_error');    elem.style.display = 'block';    elem.innerHTML = error;}</script></head><body>    <div id='screen_loading'>        <h2>Loading...</h2>    </div>    <h1>QuestManager</h1>    <h2>Player Creation</h2>    <center><p>    &nbsp;&nbsp;&nbsp;&nbsp;To get started, get a player template key from the DM. This is the key that's given as soon as    a player is created.    </p></center>        <center>        <form id='form' method='post' action=''>            <input id = 'form_key' type='text' name='key' /><br />            <span id='number_error'></span></br />            <button onclick='submitKey();'>Submit</button></center>                    </form>    </center></body></html>";
+		return "<html><head><style>body {    background-color: #" + getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_BACKGROUND)) + ";    color: #" + getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_FOREGROUND)) + ";}h1 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 50px;    text-align: center;}h2 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 60px;    text-align: center;}.titlebar {color: #" + getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_FOREGROUND)) + ";width: 400px;}p {    width: 500px;    margin-bottom: 50px;    margin-top: 30px;    border: 1px solid white;}#screen_loading {    position: absolute;    top: 0px;    bottom: 0px;    left: 0px;    right: 0px;    z-index: 10000000;    display: none;    background-color: #333333;}#number_error {    text-align: center;    margin-top: 2px;    color: red;    display: none;}</style><script language='JavaScript' type='text/javascript'>function submitKey(key) {    var elem = document.getElementById('form_key');    if (!elem)        return false;    var val = Number(elem.value);    if (isNaN(val)) {        setError('Not a number');        return false;    }            document.getElementById('screen_loading').style.display = 'block';        document.getElementById('form').action =        'http://' + window.location.hostname + ':" + AppConnectionServer.DEFAULT_PORT_LISTEN + "/';        return true;}function setError(error) {    var elem = document.getElementById('number_error');    elem.style.display = 'block';    elem.innerHTML = error;}</script></head><body>    <div id='screen_loading'>        <h2>Loading...</h2>    </div>    <h1>QuestManager</h1><hr class='titlebar' />    <h2>Player Creation</h2>    <center><p>    &nbsp;&nbsp;&nbsp;&nbsp;To get started, get a player template key from the DM. This is the key that's given as soon as    a player is created.    </p></center>        <center>        <form id='form' method='post' action=''>            <input id = 'form_key' type='text' name='key' /><br />            <span id='number_error'></span></br />            <button onclick='submitKey();'>Submit</button></center>                    </form>    </center></body></html>";
 	}
 	
 	@Override
 	public String generateRejectionPage() {
-		return "<html><head><style>body {    background-color: #" + getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_BACKGROUND)) + ";    color: #" + getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_FOREGROUND)) + ";}h1 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 50px;    text-align: center;}h2 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 30px;    text-align: center;}p {    width: 500px;    margin-bottom: 50px;    margin-top: 30px;    border: 1px solid white;}#screen_loading {    position: absolute;    top: 0px;    bottom: 0px;    left: 0px;    right: 0px;    z-index: 10000000;    display: none;    background-color: #333333;}#number_error {    text-align: center;    margin-top: 2px;    color: red;    display: none;}</style><script language='JavaScript' type='text/javascript'>function setAction() {    document.getElementById('form').action =        'http://' + window.location.hostname + '/';    return true;}</script></head><body>    <h2>Invalid ID</h2>    <center><p>    &nbsp;&nbsp;&nbsp;&nbsp;That ID is not valid. Check with the DM and try again.</p></center>        <center>        <form id='form' method='get' action=''>            <button onclick='setAction();'>Submit</button></center>                    </form>    </center></body></html>";
+		return "<html><head><style>body {    background-color: #" + getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_BACKGROUND)) + ";    color: #" + getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_FOREGROUND)) + ";}h1 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 50px;    text-align: center;}h2 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 30px;    text-align: center;}p {    width: 500px;    margin-bottom: 50px;    margin-top: 30px;    border: 1px solid white;}#screen_loading {    position: absolute;    top: 0px;    bottom: 0px;    left: 0px;    right: 0px;    z-index: 10000000;    display: none;    background-color: #333333;}#number_error {    text-align: center;    margin-top: 2px;    color: red;    display: none;}</style><script language='JavaScript' type='text/javascript'>function setAction() {    document.getElementById('form').action =        'http://' + window.location.hostname + '/';    return true;}</script></head><body>    <h2>Invalid ID</h2>    <center><p>    &nbsp;&nbsp;&nbsp;&nbsp;That ID is not valid. Check with the DM and try again.</p></center>        <center>        <form id='form' method='get' action=''>            <button onclick='setAction();'>Back</button></center>                    </form>    </center></body></html>";
 	}
 	
 	private String getRGBWord(Color color) {

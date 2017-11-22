@@ -1,8 +1,6 @@
 package com.smanzana.dungeonmaster.ui.app;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,6 +9,7 @@ import java.net.SocketTimeoutException;
 
 import com.smanzana.dungeonmaster.ui.Comm;
 import com.smanzana.dungeonmaster.ui.web.WebUI;
+import com.smanzana.dungeonmaster.ui.web.utils.HTTPHeaders;
 
 /**
  * Connection listening server. Listens for connections and hands
@@ -54,7 +53,6 @@ public class AppConnectionServer implements Runnable {
 	}
 	
 	public static final int DEFAULT_PORT_LISTEN = 8124;
-	private static final int HEADER_LEN_MAX = 5000;
 	
 	private AppConnectionHook hook;
 	private ServerSocket listenSocket;
@@ -204,7 +202,7 @@ public class AppConnectionServer implements Runnable {
 		String page = hook.generateConnectionPage();
 		try {
 			PrintWriter writer = new PrintWriter(connection.getOutputStream());
-			writeHeader(writer);
+			writer.print(HTTPHeaders.generateResponseHeader());
 			writer.print(page);
 			writer.close();
 		} catch (IOException e) {
@@ -221,41 +219,8 @@ public class AppConnectionServer implements Runnable {
 		try {
 			int originalTimeout = connection.getSoTimeout();
 			connection.setSoTimeout(1000);
-			InputStreamReader reader = new InputStreamReader(new BufferedInputStream(connection.getInputStream()));
-			StringBuffer buffer = new StringBuffer();
-			char buf[] = new char[HEADER_LEN_MAX];
-			int len;
 			
-			do {
-				if (connection.isClosed())
-					break;
-				
-				try {
-				len = reader.read(buf, 0, HEADER_LEN_MAX);
-				} catch (SocketTimeoutException e) {
-					len = 0;
-				}
-				if (len == -1) {
-					System.out.println("Got -1 from read");
-					break;
-				}
-				
-				if (len == 0) {
-					System.out.println("got 0 (timeout) from read");
-					break;
-				}
-				
-				buffer.append(buf, 0, len);
-				
-				String result = buffer.toString();
-				if (!result.toString().contains("\r\n\r\n")) {
-					System.out.println("Got large (> " + HEADER_LEN_MAX + ") response");
-					break; // No end of header. It's too big. 
-				}
-				
-				message = result.substring(result.indexOf("\r\n\r\n") + 4);
-				
-			} while (false);
+			message = HTTPHeaders.readHTTPResponse(connection);
 			
 			// reset back to original
 			connection.setSoTimeout(originalTimeout);
@@ -279,7 +244,7 @@ public class AppConnectionServer implements Runnable {
 			
 			try { 
 				PrintWriter writer = new PrintWriter(connection.getOutputStream());
-				writeHeader(writer);
+				writer.print(HTTPHeaders.generateResponseHeader());
 				writer.print(hook.generateRejectionPage());
 				writer.close(); 
 			} catch (Exception ex) {};
@@ -291,11 +256,5 @@ public class AppConnectionServer implements Runnable {
 	
 	private Comm wrapInComm(Socket connection) {
 		return new WebUI(connection);
-	}
-	
-	private void writeHeader(PrintWriter writer) {
-		writer.print("HTTP/1.1 200 OK\r\n");
-		writer.print("Content-Type: text/html\r\n");
-		writer.print("\r\n\r\n");
 	}
 }

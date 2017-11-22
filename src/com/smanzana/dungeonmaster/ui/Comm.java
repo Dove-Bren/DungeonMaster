@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.smanzana.dungeonmaster.action.Action;
 import com.smanzana.dungeonmaster.pawn.Attributes;
+import com.smanzana.dungeonmaster.ui.app.swing.screens.PlayerManagementScreen.PlayerCreationOptions;
 import com.smanzana.dungeonmaster.ui.common.InventoryView;
 import com.smanzana.dungeonmaster.ui.common.MessageBox;
 import com.smanzana.dungeonmaster.ui.common.NPCView;

@@ -5,6 +5,11 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,11 +24,13 @@ import com.smanzana.dungeonmaster.session.GameSession;
 import com.smanzana.dungeonmaster.ui.Comm;
 import com.smanzana.dungeonmaster.ui.UICallback;
 import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
+import com.smanzana.dungeonmaster.ui.app.swing.screens.PlayerManagementScreen.PlayerCreationOptions;
 import com.smanzana.dungeonmaster.ui.common.InventoryView;
 import com.smanzana.dungeonmaster.ui.common.MessageBox;
 import com.smanzana.dungeonmaster.ui.common.NPCView;
 import com.smanzana.dungeonmaster.ui.common.PlayerView;
 import com.smanzana.dungeonmaster.ui.common.TargetView;
+import com.smanzana.dungeonmaster.ui.web.utils.HTTPHeaders;
 import com.smanzana.templateeditor.uiutils.UIColor;
 
 public class AppUI extends Comm {
@@ -213,9 +220,87 @@ public class AppUI extends Comm {
 	}
 
 	@Override
-	public void showPlayerCreation(int creationKey) {
+	public void showPlayerCreation(int creationKey, PlayerCreationOptions opts) {
 		// TODO Auto-generated method stub
 		
 	}
 	
+	public static String getLocalIP() {
+		try {
+			return InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			return "127.0.0.1";
+		}
+	}
+	
+	private static String externalIPCache = null;
+	
+	public static String getExternalIP() {
+		if (externalIPCache != null)
+			return externalIPCache;
+		
+		Socket s = null;
+		try {
+			s = new Socket("api.ipify.org", 80);
+			s.setSoTimeout(500);
+			PrintWriter writer = new PrintWriter(s.getOutputStream());
+			writer.print(HTTPHeaders.generateHeader(true, "/", "api.ipify.org", 0));
+			writer.flush();
+		} catch (UnknownHostException e) {
+			; // continue to try again
+			System.err.println("Unknown host: ipecho");
+		} catch (IOException e) {
+			System.err.println("Could not lookup ipecho for remote address");
+			try {s.close();} catch (Exception ex) {};
+		}
+		
+		if (s != null) {
+			try {
+				externalIPCache = HTTPHeaders.readHTTPResponse(s);
+				s.close();
+				if (externalIPCache != null)
+					return externalIPCache;
+			} catch (SocketTimeoutException e) {
+				System.err.println("Connection to ipecho timed out");
+				try {s.close();} catch (Exception ex) {};
+			} catch (IOException e) {
+				System.err.println("Read error while fetching remove address");
+				try {s.close();} catch (Exception ex) {};
+			}
+		}
+		
+		// Try next service: ipify.org
+		s = null;
+		try {
+			s = new Socket("ipecho.net", 80);
+			s.setSoTimeout(1500);
+			PrintWriter writer = new PrintWriter(s.getOutputStream());
+			writer.print(HTTPHeaders.generateHeader(true, "/plain", "ipecho.net", 0));
+			writer.flush();
+		} catch (UnknownHostException e) {
+			; // continue to try again
+			System.err.println("Unknown host: ipify");
+		} catch (IOException e) {
+			System.err.println("Could not lookup ipify for remote address");
+			try {s.close();} catch (Exception ex) {};
+		}
+		
+		if (s != null) {
+			try {
+				externalIPCache = HTTPHeaders.readHTTPResponse(s);
+				
+				s.close();
+				if (externalIPCache != null)
+					return externalIPCache;
+			} catch (SocketTimeoutException e) {
+				System.err.println("Connection to ipify timed out");
+				try {s.close();} catch (Exception ex) {};
+			} catch (IOException e) {
+				System.err.println("Read error while fetching remove address");
+				try {s.close();} catch (Exception ex) {};
+			}
+		}
+		
+		return "127.0.0.1";
+	}
 }
