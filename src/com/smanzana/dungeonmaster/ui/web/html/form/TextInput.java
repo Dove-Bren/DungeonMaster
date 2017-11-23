@@ -12,6 +12,10 @@ public class TextInput extends HTMLElement implements FormInput {
 	private boolean vNoNumbers;
 	private int maxLen; // < 1 is don't check
 	private int minLen; // < 0 is don't check
+
+	private boolean large;
+	private int rows;
+	private int cols;
 	
 	public TextInput(String name, String startingText) {
 		this(UUID.randomUUID().toString(), name, startingText);
@@ -65,12 +69,33 @@ public class TextInput extends HTMLElement implements FormInput {
 		return this;
 	}
 	
+	/**
+	 * Sets the number of rows to display.
+	 * This converts this into a textarea
+	 * @param rows
+	 * @return
+	 */
+	public TextInput rows(int rows) {
+		this.rows = rows;
+		large = true;
+		return this;
+	}
+	
+	public TextInput cols(int cols) {
+		this.cols = cols;
+		return this;
+	}
+	
 	@Override
 	public String asHTML() {
-		return "<input type='text' name='" + name + "'"
+		return (large ? "<textarea" : "<input type='text'")
+				+ " name='" + name + "'"
 				+ " id='" + getID() + "'"
 				+ (startString == null ? "" : " value=' "+ startString + "'")
-				+ " />";
+				+ (maxLen > 0 ? " maxlength='" + maxLen + "'" : "")
+				+ (rows > 0 ? " rows='" + rows + "'" : "")
+				+ (cols > 0 ? " cols='" + cols + "'" : "")
+				+ (large ? "></textarea>" : " />");
 	}
 
 	@Override
@@ -80,7 +105,7 @@ public class TextInput extends HTMLElement implements FormInput {
 		
 		String ret = "function _" + getID() + "_validate() {\r\n";
 		
-		ret += "var val = document.getElementById('" + getID() + "');\r\n";
+		ret += "var val = document.getElementById('" + getID() + "').value;\r\n";
 		if (vInteger) {
 			ret += "if (isNan(val)) return false;\r\n";
 		} else if (vNoNumbers) {
@@ -90,7 +115,9 @@ public class TextInput extends HTMLElement implements FormInput {
 		if (maxLen > 0 || minLen > -1) {
 			ret += "var len = val.length;\r\n";
 			if (maxLen > 0) {
-				ret += "if (len > " + maxLen + ") return false;\r\n";
+				//ret += "if (len > " + maxLen + ") return false;\r\n";
+				// This is now handled in the html of the tag
+				// via maxlength
 			}
 			if (minLen > -1) {
 				ret += "if (len < " + minLen + ") return false;\r\n";

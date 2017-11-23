@@ -1,5 +1,6 @@
 package com.smanzana.dungeonmaster.ui.web.utils;
 
+import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,6 +8,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
+import com.smanzana.dungeonmaster.ui.app.AppUIColor;
 import com.smanzana.dungeonmaster.ui.web.WebUI;
 import com.smanzana.dungeonmaster.ui.web.html.HTMLCompatible;
 
@@ -99,7 +101,9 @@ public class HTTP {
 	public static String formatHTML(HTMLCompatible root) {
 		String ret = "<html>\r\n<head>\r\n";
 		
-		ret += "<style>\r\n" + root.getStyleText() + "</style>\r\n";
+		ret += "<style>\r\nbody {\r\nbackground-color: #" + getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_BACKGROUND)) + ";\r\ncolor: #" + getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_FOREGROUND)) + ";\r\n}\r\n" 
+		
+				+ root.getStyleText() + "</style>\r\n";
 		ret += "<script language='javascript' type='text/javascript'>\r\n"
 				+ root.getScriptText() + "</script>\r\n";
 		
@@ -111,4 +115,38 @@ public class HTTP {
 		return ret;
 	}
 	
+	/**
+	 * Capitalizes the first letter. Converts _ and camel-casing to spaces
+	 * @param raw
+	 * @return
+	 */
+	public static String pretty(String raw) {
+		int len = raw.length();
+		
+		StringBuffer buf = new StringBuffer(raw);
+		buf.setCharAt(0, Character.toUpperCase(raw.charAt(0)));
+		for (int i = 1; i < len; i++) {
+			if (Character.isUpperCase(buf.charAt(i))) {
+				// camel case! insert space
+				buf.insert(i, ' ');
+				i += 1;
+				continue;
+			}
+			
+			if (buf.charAt(i) == '_') {
+				// snake case! Replace with space!
+				buf.setCharAt(i, ' ');
+				continue;
+			}
+		}
+		
+		return buf.toString();
+	}
+	
+	public static String getRGBWord(Color color) {
+		return String.format("%2x%2x%2x",
+				color.getRed(),
+				color.getGreen(),
+				color.getBlue());
+	}
 }

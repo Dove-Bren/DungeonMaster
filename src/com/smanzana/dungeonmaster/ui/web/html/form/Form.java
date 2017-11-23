@@ -5,12 +5,15 @@ import java.util.List;
 import java.util.UUID;
 
 import com.smanzana.dungeonmaster.ui.web.html.HTMLElement;
+import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
 
 public class Form extends HTMLElement {
 
+	private String displayName;
 	private List<FormInput> elements;
 	private String action;
 	private String method;
+	private String errorID;
 	
 	/**
 	 * Same as Form("", "GET")
@@ -28,6 +31,11 @@ public class Form extends HTMLElement {
 		this.action = action;
 		this.method = method;
 		this.elements = new LinkedList<>();
+		errorID = clean(UUID.randomUUID().toString());
+	}
+	
+	public void setDisplayName(String display) {
+		this.displayName = display;
 	}
 
 	public String getAction() {
@@ -44,21 +52,31 @@ public class Form extends HTMLElement {
 	
 	@Override
 	public String asHTML() {
-		String ret =  "<form id='" + getID() + "' action='" + action + "' method='"
-				+ method + "'>\r\n";
+		String ret = "<center>\r\n";
 		
-		for (FormInput input : elements) {
-			ret += input.asHTML() + "\r\n";
+		if (displayName != null) {
+			ret += "<h2>" + displayName + "</h2>\r\n";
 		}
 		
-		ret += generateSubmit();
+		ret += "<span class='form_error' id='" + errorID + "'></span><br />";
+				
+		ret += "<form id='" + getID() + "' action='" + action + "' method='"
+				+ method + "' onsubmit='return _" + getID()+"_submit();" + "'>\r\n";
 		
-		ret += "</form>";
+		for (FormInput input : elements) {
+			ret += input.asHTML() + "<br />\r\n";
+			ret += "<span class='form_label'>" + HTTP.pretty(input.getName()) + "</span><br /><br />\r\n";
+			
+		}
+		
+		ret += "<br />" + generateSubmit();
+		
+		ret += "</form>\r\n</center>";
 		return ret;
 	}
 	
 	private String generateSubmit() {
-		return "<button onclick='_" + getID()+"_submit()" + "'>Submit</button>";
+		return "<input type='submit' value='Submit' />";
 	}
 	
 	@Override
@@ -73,11 +91,12 @@ public class Form extends HTMLElement {
 			if (hook == null || hook.trim().isEmpty())
 				continue;
 			
-			if (!first) {
-				inputHooks += "&& ";
-				first = true;
-			}
-			inputHooks += hook + " ";
+			if (first)
+				first = false;
+			else
+				inputHooks += "else ";
+			inputHooks += "if (!" + hook + ") error_elem.innerHTML = 'Error on field: "
+					+ HTTP.pretty(input.getName()) + "';\r\n";
 			
 			// Also add any script pieces it needs before the actual call:
 			ret += input.getScriptText() + "\r\n";
@@ -86,16 +105,17 @@ public class Form extends HTMLElement {
 		if (inputHooks.trim().isEmpty())
 			return "";
 		
-		ret += "function _" + getID() + "_submit() {\r\nreturn ";
-		ret += inputHooks + ";\r\n";
-		
-		ret += "}";
+		ret += "function _" + getID() + "_submit() {\r\n";
+		ret += "var error_elem = document.getElementById('" + errorID + "');\r\n" + inputHooks + ";\r\n";
+		ret += "else error_elem.innerHTML = '';\r\n";
+		ret += "return false;\r\n}";
 		return ret;
 	}
 	
 	@Override
 	public String getStyleText() {
-		String ret =  "";
+		String ret =  ".form_label {\r\nwidth: 100px;\r\nfont-weight: bold;\r\n}\r\n"
+				+ ".form_error {margin-bottom: 15px;\r\ncolor: red;\r\nfont-weight: bold;\r\n}\r\n";
 		
 		// Form doesn't have any
 		for (FormInput input : elements) {
