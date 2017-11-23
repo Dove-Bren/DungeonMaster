@@ -206,7 +206,7 @@ public class AppConnectionServer implements Runnable {
 			int originalTimeout = connection.getSoTimeout();
 			connection.setSoTimeout(1000);
 			
-			message = HTTP.readHTTPResponse(connection);
+			message = HTTP.readHTTPRequest(connection).getBody();
 			
 			// reset back to original
 			connection.setSoTimeout(originalTimeout);

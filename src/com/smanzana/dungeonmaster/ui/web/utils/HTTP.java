@@ -12,19 +12,115 @@ import com.smanzana.dungeonmaster.ui.app.AppUIColor;
 import com.smanzana.dungeonmaster.ui.web.WebUI;
 import com.smanzana.dungeonmaster.ui.web.html.HTMLCompatible;
 
-// Static class with nice utility functions for senting HTTP requests
+// Static class with nice utility functions for sending HTTP requests
 public class HTTP {
+	
+	public static class HTTPRequestHeader {
+		
+		private boolean useGet;
+		private String URI;
+		private String host;
+		private int contentLen;
+		
+		private HTTPRequestHeader() {
+			useGet = false;
+			URI = "";
+			host = "";
+			contentLen = 0;
+		}
+		
+		public HTTPRequestHeader setGet(boolean get) {
+			useGet = get;
+			return this;
+		}
+		
+		public HTTPRequestHeader setURI(String URI) {
+			this.URI = URI;
+			return this;
+		}
+		
+		public HTTPRequestHeader setHost(String host) {
+			this.host = host;
+			return this;
+		}
+		
+		public HTTPRequestHeader setContentLen(int len) {
+			this.contentLen = len;
+			return this;
+		}
+		
+		public String asText() {
+			return toString();
+		}
+		
+		@Override
+		public String toString() {
+			return (useGet ? "GET" : "POST") + " " + URI + " HTTP/1.1\r\n"
+					+ "Host: " + host + "\r\nUser-Agent: DungeonMaster/0.1\r\n"
+							+ "Accept: text/plain, text/html;q=0.5\r\n"
+							+ "Accept-Language: en-US,en;q=0.5\r\n"
+							+ (contentLen > 0 ? "Content-Length: " + contentLen + "\r\n" : "")
+							+ (contentLen > 0 ? "Content-Type: text/plain\r\n" : "")
+							+ "\r\n";
+		}
+	}
+	
+	public static class HTTPRequest {
+		private HTTPRequestHeader header;
+		private String body;
+		
+		private HTTPRequest() {
+			header = new HTTPRequestHeader();
+			body = "";
+		}
+		
+		public String asText() {
+			return toString();
+		}
+		
+		public HTTPRequestHeader getHeader() {
+			return header;
+		}
+		
+		public String getBody() {
+			return body;
+		}
+		
+		public HTTPRequest setHeader(HTTPRequestHeader header) {
+			this.header = header;
+			return this;
+		}
+		
+		public HTTPRequest setBody(String body) {
+			this.body = body;
+			return this;
+		}
+		
+		@Override
+		public String toString() {
+			return header.asText() + body;
+		}
+	}
 
 	public static final int HEADER_LEN_MAX = 5000;
 
-	public static String generateHeader(boolean useGet, String URI, String host, int contentLen) {
-		return (useGet ? "GET" : "POST") + " " + URI + " HTTP/1.1\r\n"
-				+ "Host: " + host + "\r\nUser-Agent: DungeonMaster/0.1\r\n"
-						+ "Accept: text/plain, text/html;q=0.5\r\n"
-						+ "Accept-Language: en-US,en;q=0.5\r\n"
-						+ (contentLen > 0 ? "Content-Length: " + contentLen + "\r\n" : "")
-						+ (contentLen > 0 ? "Content-Type: text/plain\r\n" : "")
-						+ "\r\n";
+	public static HTTPRequestHeader generateRequestHeader(boolean useGet, String URI, String host, int contentLen) {
+		return new HTTPRequestHeader()
+				.setGet(useGet)
+				.setURI(URI)
+				.setHost(host)
+				.setContentLen(contentLen);
+	}
+	
+	public static HTTPRequest generateRequest(boolean useGet, String URI, String host, String content) {
+		HTTPRequest req = new HTTPRequest()
+				.setHeader(generateRequestHeader(useGet, URI, host, 
+						(content == null || content.trim().isEmpty() ? 0 : content.length())));
+		
+		if (content != null && !content.trim().isEmpty())
+			req.setBody(content);
+		
+		return req;
 	}
 	
 	public static String generateResponseHeader() {
@@ -33,8 +129,16 @@ public class HTTP {
 					+ "r\n\r\n";
 	}
 	
-	public static String readHTTPResponse(Socket connection) throws IOException {
-		String response = null;
+	public static String trimHTTPHeader(String raw) {
+		if (!raw.contains("\r\n\r\n")) {
+			return raw; 
+		}
+		
+		return raw.substring(raw.indexOf("\r\n\r\n") + 4);
+	}
+	
+	public static HTTPRequest readHTTPRequest(Socket connection) throws IOException {
+		HTTPRequest request = null;
 		InputStreamReader reader = new InputStreamReader(new BufferedInputStream(connection.getInputStream()));
 		StringBuffer buffer = new StringBuffer();
 		char buf[] = new char[HEADER_LEN_MAX];
@@ -67,11 +171,11 @@ public class HTTP {
 				break; // No end of header. It's too big. 
 			}
 			
-			response = result.substring(result.indexOf("\r\n\r\n") + 4);
+			request = parseHTTPRequest(result);
 			
 		} while (false);
 		
-		return response;
+		return request;
 	}
 	
 	public static boolean sendHTTP(Socket connection, String message) {
@@ -148,5 +252,49 @@ public class HTTP {
 				color.getRed(),
 				color.getGreen(),
 				color.getBlue());
+	}
+	
+	// Also works on responses!
+	private static HTTPRequest parseHTTPRequest(String raw) {
+		if (raw == null || raw.trim().isEmpty() || raw.indexOf("\r\n") == -1)
+			return null;
+		
+		String requestLine = raw.substring(0, raw.indexOf("\r\n")); // First line
+		HTTPRequestHeader header = new HTTPRequestHeader();
+		String[] tokens = requestLine.split(" ");
+		if (tokens.length != 3)
+			return null;
+		
+		// We only support POST and simple GET
+		header.setGet(!tokens[0].trim().equalsIgnoreCase("POST"));
+		header.setURI(breakURI(tokens[0]));
+		// Discard HTTP version
+		// Fish for content-length
+		int pos;
+		pos = raw.indexOf("Content-Length:");
+		if (pos != -1) {
+			String len = raw.substring(pos + 15, raw.indexOf("\r\n", pos + 15)).trim();
+			try {
+				header.setContentLen(Integer.parseInt(len));
+			} catch (NumberFormatException e) {
+				header.setContentLen(0);
+				System.err.println("Failed to parse content-length from ["
+						+ len + "]");
+			}
+		}
+		
+		HTTPRequest request = new HTTPRequest().setHeader(header);
+		raw = trimHTTPHeader(raw);
+		request.setBody(raw.substring(0, header.contentLen));
+		
+		return request;
+	}
+	
+	// Removes any get parameters
+	private static String breakURI(String raw) {
+		if (raw.indexOf("&") == -1)
+			return raw;
+		
+		return raw.substring(0, raw.indexOf("&"));
 	}
 }

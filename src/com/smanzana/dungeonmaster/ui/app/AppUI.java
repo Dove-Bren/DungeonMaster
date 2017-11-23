@@ -244,7 +244,7 @@ public class AppUI extends Comm {
 			s = new Socket("api.ipify.org", 80);
 			s.setSoTimeout(500);
 			PrintWriter writer = new PrintWriter(s.getOutputStream());
-			writer.print(HTTP.generateHeader(true, "/", "api.ipify.org", 0));
+			writer.print(HTTP.generateRequest(true, "/", "api.ipify.org", ""));
 			writer.flush();
 		} catch (UnknownHostException e) {
 			; // continue to try again
@@ -256,7 +256,7 @@ public class AppUI extends Comm {
 		
 		if (s != null) {
 			try {
-				externalIPCache = HTTP.readHTTPResponse(s);
+				externalIPCache = HTTP.readHTTPRequest(s).getBody();
 				s.close();
 				if (externalIPCache != null)
 					return externalIPCache;
@@ -275,7 +275,7 @@ public class AppUI extends Comm {
 			s = new Socket("ipecho.net", 80);
 			s.setSoTimeout(1500);
 			PrintWriter writer = new PrintWriter(s.getOutputStream());
-			writer.print(HTTP.generateHeader(true, "/plain", "ipecho.net", 0));
+			writer.print(HTTP.generateRequest(true, "/plain", "ipecho.net", ""));
 			writer.flush();
 		} catch (UnknownHostException e) {
 			; // continue to try again
@@ -287,7 +287,7 @@ public class AppUI extends Comm {
 		
 		if (s != null) {
 			try {
-				externalIPCache = HTTP.readHTTPResponse(s);
+				externalIPCache = HTTP.readHTTPRequest(s).getBody();
 				
 				s.close();
 				if (externalIPCache != null)

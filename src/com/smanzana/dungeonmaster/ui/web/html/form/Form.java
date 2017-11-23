@@ -14,6 +14,7 @@ public class Form extends HTMLElement {
 	private String action;
 	private String method;
 	private String errorID;
+	private int refreshInterval; // In seconds. Sends info to server
 	
 	/**
 	 * Same as Form("", "GET")
@@ -124,5 +125,10 @@ public class Form extends HTMLElement {
 		
 		return ret;
 	}
+	
+//	// Creates JS async loop of sending feedback to server
+//	private String generateFeedback() {
+//		
+//	}
 	
 }
