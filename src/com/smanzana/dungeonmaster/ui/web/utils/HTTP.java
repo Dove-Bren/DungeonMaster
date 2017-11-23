@@ -3,11 +3,15 @@ package com.smanzana.dungeonmaster.ui.web.utils;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
+import com.smanzana.dungeonmaster.ui.web.WebUI;
+import com.smanzana.dungeonmaster.ui.web.html.HTMLCompatible;
+
 // Static class with nice utility functions for senting HTTP requests
-public class HTTPHeaders {
+public class HTTP {
 
 	public static final int HEADER_LEN_MAX = 5000;
 
@@ -66,6 +70,45 @@ public class HTTPHeaders {
 		} while (false);
 		
 		return response;
+	}
+	
+	public static boolean sendHTTP(Socket connection, String message) {
+		if (connection == null || !connection.isConnected()
+				|| connection.isClosed())
+			return false;
+		
+		try {
+			PrintWriter writer = new PrintWriter(connection.getOutputStream());
+			writer.print(generateResponseHeader());
+			writer.print(message);
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Failed to deliver page to connection: "
+					+ connection.getInetAddress());
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public static boolean sendHTTP(WebUI connection, String message) {
+		return sendHTTP(connection.getConnection(), message);
+	}
+	
+	public static String formatHTML(HTMLCompatible root) {
+		String ret = "<html>\r\n<head>\r\n";
+		
+		ret += "<style>\r\n" + root.getStyleText() + "</style>\r\n";
+		ret += "<script language='javascript' type='text/javascript'>\r\n"
+				+ root.getScriptText() + "</script>\r\n";
+		
+		ret += "</head>\r\n<body>\r\n";
+		
+		ret += root.asHTML();
+		
+		ret += "\r\n</body>\r\n</html>\r\n";
+		return ret;
 	}
 	
 }

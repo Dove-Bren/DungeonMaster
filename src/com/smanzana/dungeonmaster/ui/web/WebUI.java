@@ -12,4 +12,8 @@ public class WebUI extends Comm {
 		this.connection = connection;
 	}
 	
+	public Socket getConnection() {
+		return this.connection;
+	}
+	
 }

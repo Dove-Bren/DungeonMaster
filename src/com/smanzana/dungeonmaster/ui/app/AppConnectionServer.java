@@ -9,7 +9,7 @@ import java.net.SocketTimeoutException;
 
 import com.smanzana.dungeonmaster.ui.Comm;
 import com.smanzana.dungeonmaster.ui.web.WebUI;
-import com.smanzana.dungeonmaster.ui.web.utils.HTTPHeaders;
+import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
 
 /**
  * Connection listening server. Listens for connections and hands
@@ -195,21 +195,7 @@ public class AppConnectionServer implements Runnable {
 	
 	// Connection over port 80; just checking what it is
 	private void onConnect(Socket connection) {
-		if (connection == null || !connection.isConnected()
-				|| connection.isClosed())
-			return;
-		
-		String page = hook.generateConnectionPage();
-		try {
-			PrintWriter writer = new PrintWriter(connection.getOutputStream());
-			writer.print(HTTPHeaders.generateResponseHeader());
-			writer.print(page);
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("Failed to deliver page to connection: "
-					+ connection.getInetAddress());
-		}
+		HTTP.sendHTTP(connection, hook.generateConnectionPage());
 	}
 	
 	private void onConnectEx(Socket connection) {
@@ -220,7 +206,7 @@ public class AppConnectionServer implements Runnable {
 			int originalTimeout = connection.getSoTimeout();
 			connection.setSoTimeout(1000);
 			
-			message = HTTPHeaders.readHTTPResponse(connection);
+			message = HTTP.readHTTPResponse(connection);
 			
 			// reset back to original
 			connection.setSoTimeout(originalTimeout);
@@ -244,7 +230,7 @@ public class AppConnectionServer implements Runnable {
 			
 			try { 
 				PrintWriter writer = new PrintWriter(connection.getOutputStream());
-				writer.print(HTTPHeaders.generateResponseHeader());
+				writer.print(HTTP.generateResponseHeader());
 				writer.print(hook.generateRejectionPage());
 				writer.close(); 
 			} catch (Exception ex) {};

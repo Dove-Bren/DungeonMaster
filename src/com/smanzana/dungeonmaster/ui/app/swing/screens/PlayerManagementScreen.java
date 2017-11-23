@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,10 @@ import com.smanzana.dungeonmaster.ui.app.AppConnectionServer;
 import com.smanzana.dungeonmaster.ui.app.AppConnectionServer.AppConnectionHook;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.AppUIColor;
+import com.smanzana.dungeonmaster.ui.web.WebUI;
+import com.smanzana.dungeonmaster.ui.web.html.form.Form;
+import com.smanzana.dungeonmaster.ui.web.html.form.TextInput;
+import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
 import com.smanzana.templateeditor.EmbeddedEditor;
 
 // Screen for managing creation and delegation of players
@@ -242,6 +247,8 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	private PlayerCreationOptions options;
 	// Done button, which updates depending on status
 	private JButton doneButton;
+	// Map of current people editting statuses
+	private Map<PlayerStatus, Comm> comms;
 	
 	private AppConnectionServer server;
 	private Thread serverThread;
@@ -256,6 +263,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 			clist.add(d.getName());
 			dlist.add(d.getDescription());
 		}
+		comms = new HashMap<>();
 		this.options = new PlayerCreationOptions(clist, dlist);
 		this.server = new AppConnectionServer(this);
 		serverThread = new Thread(this.server);
@@ -391,8 +399,15 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 		
 	}
 	
-	private void clientEdit(PlayerStatus status) {
+	private void clientEdit(Comm newComm, PlayerStatus status) {
 		System.out.println("Client editting!");
+		Form form = new Form("GET", "/");
+		form.addInput(new TextInput("name", "Name")
+				.noNumbers().min(2).max(20));
+		
+		if (HTTP.sendHTTP((WebUI) newComm, HTTP.formatHTML(form)))
+			comms.put(status, newComm);
+		
 	}
 	
 	private void updateDoneButton() {
@@ -406,7 +421,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 		while (it.hasMoreElements()) {
 			PlayerStatus status = it.nextElement();
 			if (status.isTaken() && status.editKey == key) {
-				clientEdit(status);
+				clientEdit(newComm, status);
 				return;
 			}
 		}
@@ -419,12 +434,12 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	public int filter(String connectMessage) {
 		// "key: KEY"
 		if (connectMessage == null || connectMessage.trim().isEmpty()
-				|| connectMessage.indexOf(':') == -1)
+				|| connectMessage.indexOf('=') == -1)
 			return 0;
 		
 		int foundKey;
 		try {
-			foundKey = Integer.parseInt(connectMessage.substring(connectMessage.indexOf(':')+1));
+			foundKey = Integer.parseInt(connectMessage.substring(connectMessage.indexOf('=')+1));
 		} catch (NumberFormatException e) {
 			return 0;
 		}
