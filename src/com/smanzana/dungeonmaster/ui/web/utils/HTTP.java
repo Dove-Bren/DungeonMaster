@@ -9,7 +9,6 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 import com.smanzana.dungeonmaster.ui.app.AppUIColor;
-import com.smanzana.dungeonmaster.ui.web.WebUI;
 import com.smanzana.dungeonmaster.ui.web.html.HTMLCompatible;
 
 // Static class with nice utility functions for sending HTTP requests
@@ -53,6 +52,22 @@ public class HTTP {
 			return toString();
 		}
 		
+		public boolean isUseGet() {
+			return useGet;
+		}
+
+		public String getURI() {
+			return URI;
+		}
+
+		public String getHost() {
+			return host;
+		}
+
+		public int getContentLen() {
+			return contentLen;
+		}
+
 		@Override
 		public String toString() {
 			return (useGet ? "GET" : "POST") + " " + URI + " HTTP/1.1\r\n"
@@ -124,7 +139,11 @@ public class HTTP {
 	}
 	
 	public static String generateResponseHeader() {
-			return "HTTP/1.1 200 OK\r\n"
+		return generateResponseHeader(200, "OK");
+	}
+	
+	public static String generateResponseHeader(int code, String desc) {
+			return "HTTP/1.1 " + code + " " + desc + "\r\n"
 					+ "Content-Type: text/html\r\n"
 					+ "r\n\r\n";
 	}
@@ -198,9 +217,9 @@ public class HTTP {
 		return true;
 	}
 	
-	public static boolean sendHTTP(WebUI connection, String message) {
-		return sendHTTP(connection.getConnection(), message);
-	}
+//	public static boolean sendHTTP(WebUI connection, String message) {
+//		return sendHTTP(connection.getConnection(), message);
+//	}
 	
 	public static String formatHTML(HTMLCompatible root) {
 		String ret = "<html>\r\n<head>\r\n";
@@ -267,7 +286,7 @@ public class HTTP {
 		
 		// We only support POST and simple GET
 		header.setGet(!tokens[0].trim().equalsIgnoreCase("POST"));
-		header.setURI(breakURI(tokens[0]));
+		header.setURI(breakURI(tokens[1]));
 		// Discard HTTP version
 		// Fish for content-length
 		int pos;

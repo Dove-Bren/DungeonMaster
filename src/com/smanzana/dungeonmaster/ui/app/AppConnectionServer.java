@@ -10,6 +10,7 @@ import java.net.SocketTimeoutException;
 import com.smanzana.dungeonmaster.ui.Comm;
 import com.smanzana.dungeonmaster.ui.web.WebUI;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
+import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPRequest;
 
 /**
  * Connection listening server. Listens for connections and hands
@@ -50,6 +51,16 @@ public class AppConnectionServer implements Runnable {
 		 * @return
 		 */
 		public String generateRejectionPage();
+		
+		/**
+		 * When a connection requests a non-root page, it usually means
+		 * They are trying to connect to a Java hook.
+		 * @param URI
+		 * @param request
+		 * @return Response (including header) to send to client. If
+		 * null, generates a rejection response and sends it.
+		 */
+		public String doHook(String URI, HTTPRequest request);
 	}
 	
 	public static final int DEFAULT_PORT_LISTEN = 8124;
@@ -201,12 +212,12 @@ public class AppConnectionServer implements Runnable {
 	private void onConnectEx(Socket connection) {
 		
 		// Get connection message;
-		String message = null;
+		HTTPRequest request;
 		try {
 			int originalTimeout = connection.getSoTimeout();
 			connection.setSoTimeout(1000);
 			
-			message = HTTP.readHTTPRequest(connection).getBody();
+			request = HTTP.readHTTPRequest(connection);
 			
 			// reset back to original
 			connection.setSoTimeout(originalTimeout);
@@ -218,29 +229,58 @@ public class AppConnectionServer implements Runnable {
 			return;
 		}
 		
-		if (message == null) {
+		if (request == null) {
 			System.err.println("Recieved no message from connecting client. Disconnecting");
 			try { connection.close(); } catch (Exception ex) {};
 			return;
 		}
 		
-		int key = hook.filter(message);
-		if (key == 0) {
-			System.err.println("Hook rejecting connection. Disconnecting");
+		System.out.println("URI requested: " + request.getHeader().getURI().trim());
+		String uri = request.getHeader().getURI().trim();
+		if (uri.equals("/")) {
+			int key = hook.filter(request.getBody());
+			if (key == 0) {
+				System.err.println("Hook rejecting connection. Disconnecting");
+				
+				try { 
+					PrintWriter writer = new PrintWriter(connection.getOutputStream());
+					writer.print(HTTP.generateResponseHeader());
+					writer.print(hook.generateRejectionPage());
+					writer.close(); 
+				} catch (Exception ex) {};
+				return;
+			}
+			
+			hook.connect(key, wrapInComm(connection));
+		}
+		else {
+			// It's something for our hooks?
+			uri = stripPath(uri);
+			String response = hook.doHook(uri, request);
+			
+			if (response == null)
+				response = getHTTPReject();
 			
 			try { 
 				PrintWriter writer = new PrintWriter(connection.getOutputStream());
-				writer.print(HTTP.generateResponseHeader());
-				writer.print(hook.generateRejectionPage());
+				writer.print(response);
 				writer.close(); 
 			} catch (Exception ex) {};
 			return;
 		}
-		
-		hook.connect(key, wrapInComm(connection));
 	}
 	
 	private Comm wrapInComm(Socket connection) {
 		return new WebUI(connection);
+	}
+	
+	private String stripPath(String raw) {
+		if (raw.charAt(0) == '/')
+			raw = raw.substring(1);
+		return raw;
+	}
+	
+	private static String getHTTPReject() {
+		return HTTP.generateResponseHeader(404, "ERROR");
 	}
 }

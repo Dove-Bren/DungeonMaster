@@ -1,5 +1,9 @@
 package com.smanzana.dungeonmaster.ui.web.html;
 
+import java.util.Map;
+
+import com.smanzana.dungeonmaster.ui.web.WebHook;
+
 public interface HTMLCompatible {
 
 	/**
@@ -28,5 +32,12 @@ public interface HTMLCompatible {
 	 * @return
 	 */
 	public String getID();
+	
+	/**
+	 * Returns a mapping between URIKey and webhooks this element would register.
+	 * Returning null or an empty map work to refuse any registration
+	 * @return
+	 */
+	public Map<String, WebHook> getWebHooks();
 	
 }

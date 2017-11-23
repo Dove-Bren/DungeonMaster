@@ -40,8 +40,10 @@ import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.AppUIColor;
 import com.smanzana.dungeonmaster.ui.web.WebUI;
 import com.smanzana.dungeonmaster.ui.web.html.form.Form;
+import com.smanzana.dungeonmaster.ui.web.html.form.Form.FormInterface;
 import com.smanzana.dungeonmaster.ui.web.html.form.TextInput;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
+import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPRequest;
 import com.smanzana.templateeditor.EmbeddedEditor;
 
 // Screen for managing creation and delegation of players
@@ -157,6 +159,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 			this.add(clazz);
 			this.add(Box.createRigidArea(new Dimension(0, 5)));
 			this.add(Box.createVerticalGlue());
+			this.setPreferredSize(new Dimension(Short.MAX_VALUE, 75));
 			
 			setBackground(Color.DARK_GRAY);
 		}
@@ -165,7 +168,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 		public Component getListCellRendererComponent(JList<? extends PlayerStatus> arg0, PlayerStatus arg1,
 				int arg2, boolean arg3, boolean arg4) {
 			
-			name.setText(arg1.getClassName());
+			name.setText(arg1.getName());
 			race.setText(arg1.getRace());
 			clazz.setText(arg1.getClassName());
 			
@@ -409,8 +412,29 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 		form.addInput(new TextInput("background", "Background")
 				.noNumbers().min(20).max(1000)
 				.rows(5).cols(100));
+		form.addFeedback(5, new FormInterface() {
+			@Override
+			public void refreshData(Map<String, String> data) {
+				String val;
+				System.out.println("Got refresh with " + data.size() + " elements!");
+				
+				val = data.get("name");
+				if (val != null)
+					status.player.setName(val);
+
+				val = data.get("race");
+				if (val != null)
+					status.player.setRace(val);
+
+				val = data.get("background");
+				if (val != null)
+					status.player.setBackground(val);
+				
+				playerList.repaint();
+			}
+		});
 		
-		if (HTTP.sendHTTP((WebUI) newComm, HTTP.formatHTML(form)))
+		if (((WebUI) newComm).sendHTML(form))
 			comms.put(status, newComm);
 		
 	}
@@ -469,5 +493,17 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	@Override
 	public String generateRejectionPage() {
 		return "<html><head><style>body {    background-color: #" + HTTP.getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_BACKGROUND)) + ";    color: #" + HTTP.getRGBWord(AppUIColor.peek(AppUIColor.Key.BASE_FOREGROUND)) + ";}h1 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 50px;    text-align: center;}h2 {    font-family: Helvetica, Serif, Sans-Serif;    margin-top: 30px;    text-align: center;}p {    width: 500px;    margin-bottom: 50px;    margin-top: 30px;    border: 1px solid white;}#screen_loading {    position: absolute;    top: 0px;    bottom: 0px;    left: 0px;    right: 0px;    z-index: 10000000;    display: none;    background-color: #333333;}#number_error {    text-align: center;    margin-top: 2px;    color: red;    display: none;}</style><script language='JavaScript' type='text/javascript'>function setAction() {    document.getElementById('form').action =        'http://' + window.location.hostname + '/';    return true;}</script></head><body>    <h2>Invalid ID</h2>    <center><p>    &nbsp;&nbsp;&nbsp;&nbsp;That ID is not valid. Check with the DM and try again.</p></center>        <center>        <form id='form' method='get' action=''>            <button onclick='setAction();'>Back</button></center>                    </form>    </center></body></html>";
+	}
+
+	@Override
+	public String doHook(String URI, HTTPRequest request) {
+		for (Comm comm : comms.values()) {
+			if (comm instanceof WebUI) {
+				if (((WebUI) comm).doHook(URI, request))
+					return HTTP.generateResponseHeader();
+			}
+		}
+		
+		return null;
 	}
 }

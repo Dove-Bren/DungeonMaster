@@ -1,13 +1,58 @@
 package com.smanzana.dungeonmaster.ui.web.html.form;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import com.smanzana.dungeonmaster.ui.web.WebHook;
+import com.smanzana.dungeonmaster.ui.web.WebUI;
 import com.smanzana.dungeonmaster.ui.web.html.HTMLElement;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
+import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPRequest;
 
 public class Form extends HTMLElement {
+	
+	private class FormHook implements WebHook {
+		@Override
+		public void fire(WebUI comm, HTTPRequest request) {
+			if (hook == null || comm == null || request == null)
+				return;
+			
+			// Parse html body as a map
+			String body = request.getBody();
+			Map<String, String> data = new HashMap<>();
+			// Should be map between key = value
+			while (!body.trim().isEmpty()) {
+				int pos = body.indexOf("\r\n");
+				String row;
+				if (pos == -1)
+					row = body;
+				else
+					row = body.substring(0, pos);
+
+				pos = row.indexOf("=");
+				if (pos == -1)
+					continue;
+				data.put(row.substring(0, pos).trim(), row.substring(pos+1).trim());
+				
+				body = body.substring(row.length() + 2);
+			}
+			
+			hook.refreshData(data);
+		}
+	}
+	
+	public static interface FormInterface {
+		
+		/**
+		 * When feedback is enabled, this function is called to
+		 * deliver the newest data to the registered interface.
+		 * @param data
+		 */
+		public void refreshData(Map<String, String> data);
+	}
 
 	private String displayName;
 	private List<FormInput> elements;
@@ -15,6 +60,7 @@ public class Form extends HTMLElement {
 	private String method;
 	private String errorID;
 	private int refreshInterval; // In seconds. Sends info to server
+	private FormInterface hook;
 	
 	/**
 	 * Same as Form("", "GET")
@@ -32,11 +78,18 @@ public class Form extends HTMLElement {
 		this.action = action;
 		this.method = method;
 		this.elements = new LinkedList<>();
+		hook = null;
+		refreshInterval = 0;
 		errorID = clean(UUID.randomUUID().toString());
 	}
 	
 	public void setDisplayName(String display) {
 		this.displayName = display;
+	}
+	
+	public void addFeedback(int intervalSeconds, FormInterface hook) {
+		this.hook = hook;
+		this.refreshInterval = intervalSeconds;
 	}
 
 	public String getAction() {
@@ -107,9 +160,14 @@ public class Form extends HTMLElement {
 			return "";
 		
 		ret += "function _" + getID() + "_submit() {\r\n";
-		ret += "var error_elem = document.getElementById('" + errorID + "');\r\n" + inputHooks + ";\r\n";
+		ret += "var error_elem = document.getElementById('" + errorID + "');\r\n" + inputHooks + "\r\n";
 		ret += "else error_elem.innerHTML = '';\r\n";
-		ret += "return false;\r\n}";
+		ret += "return false;\r\n}\r\n";
+		
+		if (refreshInterval > 0 && this.hook != null) {
+			ret += generateFeedback() + "\r\n";
+		}
+		
 		return ret;
 	}
 	
@@ -126,9 +184,48 @@ public class Form extends HTMLElement {
 		return ret;
 	}
 	
-//	// Creates JS async loop of sending feedback to server
-//	private String generateFeedback() {
-//		
-//	}
+	// Creates JS async loop of sending feedback to server
+	private String generateFeedback() {
+		String ids = "";
+		boolean first = true;
+		for (FormInput input : elements) {
+			if (first) first = false;
+			else ids += ", ";
+			
+			ids += "'" + input.getID() + "' ";
+			
+		}
+		return "function _" + getID() + "_feedback() {\r\n"
+				+ "var content = '';\r\n"
+				+ "var ids = [" + ids + "];\r\n"
+				+ "var i;"
+				+ "for (i = 0; i < ids.length; i++) {\r\n"
+				+ "  var elem = document.getElementById(ids[i]);\r\n"
+				+ "  content = content + elem.name + ' = ' + elem.value + '\\r\\n';\r\n"
+				+ "}\r\n"
+				+ "var req;\r\n"
+				+ "if (window.XMLHttpRequest) {req = new XMLHttpRequest();}\r\n"
+				+ "else {req = new ActiveXObject('Microsoft.XMLHTTP');}\r\n"
+				+ "req.open('POST', 'hook_" + getID() + "', true);\r\n"
+				+ "req.setRequestHeader('Content-Type', 'text/plain');\r\n"
+				+ "req.send(content);\r\n"
+				+ "req.onreadystatechange = function() {\r\n"
+				+ "if (this.readyState == 4 && this.status == 200) {\r\n"
+				+ "setTimeout(_" + getID() + "_feedback, "
+				+ refreshInterval * 1000 + ");\r\n"
+				+ "}\r\n"
+				+ "};\r\n"
+				+ "}\r\nsetTimeout(_" + getID() + "_feedback, "
+				+ refreshInterval * 1000 + ");\r\n";
+	}
+	
+	@Override
+	public Map<String, WebHook> getWebHooks() {
+		Map<String, WebHook> map = new HashMap<>();
+		
+		map.put("hook_" + getID(), new FormHook());
+		
+		return map;
+	}
 	
 }
