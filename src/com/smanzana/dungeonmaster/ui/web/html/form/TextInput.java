@@ -1,7 +1,9 @@
 package com.smanzana.dungeonmaster.ui.web.html.form;
 
+import java.util.Map;
 import java.util.UUID;
 
+import com.smanzana.dungeonmaster.ui.web.WebHook;
 import com.smanzana.dungeonmaster.ui.web.html.HTMLElement;
 
 public class TextInput extends HTMLElement implements FormInput {
@@ -144,6 +146,11 @@ public class TextInput extends HTMLElement implements FormInput {
 			return "";
 		
 		return "_" + getID() + "_validate()";
+	}
+
+	@Override
+	public Map<String, WebHook> getWebHooks() {
+		return null;
 	}
 
 }

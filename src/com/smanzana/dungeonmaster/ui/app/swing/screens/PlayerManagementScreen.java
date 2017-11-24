@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -41,6 +42,7 @@ import com.smanzana.dungeonmaster.ui.app.AppUIColor;
 import com.smanzana.dungeonmaster.ui.web.WebUI;
 import com.smanzana.dungeonmaster.ui.web.html.form.Form;
 import com.smanzana.dungeonmaster.ui.web.html.form.Form.FormInterface;
+import com.smanzana.dungeonmaster.ui.web.html.form.SwitchboxInput;
 import com.smanzana.dungeonmaster.ui.web.html.form.TextInput;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPRequest;
@@ -413,11 +415,12 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 		form.addInput(new TextInput("background", "Background")
 				.noNumbers().min(20).max(1000)
 				.rows(5).cols(100));
+		form.addInput(new SwitchboxInput("class", new ArrayList<String>(options.classes.keySet())));
+		form.setDisplayName("Character Creation");
 		form.addFeedback(5, new FormInterface() {
 			@Override
 			public void refreshData(Map<String, String> data) {
 				String val;
-				System.out.println("Got refresh with " + data.size() + " elements!");
 				
 				val = data.get("name");
 				if (val != null)
@@ -430,6 +433,10 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 				val = data.get("background");
 				if (val != null)
 					status.player.setBackground(val);
+				
+				val = data.get("class");
+				if (val != null && session.lookupClass(val) != null)
+					status.player.setPlayerClass(new PlayerClass(session.lookupClass(val)));
 				
 				playerList.repaint();
 			}

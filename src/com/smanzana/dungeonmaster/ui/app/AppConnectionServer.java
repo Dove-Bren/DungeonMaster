@@ -1,7 +1,6 @@
 package com.smanzana.dungeonmaster.ui.app;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -70,6 +69,7 @@ public class AppConnectionServer implements Runnable {
 	}
 	
 	public static final int DEFAULT_PORT_LISTEN = 8124;
+	public static final String IMAGE_PREFIX = "/images/";
 	
 	private AppConnectionHook hook;
 	private ServerSocket listenSocket;
@@ -243,7 +243,6 @@ public class AppConnectionServer implements Runnable {
 			return;
 		}
 		
-		System.out.println("URI requested: " + request.getHeader().getURI().trim());
 		String uri = request.getHeader().getURI().trim();
 		if (uri.equals("/")) {
 			int key = hook.filter(request.getBody());
@@ -259,23 +258,40 @@ public class AppConnectionServer implements Runnable {
 			}
 			
 			hook.connect(key, wrapInComm(connection));
-		}
-		else {
+		} else if (uri.startsWith(IMAGE_PREFIX)) {
+			// It's an image request?
+			String name = uri.substring(IMAGE_PREFIX.length());
+			ImageIcon image = imageMap.get(name);
+			
+			if (image != null) {
+				HTTPResponse response = HTTP.generateImageResponse(image);
+				if (response != null) {
+					try { 
+						HTTP.sendHTTP(connection, response);
+						connection.close(); 
+					} catch (Exception ex) {};
+					return;
+				}
+			}
+		} else {
 			// It's something for our hooks?
 			uri = stripPath(uri);
 			HTTPResponse response = hook.doHook(uri, request);
 			
-			if (response == null) {
-				response = HTTP.generateResponse(404, "ERROR", "");
+			if (response != null) {
+				try { 
+					HTTP.sendHTTP(connection, response);
+					connection.close(); 
+				} catch (Exception ex) {};
+				return;
 			}
-				
-			
-			try { 
-				HTTP.sendHTTP(connection, response);
-				connection.close(); 
-			} catch (Exception ex) {};
-			return;
 		}
+		
+		HTTPResponse bad = HTTP.generateResponse(404, "ERROR", "");
+		try { 
+			HTTP.sendHTTP(connection, bad);
+			connection.close(); 
+		} catch (Exception ex) {};
 	}
 	
 	private Comm wrapInComm(Socket connection) {
@@ -295,5 +311,9 @@ public class AppConnectionServer implements Runnable {
 		map.put("sync_active.png", AppFrame.createImageIcon("icon/sync_active.png"));
 		
 		return map;
+	}
+	
+	public void addImage(String key, ImageIcon image) {
+		imageMap.put(key, image);
 	}
 }

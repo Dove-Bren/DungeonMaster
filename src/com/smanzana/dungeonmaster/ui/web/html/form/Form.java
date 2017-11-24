@@ -112,8 +112,6 @@ public class Form extends HTMLElement {
 			ret += "<h2>" + displayName + "</h2>\r\n";
 		}
 		
-		ret += "<span class='form_error' id='" + errorID + "'></span><br />";
-				
 		ret += "<form id='" + getID() + "' action='" + action + "' method='"
 				+ method + "' onsubmit='return _" + getID()+"_submit();" + "'>\r\n";
 		
@@ -125,7 +123,9 @@ public class Form extends HTMLElement {
 		
 		ret += "<br />" + generateSubmit();
 		
-		ret += "</form>\r\n</center>";
+		ret += "<br /><br /><span class='form_error' id='" + errorID + "'></span><br />";
+		
+		ret += "<p><img id='sync_icon' class='sync_active' src='/images/sync_active.png' /></p>\r\n</form>\r\n</center>";
 		return ret;
 	}
 	
@@ -175,11 +175,11 @@ public class Form extends HTMLElement {
 	public String getStyleText() {
 		String ret =  ".form_label {\r\nwidth: 100px;\r\nfont-weight: bold;\r\n}\r\n"
 				+ ".form_error {margin-bottom: 15px;\r\ncolor: red;\r\nfont-weight: bold;\r\n}\r\n"
-				+ ".sync_inactive {}\r\n"
-				+ "@keyframes frames_sync_active1 {0%{width: 80%; height: auto;} 50%{transform:rotateY(180deg); width: 100%;}}\r\n"
-				+ "@keyframes frames_sync_active2 {0%{width: 80%; height: auto;} 50%{transform:rotateY(180deg); width: 100%;}}\r\n"
-				+ ".sync_active {\r\nanimation: frames_sync_active1 2s linear;\r\n}\r\n"
-				+ ".sync_active2 {\r\nanimation: frames_sync_active2 2s linear;\r\n}\r\n";
+				+ ".sync_inactive {\r\nposition: absolute;\r\nright: 20px;\r\nbottom: 20px;\r\n}\r\n"
+				+ "@keyframes frames_sync_active1 {0%{width: 24px; height: auto;} 50%{transform:rotateZ(180deg); width: 32px;} 100%{transform:rotateZ(360deg); width: 24px;}}\r\n"
+				+ "@keyframes frames_sync_active2 {0%{width: 24px; height: auto;} 50%{transform:rotateZ(180deg); width: 32px;} 100%{transform:rotateZ(360deg); width: 24px;}}\r\n"
+				+ ".sync_active {\r\nposition: absolute;\r\nright: 20px;\r\nbottom: 20px;\r\nanimation: frames_sync_active1 2s linear forwards;\r\n}\r\n"
+				+ ".sync_active2 {\r\nposition: absolute;\r\nright: 20px;\r\nbottom: 20px;\r\nanimation: frames_sync_active2 2s linear forwards;\r\n}\r\n";
 		
 		// Form doesn't have any
 		for (FormInput input : elements) {
@@ -205,7 +205,7 @@ public class Form extends HTMLElement {
 				+ "var elem = document.getElementById('sync_icon');\r\n"
 				+ "if (elem.className == 'sync_active') elem.className = 'sync_active2';\r\n"
 				+ "else elem.className = 'sync_active';\r\n"
-				+ "elem.src = 'images/sync_dead.png';\r\n}\r\n"
+				+ "elem.src = 'images/sync_active.png';\r\n}\r\n"
 				+ "function connection_downtime() {\r\n"
 				+ "var elem = document.getElementById('sync_icon');\r\n"
 				+ "elem.className = 'sync_inactive';\r\nelem.src = 'images/sync_dead.png';\r\n}\r\n"
