@@ -44,6 +44,7 @@ import com.smanzana.dungeonmaster.ui.web.html.form.Form.FormInterface;
 import com.smanzana.dungeonmaster.ui.web.html.form.TextInput;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPRequest;
+import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPResponse;
 import com.smanzana.templateeditor.EmbeddedEditor;
 
 // Screen for managing creation and delegation of players
@@ -496,11 +497,11 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	}
 
 	@Override
-	public String doHook(String URI, HTTPRequest request) {
+	public HTTPResponse doHook(String URI, HTTPRequest request) {
 		for (Comm comm : comms.values()) {
 			if (comm instanceof WebUI) {
 				if (((WebUI) comm).doHook(URI, request))
-					return HTTP.generateResponseHeader();
+					return HTTP.generateBlankResponse();
 			}
 		}
 		

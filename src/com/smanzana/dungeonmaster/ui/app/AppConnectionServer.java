@@ -6,11 +6,17 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.ImageIcon;
 
 import com.smanzana.dungeonmaster.ui.Comm;
+import com.smanzana.dungeonmaster.ui.app.swing.AppFrame;
 import com.smanzana.dungeonmaster.ui.web.WebUI;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPRequest;
+import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPResponse;
 
 /**
  * Connection listening server. Listens for connections and hands
@@ -57,10 +63,10 @@ public class AppConnectionServer implements Runnable {
 		 * They are trying to connect to a Java hook.
 		 * @param URI
 		 * @param request
-		 * @return Response (including header) to send to client. If
+		 * @return Response to send to client. If
 		 * null, generates a rejection response and sends it.
 		 */
-		public String doHook(String URI, HTTPRequest request);
+		public HTTPResponse doHook(String URI, HTTPRequest request);
 	}
 	
 	public static final int DEFAULT_PORT_LISTEN = 8124;
@@ -70,6 +76,7 @@ public class AppConnectionServer implements Runnable {
 	private ServerSocket webSocket;
 	private boolean valid;
 	private Boolean running;
+	private Map<String, ImageIcon> imageMap;
 	
 	public AppConnectionServer(AppConnectionHook hook) {
 		this(hook, AppConnectionServer.DEFAULT_PORT_LISTEN);
@@ -98,7 +105,7 @@ public class AppConnectionServer implements Runnable {
 		}
 		
 		valid = true;
-		
+		imageMap = defaultImages();
 	}
 	
 	public void run() {
@@ -206,7 +213,8 @@ public class AppConnectionServer implements Runnable {
 	
 	// Connection over port 80; just checking what it is
 	private void onConnect(Socket connection) {
-		HTTP.sendHTTP(connection, hook.generateConnectionPage());
+		HTTP.sendHTTP(connection, 
+				HTTP.generateResponse(hook.generateConnectionPage()), true);
 	}
 	
 	private void onConnectEx(Socket connection) {
@@ -242,12 +250,11 @@ public class AppConnectionServer implements Runnable {
 			if (key == 0) {
 				System.err.println("Hook rejecting connection. Disconnecting");
 				
-				try { 
-					PrintWriter writer = new PrintWriter(connection.getOutputStream());
-					writer.print(HTTP.generateResponseHeader());
-					writer.print(hook.generateRejectionPage());
-					writer.close(); 
-				} catch (Exception ex) {};
+				try {
+					HTTP.generateResponse(hook.generateRejectionPage())
+						.write(connection.getOutputStream());
+					connection.getOutputStream().close();
+				} catch (IOException e) { }
 				return;
 			}
 			
@@ -256,15 +263,16 @@ public class AppConnectionServer implements Runnable {
 		else {
 			// It's something for our hooks?
 			uri = stripPath(uri);
-			String response = hook.doHook(uri, request);
+			HTTPResponse response = hook.doHook(uri, request);
 			
-			if (response == null)
-				response = getHTTPReject();
+			if (response == null) {
+				response = HTTP.generateResponse(404, "ERROR", "");
+			}
+				
 			
 			try { 
-				PrintWriter writer = new PrintWriter(connection.getOutputStream());
-				writer.print(response);
-				writer.close(); 
+				HTTP.sendHTTP(connection, response);
+				connection.close(); 
 			} catch (Exception ex) {};
 			return;
 		}
@@ -280,7 +288,12 @@ public class AppConnectionServer implements Runnable {
 		return raw;
 	}
 	
-	private static String getHTTPReject() {
-		return HTTP.generateResponseHeader(404, "ERROR");
+	private static Map<String, ImageIcon> defaultImages() {
+		Map<String, ImageIcon> map = new HashMap<>();
+		
+		map.put("sync_dead.png", AppFrame.createImageIcon("icon/sync_dead.png"));
+		map.put("sync_active.png", AppFrame.createImageIcon("icon/sync_active.png"));
+		
+		return map;
 	}
 }

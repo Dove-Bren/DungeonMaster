@@ -1,18 +1,30 @@
 package com.smanzana.dungeonmaster.ui.web.utils;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 import com.smanzana.dungeonmaster.ui.app.AppUIColor;
 import com.smanzana.dungeonmaster.ui.web.html.HTMLCompatible;
 
 // Static class with nice utility functions for sending HTTP requests
 public class HTTP {
+
+	public static abstract class HTTPTransfer {
+		
+		public abstract void write(OutputStream output);
+	}
 	
 	public static class HTTPRequestHeader {
 		
@@ -80,7 +92,7 @@ public class HTTP {
 		}
 	}
 	
-	public static class HTTPRequest {
+	public static class HTTPRequest extends HTTPTransfer {
 		private HTTPRequestHeader header;
 		private String body;
 		
@@ -115,6 +127,116 @@ public class HTTP {
 		public String toString() {
 			return header.asText() + body;
 		}
+		
+		public void write(OutputStream output) {
+			PrintWriter writer = new PrintWriter(output);
+			writer.print(toString());
+			writer.flush();
+		}
+	}
+	
+	public static class HTTPResponseHeader {
+		
+		private int code;
+		private String literal;
+		private int contentLen;
+		private String contentType;
+		
+		private HTTPResponseHeader() {
+			code = 200;
+			literal = "OK";
+			contentLen = 0;
+			contentType = "text/html";
+		}
+		
+		public HTTPResponseHeader setCode(int code, String literal) {
+			this.code = code;
+			this.literal = literal;
+			return this;
+		}
+		
+		public HTTPResponseHeader setContentLength(int len) {
+			this.contentLen = len;
+			return this;
+		}
+		
+		public String asText() {
+			return toString();
+		}
+		
+		public int getCode() {
+			return code;
+		}
+
+		public String getLiteral() {
+			return literal;
+		}
+
+		public int getContentLen() {
+			return contentLen;
+		}
+
+		@Override
+		public String toString() {			
+			return "HTTP/1.1 " + code + " " + literal + "\r\n"
+			+ "Content-Type: " + contentType + "\r\n"
+			+ (contentLen > 0 ? "Content-Length: " + contentLen : "")
+			+ "r\n\r\n";
+		}
+	}
+	
+	public static class HTTPResponse extends HTTPTransfer {
+		private HTTPResponseHeader header;
+		private Object content;
+		
+		private HTTPResponse() {
+			header = new HTTPResponseHeader();
+			content = "";
+		}
+		
+		public HTTPResponseHeader getHeader() {
+			return header;
+		}
+		
+		public Object getContent() {
+			return content;
+		}
+		
+		public HTTPResponse setHeader(HTTPResponseHeader header) {
+			this.header = header;
+			return this;
+		}
+		
+		public HTTPResponse setContent(String message) {
+			if (message == null)
+				message = "";
+			this.content = message;
+			this.header.setContentLength(message.length());
+			return this;
+		}
+		
+		public HTTPResponse setContent(byte[] bytes) {
+			if (bytes == null)
+				bytes = new byte[0];
+			this.content = bytes;
+			this.header.setContentLength(bytes.length);
+			return this;
+		}
+		
+		public void write(OutputStream stream) {
+			PrintWriter printer = new PrintWriter(stream);
+			printer.print(header.asText());
+			printer.flush();
+			
+			if (content instanceof byte[]) {
+				try {
+					stream.write((byte[]) content);
+				} catch (IOException e) { }
+			} else {
+				printer.print(content);
+				printer.flush();
+			}
+		}
 	}
 
 	public static final int HEADER_LEN_MAX = 5000;
@@ -138,14 +260,22 @@ public class HTTP {
 		return req;
 	}
 	
-	public static String generateResponseHeader() {
-		return generateResponseHeader(200, "OK");
+	public static HTTPResponse generateBlankResponse() {
+		return new HTTPResponse(); // Defaults are good enough
 	}
 	
-	public static String generateResponseHeader(int code, String desc) {
-			return "HTTP/1.1 " + code + " " + desc + "\r\n"
-					+ "Content-Type: text/html\r\n"
-					+ "r\n\r\n";
+	public static HTTPResponse generateResponse(String content) {
+		return generateResponse(200, "OK", content);
+	}
+	
+	// Supports byte arrays and strings. everything else is .toString()ed
+	public static HTTPResponse generateResponse(int code, String desc, String content) {
+		HTTPResponse response = new HTTPResponse();
+		
+		response.getHeader().setCode(code, desc);
+		response.setContent(content);
+		
+		return response;
 	}
 	
 	public static String trimHTTPHeader(String raw) {
@@ -197,22 +327,28 @@ public class HTTP {
 		return request;
 	}
 	
-	public static boolean sendHTTP(Socket connection, String message) {
+	public static boolean sendHTTP(Socket connection, HTTPTransfer request) {
+		return sendHTTP(connection, request, false);
+	}
+	
+	public static boolean sendHTTP(Socket connection, HTTPTransfer data, boolean close) {
 		if (connection == null || !connection.isConnected()
 				|| connection.isClosed())
 			return false;
 		
 		try {
-			PrintWriter writer = new PrintWriter(connection.getOutputStream());
-			writer.print(generateResponseHeader());
-			writer.print(message);
-			writer.close();
+			data.write(connection.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("Failed to deliver page to connection: "
 					+ connection.getInetAddress());
 			return false;
 		}
+		
+		if (close)
+			try {
+				connection.close();
+			} catch (IOException e) { }
 		
 		return true;
 	}
@@ -315,5 +451,29 @@ public class HTTP {
 			return raw;
 		
 		return raw.substring(0, raw.indexOf("&"));
+	}
+	
+	public static HTTPResponse generateImageResponse(ImageIcon image) {
+		HTTPResponse response = new HTTPResponse();
+		
+		BufferedImage raster = new BufferedImage(image.getIconWidth(),
+				image.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+		Graphics g = raster.createGraphics();
+		image.paintIcon(null, g, 0, 0);
+		g.dispose();
+		
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		
+		try {
+			ImageIO.write(raster, "png", output);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		response.setContent(output.toByteArray());
+		response.getHeader().contentType = "image/png";
+		
+		return response;
 	}
 }

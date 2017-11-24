@@ -36,7 +36,7 @@ public class WebUI extends Comm {
 			}
 		}
 		
-		return HTTP.sendHTTP(connection, HTTP.formatHTML(root));
+		return HTTP.sendHTTP(connection, HTTP.generateResponse(HTTP.formatHTML(root)), true);
 	}
 	
 	public void registerHook(String URIKey, WebHook hook) {

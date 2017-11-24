@@ -174,7 +174,12 @@ public class Form extends HTMLElement {
 	@Override
 	public String getStyleText() {
 		String ret =  ".form_label {\r\nwidth: 100px;\r\nfont-weight: bold;\r\n}\r\n"
-				+ ".form_error {margin-bottom: 15px;\r\ncolor: red;\r\nfont-weight: bold;\r\n}\r\n";
+				+ ".form_error {margin-bottom: 15px;\r\ncolor: red;\r\nfont-weight: bold;\r\n}\r\n"
+				+ ".sync_inactive {}\r\n"
+				+ "@keyframes frames_sync_active1 {0%{width: 80%; height: auto;} 50%{transform:rotateY(180deg); width: 100%;}}\r\n"
+				+ "@keyframes frames_sync_active2 {0%{width: 80%; height: auto;} 50%{transform:rotateY(180deg); width: 100%;}}\r\n"
+				+ ".sync_active {\r\nanimation: frames_sync_active1 2s linear;\r\n}\r\n"
+				+ ".sync_active2 {\r\nanimation: frames_sync_active2 2s linear;\r\n}\r\n";
 		
 		// Form doesn't have any
 		for (FormInput input : elements) {
@@ -195,7 +200,16 @@ public class Form extends HTMLElement {
 			ids += "'" + input.getID() + "' ";
 			
 		}
-		return "function _" + getID() + "_feedback() {\r\n"
+		return ""
+				+ "function connection_uptime() {\r\n"
+				+ "var elem = document.getElementById('sync_icon');\r\n"
+				+ "if (elem.className == 'sync_active') elem.className = 'sync_active2';\r\n"
+				+ "else elem.className = 'sync_active';\r\n"
+				+ "elem.src = 'images/sync_dead.png';\r\n}\r\n"
+				+ "function connection_downtime() {\r\n"
+				+ "var elem = document.getElementById('sync_icon');\r\n"
+				+ "elem.className = 'sync_inactive';\r\nelem.src = 'images/sync_dead.png';\r\n}\r\n"
+				+ "function _" + getID() + "_feedback() {\r\n"
 				+ "var content = '';\r\n"
 				+ "var ids = [" + ids + "];\r\n"
 				+ "var i;"
@@ -206,16 +220,20 @@ public class Form extends HTMLElement {
 				+ "var req;\r\n"
 				+ "if (window.XMLHttpRequest) {req = new XMLHttpRequest();}\r\n"
 				+ "else {req = new ActiveXObject('Microsoft.XMLHTTP');}\r\n"
+				+ "var timehandle = setTimeout(connection_downtime, 1000);\r\n"
 				+ "req.open('POST', 'hook_" + getID() + "', true);\r\n"
 				+ "req.setRequestHeader('Content-Type', 'text/plain');\r\n"
-				+ "req.send(content);\r\n"
 				+ "req.onreadystatechange = function() {\r\n"
+				+ "clearTimeout(timehandle);\r\n"
 				+ "if (this.readyState == 4 && this.status == 200) {\r\n"
 				+ "setTimeout(_" + getID() + "_feedback, "
 				+ refreshInterval * 1000 + ");\r\n"
+				+ "connection_uptime();\r\n"
 				+ "}\r\n"
 				+ "};\r\n"
-				+ "}\r\nsetTimeout(_" + getID() + "_feedback, "
+				+ "req.send(content);\r\n"
+				+ "}\r\n"
+				+ "setTimeout(_" + getID() + "_feedback, "
 				+ refreshInterval * 1000 + ");\r\n";
 	}
 	
