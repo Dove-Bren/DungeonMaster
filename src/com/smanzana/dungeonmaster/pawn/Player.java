@@ -17,8 +17,10 @@ import com.smanzana.dungeonmaster.session.configuration.MechanicsKey;
 import com.smanzana.dungeonmaster.session.configuration.RollTableConfig;
 import com.smanzana.dungeonmaster.session.datums.data.DataNode;
 import com.smanzana.dungeonmaster.spell.Spell;
+import com.smanzana.dungeonmaster.ui.common.PlayerView;
 import com.smanzana.dungeonmaster.utils.Dice;
 import com.smanzana.dungeonmaster.utils.ValueCapsule;
+import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 
 public class Player extends Entity {
 	
@@ -40,6 +42,27 @@ public class Player extends Entity {
 			effects = new LinkedList<>();
 			spellSlots = new HashMap<>();
 			spells = new LinkedList<>();
+		}
+		
+		public PlayerOverlay(PlayerView view) {
+			this(view.getName(),
+					view.getRace(),
+					view.getBackground(),
+					new LinkedList<Effect>(),
+					view.isZombie(),
+					view.getXp(),
+					view.getMaxxp(),
+					view.getLevel(),
+					view.getSpellSlots(),
+					new LinkedList<>(),
+					new PlayerClass(
+							DungeonMaster.getActiveSession().lookupClass(view.getClassName())));
+			
+			// Spells need to be fixed up
+			for (String spellname : view.getSpells()) {
+				this.addSpell(DungeonMaster.getActiveSession().lookupSpell(spellname)
+						.getSpell());
+			}
 		}
 
 		public PlayerOverlay(String name, String race, String background, List<Effect> effects, boolean zombie, int xp,
@@ -128,11 +151,18 @@ public class Player extends Entity {
 	
 	public static class SpellSlot {
 		
+		@DataLoaderData
 		private int total;
+		@DataLoaderData
 		private int remaining;
 		
 		public SpellSlot(int total) {
-			this.remaining = this.total = total;
+			this(total, total);
+		}
+		
+		public SpellSlot(int total, int remaining) {
+			this.total = total;
+			this.remaining = Math.min(remaining, total);
 		}
 		
 		public int getTotal() {
@@ -208,6 +238,16 @@ public class Player extends Entity {
 			return 0;
 		
 		return spellSlots.get(slotLevel).getRemaining();
+	}
+	
+	public int getMaxSlotLevel() {
+		int max = 0;
+		for (Integer level : spellSlots.keySet()) {
+			if (max < level)
+				max = level;
+		}
+		
+		return max;
 	}
 	
 	public void recoverSpellSlots() {

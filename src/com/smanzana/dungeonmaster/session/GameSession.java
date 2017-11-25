@@ -18,6 +18,7 @@ import com.smanzana.dungeonmaster.pawn.NPC;
 import com.smanzana.dungeonmaster.pawn.Pawn;
 import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
+import com.smanzana.dungeonmaster.session.datums.SpellDatumData;
 import com.smanzana.dungeonmaster.setting.Setting;
 import com.smanzana.dungeonmaster.utils.Notable;
 
@@ -616,6 +617,10 @@ public class GameSession extends SessionBase implements Notable {
 			this.requestQueue.remove(0);
 			return pop;
 		}
+	}
+
+	public List<SpellDatumData> getAllSpells() {
+		return this.spellDatum.getData();
 	}
 	
 }

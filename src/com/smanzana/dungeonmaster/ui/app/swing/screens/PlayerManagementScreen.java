@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.Border;
 
+import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.pawn.PlayerClass;
 import com.smanzana.dungeonmaster.session.GameSession;
@@ -47,7 +48,6 @@ import com.smanzana.dungeonmaster.ui.web.html.form.TextInput;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPRequest;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPResponse;
-import com.smanzana.templateeditor.EmbeddedEditor;
 
 // Screen for managing creation and delegation of players
 public class PlayerManagementScreen extends JPanel implements ActionListener,
@@ -107,13 +107,14 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 			this.add(Box.createRigidArea(new Dimension(0, 50)));
 			
 			JButton button = new JButton("Edit Locally");
+			button.setAlignmentX(Box.CENTER_ALIGNMENT);
 			button.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					edit(status);
+					select(status);
 				}
 			});
-			label.add(button);
+			this.add(button);
 			this.add(Box.createRigidArea(new Dimension(0, 50)));
 			this.add(Box.createVerticalGlue());
 		}
@@ -140,6 +141,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	
 	private static class PlayerStatusRenderer extends JPanel implements ListCellRenderer<PlayerStatus> {
 		
+		private static final long serialVersionUID = 4181005398572157166L;
 		private static final Border selectedBorder = BorderFactory.createLineBorder(Color.GREEN, 2);
 		private static final Border regularBorder = BorderFactory.createLineBorder(Color.BLACK);
 		
@@ -248,7 +250,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	// Main editor panel
 	private JPanel editorPanel;
 	// Current editor, if any
-	private EmbeddedEditor<?> currentEditor;
+	private PlayerCreationScreen editScreen;
 	// Nice handy link to creation options
 	private PlayerCreationOptions options;
 	// Done button, which updates depending on status
@@ -277,6 +279,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	}
 		
 	public void init() {
+		DungeonMaster.setGameSession(session);
 		editorPanel = new JPanel(new BorderLayout());
 		AppUIColor.setColors(editorPanel, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
 		
@@ -364,12 +367,14 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	}
 	
 	private void closeEditor() {
-		if (currentEditor != null) {
-			currentEditor.commit();
+		if (editScreen != null) {
+			editScreen.commit();
+			editScreen.setVisible(false);
 			editorPanel.removeAll();
+			editorPanel.validate();
 		}
 		
-		currentEditor = null;
+		editScreen = null;
 	}
 	
 	private void showCreateScreen(PlayerStatus status) {
@@ -384,25 +389,19 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	}
 	
 	private void select(PlayerStatus selected) {
-		String display = path;
-		int fieldlen = nameField.getColumns();
-		if (path.length() > fieldlen) {
-			int pos = path.length() - (fieldlen - 3);
-			display = "..." + path.substring(pos);
-			
-			System.out.println("path: [" + path + "]");
-			System.out.println("pos: " + pos);
-			System.out.println("display: " + display);
-		}
-		
-		nameField.setText(display);
-		sessionPath = path;
-		
-		updateSubmitButton();
+		edit(selected, selected.isTaken());
+		updateDoneButton();
 	}
 	
-	private void edit(PlayerStatus status) {
+	private void edit(PlayerStatus status, boolean locked) {
+		closeEditor();
 		
+		editScreen = new PlayerCreationScreen(ui, null, status.player);
+		editScreen.init();
+		editorPanel.removeAll();
+		editorPanel.add(editScreen, BorderLayout.CENTER);
+		editScreen.setVisible(true);
+		editorPanel.validate();
 	}
 	
 	private void clientEdit(Comm newComm, PlayerStatus status) {

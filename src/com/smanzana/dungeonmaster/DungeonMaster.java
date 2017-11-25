@@ -19,6 +19,7 @@ public class DungeonMaster {
 	
 	private static GameSession activeSession = null;
 	private static Thread UIThread = null;
+	private static Boolean sessionRunning = false; // Run session each frame
 	private static Boolean receivedShutdown = false; // Shut down the whole program
 	private static Boolean receivedClose = false; // Shut down running session & UI
 	private static Boolean sessionLock = false; // locked for access; true when session active
@@ -53,6 +54,11 @@ public class DungeonMaster {
 				}
 			}
 			
+			synchronized(sessionRunning) {
+				if (!sessionRunning)
+					continue;
+			}
+			
 			GameSession next = null;
 			synchronized(sessionLock) {
 				if (activeSession != null) {
@@ -77,6 +83,16 @@ public class DungeonMaster {
 		return activeSession;
 	}
 	
+	/**
+	 * This method is exclusively for non-running game sessions that
+	 * are required for various data types. Do not call this.
+	 * @param session
+	 */
+	public static void setGameSession(GameSession session) {
+		System.out.println("Manually setting game session... Dangerous!");
+		activeSession = session;
+	}
+	
 	public static void runSession(GameSession session) {
 		synchronized(sessionLock) {
 			if (sessionLock || activeSession != null) {
@@ -84,8 +100,31 @@ public class DungeonMaster {
 				return;
 			}
 			activeSession = session;
+			sessionRunning = true;
 		}
 		
+	}
+	
+	public static void pauseSession() {
+		synchronized (sessionLock) {
+			if (activeSession == null) {
+				System.out.println("No session to pause");
+				return;
+			}
+			
+			sessionRunning = false;
+		}
+	}
+	
+	public static void resumeSession() {
+		synchronized (sessionLock) {
+			if (activeSession == null) {
+				System.out.println("No session to resume");
+				return;
+			}
+			
+			sessionRunning = true;
+		}
 	}
 	
 	private static void runSessionInternal(GameSession session) {
