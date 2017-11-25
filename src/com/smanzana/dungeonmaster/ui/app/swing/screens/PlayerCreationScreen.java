@@ -45,7 +45,7 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 	// If not top-level, the screen that owns us (for updates)
 	private PlayerManagementScreen parentScreen;
 	// When embedded, basic info can be locked as a client is editting it
-	private boolean locked;
+	private Boolean locked;
 	// Actual link to player to edit. May be locked (@locked)
 	private PlayerView player;
 	// Link to the inventory to edit
@@ -68,7 +68,7 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 		this.player = new PlayerView(player);
 		this.inventory = new InventoryData(player.getInventory());
 		this.session = session;
-		locked = false;
+		locked = null;
 		if (session != null)
 			DungeonMaster.setGameSession(session);
 		this.parentScreen = parent;
@@ -96,12 +96,12 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 		topPanel = new JPanel();
 		AppUIColor.setColors(topPanel, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.PAGE_AXIS));
-		topPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+		topPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 		lockLabel = new JLabel("Unlocked");
 		lockLabel.setHorizontalAlignment(JLabel.RIGHT);
-		lockLabel.setAlignmentX(Box.RIGHT_ALIGNMENT);
+		lockLabel.setAlignmentX(Box.CENTER_ALIGNMENT);
 		AppUIColor.setColors(lockLabel, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
-		castSize(lockLabel);
+		//castSize(lockLabel);
 		topPanel.add(lockLabel);
 		topPanel.add(Box.createRigidArea(new Dimension(0, 30)));
 		
@@ -134,9 +134,12 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 		backgroundField = new JTextArea(player.getBackground(), 5, 50);
 		AppUIColor.setColors(backgroundField, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
 		backgroundField.setLineWrap(true);
+		backgroundField.setWrapStyleWord(true);
 		castSize(backgroundField);
 		backgroundField.setAlignmentX(Box.CENTER_ALIGNMENT);
-		topPanel.add(backgroundField);
+		JScrollPane secret = new JScrollPane(backgroundField);
+		castSize(secret);
+		topPanel.add(secret);
 		label = new JLabel("Background");
 		AppUIColor.setColors(label, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_NESTED_BACKGROUND);
 		label.setAlignmentX(Box.CENTER_ALIGNMENT);
@@ -223,19 +226,23 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 	}
 	
 	public void updateLock(boolean locked) {
-		if (locked == this.locked)
+		if (this.locked != null && locked == this.locked)
 			return;
 		
 		this.locked = locked;
+		String key = "";
+		if (parentScreen != null) {
+			key = " - " + parentScreen.getCurrentEditKey();
+		}
 		if (locked) {
 			// Lock fields
 			commitFields();
-			lockLabel.setText("Locked");
+			lockLabel.setText("Locked" + key);
 			lockLabel.setForeground(new Color(50, 0, 10));
 		} else {
 			// Becoming unlocked
 			refreshFields();
-			lockLabel.setText("Unlocked");
+			lockLabel.setText("Unlocked" + key);
 			lockLabel.setForeground(
 					AppUIColor.peek(AppUIColor.Key.BASE_FOREGROUND));
 		}
@@ -246,23 +253,31 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 	}
 	
 	private void commitFields() {
-		player.setName(nameField.getText());
-		player.setRace(raceField.getText());
-		player.setBackground(backgroundField.getText());
-		
-		String name = (String) classField.getSelectedItem();
-		player.setClassName(name);
-		
-		player.setClassDesc(
-				DungeonMaster.getActiveSession().lookupClass(name).getDescription());
+		if (locked == null || !locked) {
+			player.setName(nameField.getText());
+			player.setRace(raceField.getText());
+			player.setBackground(backgroundField.getText());
+			
+			String name = (String) classField.getSelectedItem();
+			player.setClassName(name);
+			
+			player.setClassDesc(
+					DungeonMaster.getActiveSession().lookupClass(name).getDescription());
+		}
 	}
 	
-	// Draws info from playerview into our managed fields
-	private void refreshFields() {
-		nameField.setText(player.getName());
-		raceField.setText(player.getRace());
-		backgroundField.setText(player.getBackground());
-		classField.setSelectedItem(player.getClassName());
+	/**
+	 * Draws info from playerview into our managed fields.
+	 * Does not work when not locked
+	 */
+	public void refreshFields() {
+		if (locked) {
+			nameField.setText(player.getName());
+			raceField.setText(player.getRace());
+			backgroundField.setText(player.getBackground());
+			classField.setSelectedItem(player.getClassName());
+			topPanel.repaint();
+		}
 	}
 	
 	public PlayerView getPlayer() {

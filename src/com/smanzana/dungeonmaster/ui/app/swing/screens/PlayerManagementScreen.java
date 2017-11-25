@@ -31,7 +31,6 @@ import javax.swing.ListCellRenderer;
 import javax.swing.border.Border;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
-import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.pawn.Player;
 import com.smanzana.dungeonmaster.pawn.Player.PlayerOverlay;
 import com.smanzana.dungeonmaster.pawn.PlayerClass;
@@ -42,6 +41,7 @@ import com.smanzana.dungeonmaster.ui.app.AppConnectionServer;
 import com.smanzana.dungeonmaster.ui.app.AppConnectionServer.AppConnectionHook;
 import com.smanzana.dungeonmaster.ui.app.AppUI;
 import com.smanzana.dungeonmaster.ui.app.AppUIColor;
+import com.smanzana.dungeonmaster.ui.common.PlayerView;
 import com.smanzana.dungeonmaster.ui.web.WebUI;
 import com.smanzana.dungeonmaster.ui.web.html.form.Form;
 import com.smanzana.dungeonmaster.ui.web.html.form.Form.FormInterface;
@@ -400,27 +400,29 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	
 	private void edit(PlayerStatus status, boolean locked) {
 		closeEditor();
-		
+
+		currentEdittingStatus = status;
 		editScreen = new PlayerCreationScreen(null, null, this, status.player);
 		editScreen.init();
 		editorPanel.removeAll();
 		editorPanel.add(editScreen, BorderLayout.CENTER);
+		editScreen.updateLock(locked);
 		editScreen.setVisible(true);
 		editorPanel.validate();
-		currentEdittingStatus = status;
 	}
 	
 	private void clientEdit(Comm newComm, PlayerStatus status) {
 		System.out.println("Client editting!");
 		Form form = new Form("/", "GET");
-		form.addInput(new TextInput("name", "Name")
+		form.addInput(new TextInput("name", status.getName())
 				.noNumbers().min(2).max(20).cols(20));
-		form.addInput(new TextInput("race", "Race")
+		form.addInput(new TextInput("race", status.getRace())
 				.noNumbers().min(2).max(10).cols(20));
-		form.addInput(new TextInput("background", "Background")
+		form.addInput(new TextInput("background", status.player.getBackground())
 				.noNumbers().min(20).max(1000)
 				.rows(5).cols(100));
-		form.addInput(new SwitchboxInput("class", new ArrayList<String>(options.classes.keySet())));
+		form.addInput(new SwitchboxInput("class", new ArrayList<String>(options.classes.keySet()),
+				status.getClassName()));
 		form.setDisplayName("Character Creation");
 		form.addFeedback(5, new FormInterface() {
 			@Override
@@ -444,11 +446,25 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 					status.player.setPlayerClass(new PlayerClass(session.lookupClass(val)));
 				
 				playerList.repaint();
+				if (currentEdittingStatus != null &&
+						currentEdittingStatus == status) {
+					PlayerView view = editScreen.getPlayer();
+					view.setName(currentEdittingStatus.getName());
+					view.setRace(currentEdittingStatus.getRace());
+					view.setBackground(currentEdittingStatus.player.getBackground());
+					view.setClassName(currentEdittingStatus.getClassName());
+					editScreen.refreshFields();
+				}
 			}
 		});
 		
-		if (((WebUI) newComm).sendHTML(form))
+		if (((WebUI) newComm).sendHTML(form)) {
 			comms.put(status, newComm);
+			if (currentEdittingStatus != null &&
+					currentEdittingStatus == status) {
+				editScreen.updateLock(true);
+			}
+		}
 		
 	}
 	
@@ -460,12 +476,25 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	public void updateCurrentStatus() {
 		// Update status as part of an update loop
 		editScreen.commit();
-		currentEdittingStatus.player.applyOverlay(new PlayerOverlay(
-				editScreen.getPlayer()));
+		PlayerOverlay overlay = new PlayerOverlay(editScreen.getPlayer());
+		if (currentEdittingStatus.isTaken()) {
+			// Overwrite creation screen's stuff with our stuff
+			overlay.name(currentEdittingStatus.getName())
+				.race(currentEdittingStatus.getRace())
+				.background(currentEdittingStatus.player.getBackground())
+				.setPlayerClass(currentEdittingStatus.player.getPlayerClass());
+		}
+		currentEdittingStatus.player.applyOverlay(overlay);
 		currentEdittingStatus.player.getInventory().replaceWith(
 				editScreen.getInventory().toInventory()
 				);
 		playerList.repaint();
+	}
+	
+	public int getCurrentEditKey() {
+		if (currentEdittingStatus == null)
+			return 0;
+		return currentEdittingStatus.getKey();
 	}
 
 	@Override

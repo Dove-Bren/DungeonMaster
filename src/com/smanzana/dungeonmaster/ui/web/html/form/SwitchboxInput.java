@@ -11,15 +11,21 @@ public class SwitchboxInput extends HTMLElement implements FormInput {
 
 	private List<String> elems;
 	private String name;
+	private String starting;
 
 	public SwitchboxInput(String name, List<String> options) {
-		this(UUID.randomUUID().toString(), name, options);
+		this(UUID.randomUUID().toString(), name, options, null);
 	}
 	
-	public SwitchboxInput(String ID, String name, List<String> options) {
+	public SwitchboxInput(String name, List<String> options, String starting) {
+		this(UUID.randomUUID().toString(), name, options, starting);
+	}
+	
+	public SwitchboxInput(String ID, String name, List<String> options, String starting) {
 		super(ID);
 		this.name = name;
 		this.elems = options;
+		this.starting = starting;
 	}
 	
 	@Override
@@ -27,7 +33,9 @@ public class SwitchboxInput extends HTMLElement implements FormInput {
 		String ret =  "<select name='" + name + "' id='" + getID() + "'>\r\n";
 		
 		for (String elem : elems) {
-			ret += "<option value='" + elem + "'>" + elem + "</option>\r\n";
+			ret += "<option value='" + elem + "'"
+					+ (elem.equals(starting) ? " selected" : "")
+					+ ">" + elem + "</option>\r\n";
 		}
 		
 		ret += "</select>\r\n";

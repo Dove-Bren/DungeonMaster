@@ -93,11 +93,11 @@ public class TextInput extends HTMLElement implements FormInput {
 		return (large ? "<textarea" : "<input type='text'")
 				+ " name='" + name + "'"
 				+ " id='" + getID() + "'"
-				+ (startString == null ? "" : " value=' "+ startString + "'")
+				+ (!large && startString == null ? "" : " value='"+ startString + "'")
 				+ (maxLen > 0 ? " maxlength='" + maxLen + "'" : "")
 				+ (rows > 0 ? " rows='" + rows + "'" : "")
 				+ (cols > 0 ? " cols='" + cols + "'" : "")
-				+ (large ? "></textarea>" : " />");
+				+ (large ? ">" + startString + "</textarea>" : " />");
 	}
 
 	@Override
