@@ -42,6 +42,8 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 	private AppUI ui;
 	// Link to active session for class data & stuff(TM)
 	private GameSession session;
+	// If not top-level, the screen that owns us (for updates)
+	private PlayerManagementScreen parentScreen;
 	// When embedded, basic info can be locked as a client is editting it
 	private boolean locked;
 	// Actual link to player to edit. May be locked (@locked)
@@ -59,7 +61,8 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 	private EmbeddedEditor<InventoryData> inventoryEditor;
 	private JPanel topPanel; // Houses non-editor fields that can be locked
 	
-	public PlayerCreationScreen(AppUI ui, GameSession session, Player player) {
+	public PlayerCreationScreen(AppUI ui, GameSession session,
+			PlayerManagementScreen parent, Player player) {
 		super(new BorderLayout());
 		this.ui = ui;
 		this.player = new PlayerView(player);
@@ -68,6 +71,7 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 		locked = false;
 		if (session != null)
 			DungeonMaster.setGameSession(session);
+		this.parentScreen = parent;
 	}
 		
 	public void init() {
@@ -127,8 +131,9 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 		topPanel.add(label);
 		topPanel.add(Box.createRigidArea(new Dimension(0, 25)));
 
-		backgroundField = new JTextArea(player.getBackground(), 50, 5);
+		backgroundField = new JTextArea(player.getBackground(), 5, 50);
 		AppUIColor.setColors(backgroundField, AppUIColor.Key.BASE_FOREGROUND, AppUIColor.Key.BASE_BACKGROUND);
+		backgroundField.setLineWrap(true);
 		castSize(backgroundField);
 		backgroundField.setAlignmentX(Box.CENTER_ALIGNMENT);
 		topPanel.add(backgroundField);
@@ -270,8 +275,11 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 
 	@Override
 	public void dirty() {
+		System.out.println("Committing");
 		commit();
 		commitFields();
+		if (parentScreen != null)
+			parentScreen.updateCurrentStatus();
 	}
 
 	@Override

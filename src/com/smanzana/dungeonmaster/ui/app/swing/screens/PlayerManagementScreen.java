@@ -31,7 +31,9 @@ import javax.swing.ListCellRenderer;
 import javax.swing.border.Border;
 
 import com.smanzana.dungeonmaster.DungeonMaster;
+import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.pawn.Player;
+import com.smanzana.dungeonmaster.pawn.Player.PlayerOverlay;
 import com.smanzana.dungeonmaster.pawn.PlayerClass;
 import com.smanzana.dungeonmaster.session.GameSession;
 import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
@@ -251,6 +253,8 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	private JPanel editorPanel;
 	// Current editor, if any
 	private PlayerCreationScreen editScreen;
+	// Current playerstatus being editted, if any
+	private PlayerStatus currentEdittingStatus;
 	// Nice handy link to creation options
 	private PlayerCreationOptions options;
 	// Done button, which updates depending on status
@@ -368,13 +372,14 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	
 	private void closeEditor() {
 		if (editScreen != null) {
-			editScreen.commit();
+			updateCurrentStatus();
 			editScreen.setVisible(false);
 			editorPanel.removeAll();
 			editorPanel.validate();
 		}
 		
 		editScreen = null;
+		currentEdittingStatus = null;
 	}
 	
 	private void showCreateScreen(PlayerStatus status) {
@@ -396,12 +401,13 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	private void edit(PlayerStatus status, boolean locked) {
 		closeEditor();
 		
-		editScreen = new PlayerCreationScreen(ui, null, status.player);
+		editScreen = new PlayerCreationScreen(null, null, this, status.player);
 		editScreen.init();
 		editorPanel.removeAll();
 		editorPanel.add(editScreen, BorderLayout.CENTER);
 		editScreen.setVisible(true);
 		editorPanel.validate();
+		currentEdittingStatus = status;
 	}
 	
 	private void clientEdit(Comm newComm, PlayerStatus status) {
@@ -449,6 +455,17 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	private void updateDoneButton() {
 		doneButton.setEnabled(true);
 		// TODO
+	}
+	
+	public void updateCurrentStatus() {
+		// Update status as part of an update loop
+		editScreen.commit();
+		currentEdittingStatus.player.applyOverlay(new PlayerOverlay(
+				editScreen.getPlayer()));
+		currentEdittingStatus.player.getInventory().replaceWith(
+				editScreen.getInventory().toInventory()
+				);
+		playerList.repaint();
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package com.smanzana.dungeonmaster.inventory.item;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.action.Action;
 import com.smanzana.dungeonmaster.action.ActionRegistry;
 import com.smanzana.dungeonmaster.pawn.Pawn;
@@ -86,8 +87,12 @@ public class Usable extends Item implements IRuntimeEnumerable<String> {
 
 	@Override
 	public Map<String, String> fetchValidValues(String key) {
-		Datum<ActionDatumData> datum = TemplateEditorScreen.instance()
-				.getCurrentTemplate().getActionDatum();
+		Datum<ActionDatumData> datum;
+		if (TemplateEditorScreen.instance() == null) {
+			datum = DungeonMaster.getActiveSession().getActionDatum();
+		} else {
+			datum = TemplateEditorScreen.instance().getCurrentTemplate().getActionDatum();
+		}
 		
 		Map<String, String> values = new TreeMap<>();
 		

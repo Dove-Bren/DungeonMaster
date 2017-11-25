@@ -66,16 +66,4 @@ public class SessionTemplate extends SessionBase {
 		
 		return list;
 	}
-	
-	public Datum<ActionDatumData> getActionDatum() {
-		return this.actionDatum;
-	}
-	
-	public Datum<ClassDatumData> getClassDatum() {
-		return this.classDatum;
-	}
-	
-	public Datum<ProfileDatumData> getProfileDatum() {
-		return this.profileDatum;
-	}
 }
