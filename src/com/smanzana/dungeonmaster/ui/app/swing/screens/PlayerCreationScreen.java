@@ -290,7 +290,6 @@ public class PlayerCreationScreen extends JPanel implements IEditorOwner,
 
 	@Override
 	public void dirty() {
-		System.out.println("Committing");
 		commit();
 		commitFields();
 		if (parentScreen != null)

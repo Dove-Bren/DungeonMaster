@@ -113,6 +113,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 			button.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
+					playerList.setSelectedValue(status, true);
 					select(status);
 				}
 			});
@@ -411,6 +412,10 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 		editorPanel.validate();
 	}
 	
+	private void clientCommit(Comm comm) {
+		
+	}
+	
 	private void clientEdit(Comm newComm, PlayerStatus status) {
 		System.out.println("Client editting!");
 		Form form = new Form("/", "GET");
@@ -426,7 +431,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 		form.setDisplayName("Character Creation");
 		form.addFeedback(5, new FormInterface() {
 			@Override
-			public void refreshData(Map<String, String> data) {
+			public void refreshData(Comm comm, Map<String, String> data) {
 				String val;
 				
 				val = data.get("name");
@@ -455,6 +460,12 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 					view.setClassName(currentEdittingStatus.getClassName());
 					editScreen.refreshFields();
 				}
+			}
+
+			@Override
+			public void commit(Comm fromComm) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		

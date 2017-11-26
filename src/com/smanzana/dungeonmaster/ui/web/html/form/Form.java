@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.smanzana.dungeonmaster.ui.Comm;
 import com.smanzana.dungeonmaster.ui.web.WebHook;
 import com.smanzana.dungeonmaster.ui.web.WebUI;
+import com.smanzana.dungeonmaster.ui.web.html.AJAX;
 import com.smanzana.dungeonmaster.ui.web.html.HTMLElement;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPRequest;
@@ -23,6 +25,7 @@ public class Form extends HTMLElement {
 			// Parse html body as a map
 			String body = request.getBody();
 			Map<String, String> data = new HashMap<>();
+			String action = null;
 			// Should be map between key = value
 			while (!body.trim().isEmpty()) {
 				int pos = body.indexOf("\r\n");
@@ -31,16 +34,26 @@ public class Form extends HTMLElement {
 					row = body;
 				else
 					row = body.substring(0, pos);
-
-				pos = row.indexOf("=");
-				if (pos == -1)
-					continue;
-				data.put(row.substring(0, pos).trim(), row.substring(pos+1).trim());
+				
+				if (action == null) {
+					action = row;
+				} else {
+					pos = row.indexOf("=");
+					if (pos == -1)
+						continue;
+					data.put(row.substring(0, pos).trim(), row.substring(pos+1).trim());
+				}
 				
 				body = body.substring(row.length() + 2);
 			}
 			
-			hook.refreshData(data);
+			// Regardless of sync or commit, refresh data
+			hook.refreshData(comm, data);
+			
+			// If commit, mark session as ended
+			if (action.equalsIgnoreCase("commit")) {
+				
+			}
 		}
 	}
 	
@@ -49,9 +62,18 @@ public class Form extends HTMLElement {
 		/**
 		 * When feedback is enabled, this function is called to
 		 * deliver the newest data to the registered interface.
+		 * @param comm
 		 * @param data
 		 */
-		public void refreshData(Map<String, String> data);
+		public void refreshData(Comm fromComm, Map<String, String> data);
+		
+		/**
+		 * When form submit button is pressed, this is called.
+		 * The form is closed out (disabled) after this call.
+		 * A refreshData call directly precedes this call.
+		 * @param fromComm
+		 */
+		public void commit(Comm fromComm);
 	}
 
 	private String displayName;
@@ -69,6 +91,13 @@ public class Form extends HTMLElement {
 		this("", "GET");
 	}
 	
+	/**
+	 * New form with action and method.
+	 * @param action The page to send submitted rsults to. If "", will never be forwarded.
+	 * 				 This works well with the FormInterface's commit for embedded
+	 * 				 forms
+	 * @param method
+	 */
 	public Form(String action, String method) {
 		this(UUID.randomUUID().toString(), action, method);
 	}
@@ -81,6 +110,9 @@ public class Form extends HTMLElement {
 		hook = null;
 		refreshInterval = 0;
 		errorID = clean(UUID.randomUUID().toString());
+		
+		if (action == null)
+			action = "";
 	}
 	
 	public void setDisplayName(String display) {
@@ -162,7 +194,14 @@ public class Form extends HTMLElement {
 		ret += "function _" + getID() + "_submit() {\r\n";
 		ret += "var error_elem = document.getElementById('" + errorID + "');\r\n" + inputHooks + "\r\n";
 		ret += "else error_elem.innerHTML = '';\r\n";
-		ret += "return false;\r\n}\r\n";
+		
+		if (action.isEmpty()) {
+			// Trigger commit hook with AJAX
+			ret += "\r\n";
+			ret += "return false;\r\n}\r\n";	
+		} else {
+			ret += "return true;\r\n}\r\n";
+		}
 		
 		if (refreshInterval > 0 && this.hook != null) {
 			ret += generateFeedback() + "\r\n";
@@ -210,31 +249,26 @@ public class Form extends HTMLElement {
 				+ "var elem = document.getElementById('sync_icon');\r\n"
 				+ "elem.className = 'sync_inactive';\r\nelem.src = 'images/sync_dead.png';\r\n}\r\n"
 				+ "function _" + getID() + "_feedback() {\r\n"
-				+ "var content = '';\r\n"
+				+ "var content = 'sync\\r\\n'\r\n;\r\n"
 				+ "var ids = [" + ids + "];\r\n"
 				+ "var i;"
 				+ "for (i = 0; i < ids.length; i++) {\r\n"
 				+ "  var elem = document.getElementById(ids[i]);\r\n"
 				+ "  content = content + elem.name + ' = ' + elem.value + '\\r\\n';\r\n"
 				+ "}\r\n"
-				+ "var req;\r\n"
-				+ "if (window.XMLHttpRequest) {req = new XMLHttpRequest();}\r\n"
-				+ "else {req = new ActiveXObject('Microsoft.XMLHTTP');}\r\n"
 				+ "var timehandle = setTimeout(connection_downtime, 1000);\r\n"
-				+ "req.open('POST', 'hook_" + getID() + "', true);\r\n"
-				+ "req.setRequestHeader('Content-Type', 'text/plain');\r\n"
-				+ "req.onreadystatechange = function() {\r\n"
-				+ "clearTimeout(timehandle);\r\n"
-				+ "if (this.readyState == 4 && this.status == 200) {\r\n"
-				+ "setTimeout(_" + getID() + "_feedback, "
-				+ refreshInterval * 1000 + ");\r\n"
-				+ "connection_uptime();\r\n"
-				+ "}\r\n"
-				+ "};\r\n"
-				+ "req.send(content);\r\n"
+				+ AJAX.generate("hook_" + getID() + "", true, true, "content", ("function() {\r\n"
+						+ "clearTimeout(timehandle);\r\n"
+						+ "if (this.readyState == 4 && this.status == 200) {\r\n"
+						+ "setTimeout(_" + getID() + "_feedback, "
+						+ refreshInterval * 1000 + ");\r\n"
+						+ "connection_uptime();\r\n"
+						+ "}\r\n"
+						+ "}"))
 				+ "}\r\n"
 				+ "setTimeout(_" + getID() + "_feedback, "
 				+ refreshInterval * 1000 + ");\r\n";
+				
 	}
 	
 	@Override
