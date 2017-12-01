@@ -251,7 +251,7 @@ public class LoadScreen extends JPanel implements ActionListener {
 			return;
 		}
 		
-		GameSession session = new GameSession(file);
+		GameSession session = new GameSession(file, false);
 		
 		//ui.goSessionScreen(session);
 		ui.goCharacterManagement(session);

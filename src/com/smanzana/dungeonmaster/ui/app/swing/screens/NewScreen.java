@@ -334,7 +334,7 @@ public class NewScreen extends JPanel implements ActionListener {
 			return;
 		}
 		
-		GameSession session = new GameSession(file);
+		GameSession session = new GameSession(file, true);
 		session.save(outfile);
 		
 		session.addNote("Created from template " + file.getName());

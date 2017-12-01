@@ -88,7 +88,8 @@ public class Usable extends Item implements IRuntimeEnumerable<String> {
 	@Override
 	public Map<String, String> fetchValidValues(String key) {
 		Datum<ActionDatumData> datum;
-		if (TemplateEditorScreen.instance() == null) {
+		if (TemplateEditorScreen.instance() == null
+				|| TemplateEditorScreen.instance().getCurrentTemplate() == null) {
 			datum = DungeonMaster.getActiveSession().getActionDatum();
 		} else {
 			datum = TemplateEditorScreen.instance().getCurrentTemplate().getActionDatum();

@@ -63,10 +63,17 @@ public class GameSession extends SessionBase implements Notable {
 	 */
 	private Map<Integer, Pawn> activePawns;
 	
-	private Boolean receivedShutdown;
-		
-	public GameSession(File root) {
-		super(root, PATH_CONFIG);
+	private Boolean receivedShutdown;		
+	
+	/**
+	 * Create and load a new game session from the given root.
+	 * If loading from a template, make sure to specify so that the
+	 * correct path information is used.
+	 * @param root
+	 * @param fromTemplate
+	 */
+	public GameSession(File root, boolean fromTemplate) {
+		super(root, fromTemplate ? "" : PATH_CONFIG);
 		load();
 		notes = new LinkedList<>();
 		party = new LinkedList<>();
@@ -75,6 +82,11 @@ public class GameSession extends SessionBase implements Notable {
 		playerSessionKeys = new HashMap<>();
 		activePawns = new HashMap<>();
 		receivedShutdown = false;
+		
+		if (fromTemplate) {
+			// Fix back up path since we're done loading
+			this.configDir = PATH_CONFIG;
+		}
 				
 		// Nothing special; Session does not begin until 'run' is called
 	}

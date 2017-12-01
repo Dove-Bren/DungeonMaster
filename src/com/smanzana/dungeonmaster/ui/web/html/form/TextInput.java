@@ -30,6 +30,9 @@ public class TextInput extends HTMLElement implements FormInput {
 		
 		maxLen = 0;
 		minLen = -1;
+		
+		if (this.startString == null)
+			this.startString = "";
 	}
 	
 	/**
