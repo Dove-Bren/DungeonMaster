@@ -29,7 +29,7 @@ public class SwitchboxInput extends HTMLElement implements FormInput {
 	}
 	
 	@Override
-	public String asHTML() {
+	protected String getHTMLString() {
 		String ret =  "<select name='" + name + "' id='" + getID() + "'>\r\n";
 		
 		for (String elem : elems) {

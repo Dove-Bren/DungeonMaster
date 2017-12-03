@@ -92,7 +92,7 @@ public class TextInput extends HTMLElement implements FormInput {
 	}
 	
 	@Override
-	public String asHTML() {
+	protected String getHTMLString() {
 		return (large ? "<textarea" : "<input type='text'")
 				+ " name='" + name + "'"
 				+ " id='" + getID() + "'"

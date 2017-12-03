@@ -10,7 +10,9 @@ import com.smanzana.dungeonmaster.ui.Comm;
 import com.smanzana.dungeonmaster.ui.web.WebHook;
 import com.smanzana.dungeonmaster.ui.web.WebUI;
 import com.smanzana.dungeonmaster.ui.web.html.AJAX;
+import com.smanzana.dungeonmaster.ui.web.html.HTMLButton;
 import com.smanzana.dungeonmaster.ui.web.html.HTMLElement;
+import com.smanzana.dungeonmaster.ui.web.html.HTMLText;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP;
 import com.smanzana.dungeonmaster.ui.web.utils.HTTP.HTTPRequest;
 
@@ -25,7 +27,6 @@ public class Form extends HTMLElement {
 			// Parse html body as a map
 			String body = request.getBody();
 			Map<String, String> data = new HashMap<>();
-			String action = null;
 			// Should be map between key = value
 			while (!body.trim().isEmpty()) {
 				int pos = body.indexOf("\r\n");
@@ -35,24 +36,32 @@ public class Form extends HTMLElement {
 				else
 					row = body.substring(0, pos);
 				
-				if (action == null) {
-					action = row;
-				} else {
-					pos = row.indexOf("=");
-					if (pos == -1)
-						continue;
-					data.put(row.substring(0, pos).trim(), row.substring(pos+1).trim());
-				}
+				pos = row.indexOf("=");
+				if (pos == -1)
+					continue;
+				data.put(row.substring(0, pos).trim(), row.substring(pos+1).trim());
 				
 				body = body.substring(row.length() + 2);
+			}
+			
+			if (!data.containsKey("action")) {
+				System.err.println("Invalid submission from form: no action!");
+				return;
 			}
 			
 			// Regardless of sync or commit, refresh data
 			hook.refreshData(comm, data);
 			
 			// If commit, mark session as ended
-			if (action.equalsIgnoreCase("commit")) {
+			if (data.get("action").equalsIgnoreCase("submit")) {
+				hook.commit(comm);
 				
+				HTMLText rep = new HTMLText("Your character has been submitted.");
+				HTMLButton butt = new HTMLButton("Return");
+				rep.addChild(butt);
+				butt.href("/");
+				
+				comm.sendHTML(rep);
 			}
 		}
 	}
@@ -137,7 +146,7 @@ public class Form extends HTMLElement {
 	}
 	
 	@Override
-	public String asHTML() {
+	protected String getHTMLString() {
 		String ret = "<center>\r\n";
 		
 		if (displayName != null) {
@@ -146,6 +155,8 @@ public class Form extends HTMLElement {
 		
 		ret += "<form id='" + getID() + "' action='" + action + "' method='"
 				+ method + "' onsubmit='return _" + getID()+"_submit();" + "'>\r\n";
+		
+		ret += "<input type='hidden' name='action' value='submit'>\r\n";
 		
 		for (FormInput input : elements) {
 			ret += input.asHTML() + "<br />\r\n";
@@ -181,8 +192,8 @@ public class Form extends HTMLElement {
 				first = false;
 			else
 				inputHooks += "else ";
-			inputHooks += "if (!" + hook + ") error_elem.innerHTML = 'Error on field: "
-					+ HTTP.pretty(input.getName()) + "';\r\n";
+			inputHooks += "if (!" + hook + ") { error_elem.innerHTML = 'Error on field: "
+					+ HTTP.pretty(input.getName()) + "'; return false;}\r\n";
 			
 			// Also add any script pieces it needs before the actual call:
 			ret += input.getScriptText() + "\r\n";
@@ -197,11 +208,11 @@ public class Form extends HTMLElement {
 		
 		if (action.isEmpty()) {
 			// Trigger commit hook with AJAX
+			ret += "var actform = document.getElementById('" + getID() + "');\r\n";
+			ret += "actform.action = '/hook_" + getID() + "'";
 			ret += "\r\n";
-			ret += "return false;\r\n}\r\n";	
-		} else {
-			ret += "return true;\r\n}\r\n";
 		}
+			ret += "return true;\r\n}\r\n";
 		
 		if (refreshInterval > 0 && this.hook != null) {
 			ret += generateFeedback() + "\r\n";
@@ -249,7 +260,7 @@ public class Form extends HTMLElement {
 				+ "var elem = document.getElementById('sync_icon');\r\n"
 				+ "elem.className = 'sync_inactive';\r\nelem.src = 'images/sync_dead.png';\r\n}\r\n"
 				+ "function _" + getID() + "_feedback() {\r\n"
-				+ "var content = 'sync\\r\\n'\r\n;\r\n"
+				+ "var content = 'action = sync\\r\\n'\r\n;\r\n"
 				+ "var ids = [" + ids + "];\r\n"
 				+ "var i;"
 				+ "for (i = 0; i < ids.length; i++) {\r\n"

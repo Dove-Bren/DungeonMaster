@@ -14,7 +14,7 @@ public class AJAX {
 				+ "else {req = new ActiveXObject('Microsoft.XMLHTTP');}\r\n"
 				+ "req.open('" + (post ? "POST" : "GET") + "', '" + url + "', " + (async ? "true" : "false") + ");\r\n"
 				+ (post ? "req.setRequestHeader('Content-Type', 'text/plain');\r\n" : "")
-				+ "req.onreadystatechange = " + onstatechange + ";\r\n"
+				+ (onstatechange != null ? "req.onreadystatechange = " + onstatechange + ";\r\n" : "")
 				+ "req.send(" + (payload != null ? payload : "") + ");\r\n";
 	}
 	

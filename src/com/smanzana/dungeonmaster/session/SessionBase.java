@@ -3,6 +3,7 @@ package com.smanzana.dungeonmaster.session;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import com.smanzana.dungeonmaster.action.Action;
@@ -132,6 +133,10 @@ public abstract class SessionBase {
 		}
 		
 		return null;
+	}
+	
+	public Collection<ItemDatumData> getAllItems() {
+		return itemDatum.getData();
 	}
 	
 	public File getRoot() {

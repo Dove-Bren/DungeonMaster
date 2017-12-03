@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.net.URLDecoder;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -439,18 +441,44 @@ public class HTTP {
 		}
 		
 		HTTPRequest request = new HTTPRequest().setHeader(header);
-		raw = trimHTTPHeader(raw);
-		request.setBody(raw.substring(0, header.contentLen));
+		if (header.useGet) {
+			request.setBody(formatGet(tokens[1]));
+		} else {
+			raw = trimHTTPHeader(raw);
+			request.setBody(raw.substring(0, header.contentLen));
+		}
 		
 		return request;
 	}
 	
 	// Removes any get parameters
 	private static String breakURI(String raw) {
-		if (raw.indexOf("&") == -1)
+		if (raw.indexOf("?") == -1)
 			return raw;
 		
-		return raw.substring(0, raw.indexOf("&"));
+		return raw.substring(0, raw.indexOf("?"));
+	}
+	
+	// returns GET parameters as \r\n delim'ed list post
+	private static String formatGet(String rawURI) {
+		if (rawURI == null || rawURI.trim().isEmpty())
+			return "";
+		
+		int pos = rawURI.indexOf('?');
+		if (pos == -1)
+			return "";
+		
+		String params = null;
+		try {
+			params = URLDecoder.decode(rawURI.substring(pos + 1), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		params = params.replace("&", "\r\n");
+		if (!params.endsWith("\r\n"))
+			params += "\r\n";
+		
+		return params;
 	}
 	
 	public static HTTPResponse generateImageResponse(ImageIcon image) {

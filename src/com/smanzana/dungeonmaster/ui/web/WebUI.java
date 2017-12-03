@@ -47,12 +47,13 @@ public class WebUI extends Comm {
 		hooks.clear();
 	}
 	
-	public boolean doHook(String URIKey, HTTPRequest request) {
+	public boolean doHook(String URIKey, HTTPRequest request, Socket newConnection) {
 		if (hooks.isEmpty())
 			return false;
 		
 		for (String key : hooks.keySet())
 			if (key.equalsIgnoreCase(URIKey)) {
+				this.connection = newConnection;
 				hooks.get(key).fire(this, request);
 				return true;
 			}

@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -418,7 +419,7 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	
 	private void clientEdit(Comm newComm, PlayerStatus status) {
 		System.out.println("Client editting!");
-		Form form = new Form("/", "GET");
+		Form form = new Form("", "GET");
 		form.addInput(new TextInput("name", status.getName())
 				.noNumbers().min(2).max(20).cols(20));
 		form.addInput(new TextInput("race", status.getRace())
@@ -464,8 +465,14 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 
 			@Override
 			public void commit(Comm fromComm) {
-				// TODO Auto-generated method stub
-				
+				// lookup player status from comm
+				for (PlayerStatus status : comms.keySet()) {
+					Comm comm = comms.get(status);
+					if (comm == fromComm) {
+						clientCommit(comm, status);
+						return;
+					}
+				}
 			}
 		});
 		
@@ -477,6 +484,14 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 			}
 		}
 		
+	}
+	
+	private void clientCommit(Comm comm, PlayerStatus status) {
+		status.setTaken(false);
+		if (currentEdittingStatus == status) {
+			editScreen.updateLock(false);
+			updateCurrentStatus();
+		}
 	}
 	
 	private void updateDoneButton() {
@@ -560,10 +575,10 @@ public class PlayerManagementScreen extends JPanel implements ActionListener,
 	}
 
 	@Override
-	public HTTPResponse doHook(String URI, HTTPRequest request) {
+	public HTTPResponse doHook(String URI, HTTPRequest request, Socket connection) {
 		for (Comm comm : comms.values()) {
 			if (comm instanceof WebUI) {
-				if (((WebUI) comm).doHook(URI, request))
+				if (((WebUI) comm).doHook(URI, request, connection))
 					return HTTP.generateBlankResponse();
 			}
 		}

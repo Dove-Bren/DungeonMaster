@@ -65,7 +65,7 @@ public class AppConnectionServer implements Runnable {
 		 * @return Response to send to client. If
 		 * null, generates a rejection response and sends it.
 		 */
-		public HTTPResponse doHook(String URI, HTTPRequest request);
+		public HTTPResponse doHook(String URI, HTTPRequest request, Socket connection);
 	}
 	
 	public static final int DEFAULT_PORT_LISTEN = 8124;
@@ -276,7 +276,7 @@ public class AppConnectionServer implements Runnable {
 		} else {
 			// It's something for our hooks?
 			uri = stripPath(uri);
-			HTTPResponse response = hook.doHook(uri, request);
+			HTTPResponse response = hook.doHook(uri, request, connection);
 			
 			if (response != null) {
 				try { 
@@ -286,6 +286,8 @@ public class AppConnectionServer implements Runnable {
 				return;
 			}
 		}
+		
+		System.out.println("Unhandled request to URI " + uri);
 		
 		HTTPResponse bad = HTTP.generateResponse(404, "ERROR", "");
 		try { 
@@ -301,6 +303,9 @@ public class AppConnectionServer implements Runnable {
 	private String stripPath(String raw) {
 		if (raw.charAt(0) == '/')
 			raw = raw.substring(1);
+		if (raw.indexOf('?') != -1) {
+			raw = raw.substring(0, raw.indexOf('?'));
+		}
 		return raw;
 	}
 	

@@ -1,25 +1,34 @@
 package com.smanzana.dungeonmaster.session.datums.data;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import com.smanzana.dungeonmaster.DungeonMaster;
 import com.smanzana.dungeonmaster.inventory.EquipmentSet;
 import com.smanzana.dungeonmaster.inventory.Inventory;
 import com.smanzana.dungeonmaster.inventory.item.Equipment.Slot;
 import com.smanzana.dungeonmaster.inventory.item.Item;
 import com.smanzana.dungeonmaster.inventory.item.Junk;
+import com.smanzana.dungeonmaster.session.datums.Datum;
+import com.smanzana.dungeonmaster.session.datums.ItemDatumData;
+import com.smanzana.dungeonmaster.ui.app.swing.screens.TemplateEditorScreen;
+import com.smanzana.templateeditor.api.IRuntimeEnumerable;
 import com.smanzana.templateeditor.api.annotations.DataLoaderData;
 import com.smanzana.templateeditor.api.annotations.DataLoaderList;
+import com.smanzana.templateeditor.api.annotations.DataLoaderRuntimeEnum;
 
 /**
  * Convenience class. Holds all data needed to make an inventory
  * @author Skyler
  *
  */
-public class InventoryData {
+public class InventoryData implements IRuntimeEnumerable<Item> {
 
 	@DataLoaderData
 	private int gold;
+	@DataLoaderRuntimeEnum
 	@DataLoaderList(templateName="templateItem", factoryName="constructTemplateItem")
 	private List<Item> items;
 	@DataLoaderData
@@ -86,6 +95,25 @@ public class InventoryData {
 	
 	public Item constructTemplateItem() {
 		return new Junk();
+	}
+
+	@Override
+	public Map<String, Item> fetchValidValues(String key) {
+		Map<String, Item> map = new LinkedHashMap<>();
+		if (TemplateEditorScreen.instance() != null &&
+				TemplateEditorScreen.instance().getCurrentTemplate() != null) {
+			Datum<ItemDatumData> datum = TemplateEditorScreen.instance().getCurrentTemplate()
+					.getItemDatum();
+			for (ItemDatumData data : datum.getData()) {
+				map.put(data.getDisplayName(), data.getItem());
+			}
+		} else {
+			for (ItemDatumData data : DungeonMaster.getActiveSession().getAllItems()) {
+				map.put(data.getDisplayName(), data.getItem());
+			}
+		}
+		
+		return map;
 	}
 	
 }

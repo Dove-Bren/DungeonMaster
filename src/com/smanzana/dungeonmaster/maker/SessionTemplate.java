@@ -5,10 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.dungeonmaster.session.SessionBase;
-import com.smanzana.dungeonmaster.session.datums.ActionDatumData;
-import com.smanzana.dungeonmaster.session.datums.ClassDatumData;
 import com.smanzana.dungeonmaster.session.datums.Datum;
-import com.smanzana.dungeonmaster.session.datums.ProfileDatumData;
+import com.smanzana.dungeonmaster.session.datums.ItemDatumData;
 
 /**
  * Holds a set of configurations to spawn sessions with
@@ -65,5 +63,9 @@ public class SessionTemplate extends SessionBase {
 		list.add(this.spellDatum);
 		
 		return list;
+	}
+
+	public Datum<ItemDatumData> getItemDatum() {
+		return this.itemDatum;
 	}
 }
